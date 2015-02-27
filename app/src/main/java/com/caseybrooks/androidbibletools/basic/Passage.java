@@ -3,12 +3,24 @@ package com.caseybrooks.androidbibletools.basic;
 import com.caseybrooks.androidbibletools.data.Reference;
 import com.caseybrooks.androidbibletools.enumeration.Version;
 
+import org.w3c.dom.Element;
+
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 //A Passage is a group of Verse objects that are in a sequence (i.e. Galatians 2:19-21)
 //	A Passage is a basic type, and so its reference is non-modifiable. In addition,
@@ -27,14 +39,6 @@ public class Passage extends AbstractVerse {
 	//Data that makes up the Passage
 	private ArrayList<Verse> verses;
 	private String allText;
-
-	private static String markup_ref = "\\{/ref \"[^\"]+\"\\}";
-	private static String markup_num = "\\{/num \"\\d+\"\\}";
-	private static String markup_tag = "\\{/tag \"[^\"]+\"\\}";
-//	private static String markup_xref = "\\{/ref \"[^\"]+\"\\}";
-//	private static String markup_note = "\\{/ref \"[^\"]+\"\\}";
-//	private static String markup_red_begin = "\\{/ref \"[^\"]+\"\\}";
-//	private static String markup_red_end = "\\{/ref \"[^\"]+\"\\}";
 
 	private static Pattern hashtag = Pattern.compile("#((\\w+)|(\"[\\w ]+\"))");
 
@@ -144,6 +148,61 @@ public class Passage extends AbstractVerse {
         }
 	}
 
+
+//get the XML representation of this object
+//------------------------------------------------------------------------------
+	@Override
+	public Element toXML(org.w3c.dom.Document doc) {
+		org.w3c.dom.Element root = doc.createElement("passage");
+
+		root.setAttribute("reference", reference.toString());
+		root.setAttribute("version", version.getCode().toUpperCase());
+
+		if(verses.size() > 0) {
+			for(Verse verse : verses) {
+				Element child = verse.toXML(doc);
+				child.removeAttribute("version");
+				child.removeAttribute("reference");
+				child.setAttribute("reference", Integer.toString(verse.getReference().verse));
+
+				root.appendChild(child);
+			}
+		}
+		else {
+			root.appendChild(doc.createTextNode(allText));
+		}
+
+		return root;
+	}
+
+	@Override
+	public String toXMLString() {
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			org.w3c.dom.Document doc = builder.newDocument();
+
+			Element root = toXML(doc);
+			doc.appendChild(root);
+
+			StringWriter writer = new StringWriter();
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.transform(new DOMSource(doc), new StreamResult(writer));
+			return writer.toString();
+		}
+		catch(TransformerException ex) {
+			ex.printStackTrace();
+			return null;
+		}
+		catch(ParserConfigurationException ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
+
+
+
+//------------------------------------------------------------------------------
 	public Verse[] getVerses() {
 		Verse[] versesArray = new Verse[verses.size()];
 		verses.toArray(versesArray);

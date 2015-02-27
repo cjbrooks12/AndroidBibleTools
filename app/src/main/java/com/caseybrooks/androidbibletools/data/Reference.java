@@ -22,8 +22,8 @@ public class Reference implements Comparable<Reference> {
         this.book = book;
         this.chapter = chapter;
         if(verses.length == 1) {
-            this.verses = null;
-            verse = verses[0];
+			this.verses = new ArrayList<Integer>();
+			verse = verses[0];
         }
         else {
             verse = 0;
@@ -348,7 +348,10 @@ public class Reference implements Comparable<Reference> {
         refString += " " + chapter;
         refString += ":";
 
-        if(verses.size() == 1) {
+		if(verses.size() == 0) {
+			refString += verse;
+		}
+        else if(verses.size() == 1) {
             refString += verse;
         }
         else {
@@ -415,6 +418,7 @@ public class Reference implements Comparable<Reference> {
         else if(aBook > bBook) return 4;
         else if(aBook < bBook) return -4;
         else {
+			//TODO: get reference comparing for Verse objects (verses == null, verse is defined)
             //same book
             if(lhs.chapter - rhs.chapter == 1) {
                 if((lhs.verses.get(0) == 1) &&

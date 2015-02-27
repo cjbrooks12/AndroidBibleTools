@@ -168,6 +168,10 @@ public class Metadata {
         }
     }
 
+	/**Sort an AbstractVerse according to multiple criteria. In the event that
+	 * all metadata values in these comparators match, sort by canonical order
+	 *
+	 */
 	public static class MultiComparator implements java.util.Comparator<AbstractVerse> {
 		ArrayList<Comparator> comparisonCriteria;
 
@@ -181,7 +185,7 @@ public class Metadata {
 				int comparison = comparator.compare(lhs, rhs);
 				if (comparison != 0) return comparison;
 			}
-			return 0;
+			return lhs.getReference().compareTo(rhs.getReference());
 		}
 	}
 }

@@ -6,9 +6,20 @@ import com.caseybrooks.androidbibletools.enumeration.Book;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.w3c.dom.Element;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.ParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /** The simplest unit of data in this data structure. Each verse contains one
  *  and only one Bible verse, its corresponding Book, Chapter, and Verse Number,
@@ -115,6 +126,53 @@ public class Verse extends AbstractVerse {
         return text.trim();
     }
 
+//Turn this Verse into an XML object
+//------------------------------------------------------------------------------
+
+	/**The structure for a Verse object will be like the following
+	 *
+	 * <verse reference="John 1:5" version="KJV">
+	 *     The light shines in the darkness, and the darkness has not overcome<footnote>Or understood</footnote> it.
+	 * </verse>
+	 */
+
+	@Override
+	public Element toXML(org.w3c.dom.Document doc) {
+		org.w3c.dom.Element root = doc.createElement("verse");
+
+		root.setAttribute("reference", reference.toString());
+		root.setAttribute("version", version.getCode().toUpperCase());
+		root.appendChild(doc.createTextNode(verseText));
+
+		return root;
+	}
+
+	@Override
+	public String toXMLString() {
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			org.w3c.dom.Document doc = builder.newDocument();
+
+			Element root = toXML(doc);
+			doc.appendChild(root);
+
+			StringWriter writer = new StringWriter();
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.transform(new DOMSource(doc), new StreamResult(writer));
+			return writer.toString();
+		}
+		catch(TransformerException ex) {
+			ex.printStackTrace();
+			return null;
+		}
+		catch(ParserConfigurationException ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
+
+
 //Comparison methods for sorting
 //------------------------------------------------------------------------------
 
@@ -201,12 +259,16 @@ public class Verse extends AbstractVerse {
 
     @Override
 	public Verse retrieve() throws IOException {
+		if(listener != null) listener.onPreDownload();
 		Document doc = Jsoup.connect(getURL()).get();
 
 		Elements scripture = doc.select(".verse-" + reference.verse);
 		scripture.select("a").remove();
 		scripture.select("strong").remove();
 		verseText = scripture.text();
+
+		if(listener != null) listener.onPostDownload();
+
 
 		return this;
 	}

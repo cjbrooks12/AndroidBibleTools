@@ -3,8 +3,12 @@ package com.caseybrooks.androidbibletools.basic;
 import com.caseybrooks.androidbibletools.data.Formatter;
 import com.caseybrooks.androidbibletools.data.Metadata;
 import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.data.OnDownloadListener;
 import com.caseybrooks.androidbibletools.defaults.DefaultFormatter;
 import com.caseybrooks.androidbibletools.enumeration.Version;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -18,6 +22,7 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
     protected Formatter formatter;
     protected Metadata metadata;
 	protected TreeSet<Tag> tags;
+	protected OnDownloadListener listener;
 
 	public AbstractVerse(Reference reference) {
 		this.version = Version.KJV;
@@ -44,8 +49,10 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
     public void setFormatter(Formatter formatter) { this.formatter = formatter; }
     public Metadata getMetadata() { return metadata; }
     public void setMetadata(Metadata metadata) { this.metadata = metadata; }
+	public OnDownloadListener getOnDownloadListener() { return listener; }
+	public void setOnDownloadListener(OnDownloadListener listener) { this.listener = listener; }
 
-    public AbstractVerse removeAllTags() {
+	public AbstractVerse removeAllTags() {
         tags.clear();
 
         return this;
@@ -81,10 +88,11 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 
 //Abstract Methods
 //------------------------------------------------------------------------------
-//	public Reference getReference() { return reference; };
 	public abstract String getText();
     public abstract String getURL();
 	public abstract AbstractVerse retrieve() throws IOException;
+	public abstract String toXMLString();
+	public abstract Element toXML(Document doc);
 
 //Comparison methods
 //------------------------------------------------------------------------------

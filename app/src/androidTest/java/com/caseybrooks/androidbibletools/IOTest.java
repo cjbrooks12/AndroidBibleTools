@@ -1,14 +1,11 @@
 package com.caseybrooks.androidbibletools;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
-
 import com.caseybrooks.androidbibletools.basic.Passage;
 import com.caseybrooks.androidbibletools.enumeration.Version;
 
-public class IOTest extends ApplicationTestCase<Application> {
+import junit.framework.TestCase;
 
-	public IOTest() { super(Application.class); }
+public class IOTest extends TestCase {
 
 	public void testXMLCreation() throws Throwable {
 		final Passage passage = new Passage("John 1:1-5");

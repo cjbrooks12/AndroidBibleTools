@@ -8,6 +8,8 @@ public class Token {
 		SEMICOLON,
 		COMMA,
 		DASH,
+		SLASH,
+		BACKSLASH,
 		DOT,
 		WHITESPACE,
 	}

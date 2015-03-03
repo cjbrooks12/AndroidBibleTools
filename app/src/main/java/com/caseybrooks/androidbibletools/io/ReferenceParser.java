@@ -1,6 +1,5 @@
 package com.caseybrooks.androidbibletools.io;
 
-import com.caseybrooks.androidbibletools.basic.Passage;
 import com.caseybrooks.androidbibletools.data.Reference;
 import com.caseybrooks.androidbibletools.enumeration.Book;
 
@@ -63,10 +62,20 @@ public class ReferenceParser {
 	//Passage ::= book chapter ((punctuation) verseList)
 	public Reference getPassageReference(String reference) throws ParseException {
 		this.reference = reference;
-		ts = new TokenStream(reference);
+		return getPassageReference(new TokenStream(reference));
+	}
+
+	public Reference getPassageReference(TokenStream reference) throws ParseException {
+		ts = reference;
 
 		//Book will throw its own exception if it fails to parse
 		Book book = book();
+
+		if(book == null) {
+			throw new ParseException("Cannot parse Passage [" + reference + "]: could not match book name", 2);
+		}
+
+		punctuation();
 
 		int chapter = chapter();
 		if(chapter == -1) {
@@ -102,8 +111,21 @@ public class ReferenceParser {
 		}
 	}
 
-	public ArrayList<Passage> extractReferences(String reference) {
-		this.reference = reference;
+	public static Reference extractReferences(String reference)  {
+		TokenStream streamBase = new TokenStream(reference);
+		TokenStream stream = new TokenStream(reference);
+
+		while(stream.toString().length() > 0) {
+			try {
+				return new ReferenceParser().getPassageReference(stream);
+			}
+			catch(ParseException e) {
+				streamBase.get();
+				stream = new TokenStream(streamBase.toString());
+				continue;
+			}
+		}
+
 
 		return null;
 	}

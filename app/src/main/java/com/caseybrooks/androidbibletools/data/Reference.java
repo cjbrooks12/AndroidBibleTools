@@ -106,24 +106,10 @@ public class Reference implements Comparable<Reference> {
 //        return true;
 //    }
 //
-//    public static Reference extractReference(String reference) {
-//		TokenStream streamBase = new TokenStream(reference);
-//		TokenStream stream = new TokenStream(reference);
-//
-//        while(stream.toString().length() > 0) {
-//            try {
-//                Reference ref = new Reference(stream);
-//                return ref;
-//            }
-//            catch(ParseException e) {
-//                streamBase.get();
-//                stream = new TokenStream(streamBase.toString());
-//                continue;
-//            }
-//        }
-//
-//        return null;
-//    }
+    public static Reference extractReference(String reference) {
+		return ReferenceParser.extractReferences(reference);
+    }
+
 
     @Override
     public String toString() {

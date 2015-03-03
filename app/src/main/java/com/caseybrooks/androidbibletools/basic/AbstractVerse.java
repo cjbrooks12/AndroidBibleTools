@@ -34,7 +34,7 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 
     public AbstractVerse(String reference) throws ParseException {
         this.version = Version.KJV;
-        this.reference = new Reference(reference);
+        this.reference = Reference.parseReference(reference);
         this.formatter = new DefaultFormatter();
         this.metadata = new Metadata();
         this.tags = new TreeSet<>();

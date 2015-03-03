@@ -1,7 +1,9 @@
 package com.caseybrooks.androidbibletools.data;
 
 import com.caseybrooks.androidbibletools.enumeration.Book;
+import com.caseybrooks.androidbibletools.io.ReferenceParser;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -15,28 +17,31 @@ public class Reference implements Comparable<Reference> {
 //Parse the input string using recursive descent parsing
 //------------------------------------------------------------------------------
     public Reference(Book book, int chapter, int... verses) {
-        this.book = book;
-        this.chapter = chapter;
-        if(verses.length == 1) {
-			this.verses = new ArrayList<Integer>();
+		this.book = book;
+		this.chapter = chapter;
+		if(verses.length == 1) {
+			this.verses = new ArrayList<>();
+			this.verses.add(verses[0]);
 			verse = verses[0];
-        }
-        else {
-            verse = 0;
-            this.verses = new ArrayList<Integer>();
+		}
+		else {
+			verse = 0;
+			this.verses = new ArrayList<>();
 
-            for (int i = 0; i < verses.length; i++) {
-                this.verses.add(verses[i]);
-            }
-            Collections.sort(this.verses);
-        }
+			for(int i : verses) {
+				this.verses.add(i);
+			}
+
+			Collections.sort(this.verses);
+		}
     }
 
 	public Reference(Book book, int chapter, ArrayList<Integer> verses) {
 		this.book = book;
 		this.chapter = chapter;
 		if(verses.size() == 1) {
-			this.verses = new ArrayList<Integer>();
+			this.verses = new ArrayList<>();
+			this.verses.add(verses.get(0));
 			verse = verses.get(0);
 		}
 		else {
@@ -44,6 +49,12 @@ public class Reference implements Comparable<Reference> {
 			this.verses = verses;
 			Collections.sort(this.verses);
 		}
+	}
+
+	public static Reference parseReference(String reference) throws ParseException {
+		ReferenceParser parser = new ReferenceParser();
+
+		return parser.getPassageReference(reference);
 	}
 
 //    public Reference(String expression) throws ParseException {
@@ -220,8 +231,9 @@ public class Reference implements Comparable<Reference> {
         if(this.book != ref.book) return false;
         if(this.chapter != ref.chapter) return false;
         if(this.verses.size() != ref.verses.size()) return false;
+		if(this.verse != ref.verse) return false;
 
-        for(Integer i : this.verses) {
+		for(Integer i : this.verses) {
             if(!ref.verses.contains(i)) return false;
         }
         for(Integer i : ref.verses) {
@@ -230,6 +242,11 @@ public class Reference implements Comparable<Reference> {
 
         return true;
     }
+
+	public boolean equals(Object ref) {
+		if(ref instanceof Reference) return this.equals((Reference) ref);
+		else return false;
+	}
 
     public int hashCode() {
         int result = book.hashCode();

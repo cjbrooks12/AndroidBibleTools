@@ -1,5 +1,8 @@
 package com.caseybrooks.androidbibletools;
 
+import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.enumeration.Book;
+
 import junit.framework.TestCase;
 
 public class ReferenceTest extends TestCase {
@@ -9,65 +12,54 @@ public class ReferenceTest extends TestCase {
 	}
 
 
-//	public void testReferenceParser() throws Throwable {
-//		String[] references = new String[] {
-//				"John 3:16",
-//				"1 John 3:16",
-//				"Phili 4:11",
-//				"Eph 1:1-8",
-//				"Eph 1:1 through 8",
-//				"Eph 1:1 to 8",
-//				"Ecc 4:1, 4",
-//				"Ecc 4:1 and 4",
-//				"Gen 1:1-3"
-//		};
-//
-//		Book[] refBooks = new Book[] {
-//				Book.John,
-//				Book.FirstJohn,
-//				Book.Philippians,
-//				Book.Ephesians,
-//				Book.Ephesians,
-//				Book.Ephesians,
-//				Book.Ecclesiastes,
-//				Book.Ecclesiastes,
-//				Book.Genesis
-//		};
-//
-//		int[] refChapters = new int[] {
-//				3, 3, 4, 1, 1, 1, 4, 4, 1
-//		};
-//
-//		int[][] refVerses = new int[][] {
-//				{16},
-//				{16},
-//				{11},
-//				{1, 2, 3, 4, 5, 6, 7, 8},
-//				{1, 2, 3, 4, 5, 6, 7, 8},
-//				{1, 2, 3, 4, 5, 6, 7, 8},
-//				{1, 4},
-//				{1, 4},
-//				{1, 2, 3}
-//		};
-//
-//		for(int i = 0; i < references.length; i++) {
-//			try {
-//				Reference ref = new Reference(references[i]);
-//
-//				assertEquals(refBooks[i], ref.book);
-//				assertEquals(refChapters[i], ref.chapter);
-//				assertEquals(refVerses[i].length, ref.verses.size());
-//
-//				for(int j = 0; j < refVerses[i].length; j++) {
-//					assertEquals(refVerses[i][j], (int)ref.verses.get(j));
-//				}
-//			}
-//			catch(ParseException e) {
-//				throw new Throwable("Raw Error in parsing reference", e);
-//			}
-//		}
-//	}
-//
+	public void testReferenceParser() throws Throwable {
+		String[] references = new String[] {
+				"John 3:16",
+				"1 John 3:16",
+				"Philippians 4:11",
+				"Eph 1:1-8",
+				"Eph. 1:1 through 8",
+				"Eph 1:1 to 8",
+				"Eph 1:1 and 8",
+				"Ecc 4:1, 4",
+				"Ecc 4:1 and 4",
+				"Gen 1:1-3",
+				"Psalm 125"
+		};
+
+		Reference[] refObjects = new Reference[] {
+				new Reference(Book.John, 3, 16),
+				new Reference(Book.FirstJohn, 3, 16),
+				new Reference(Book.Philippians, 4, 11),
+				new Reference(Book.Ephesians, 1, 1, 2, 3, 4, 5, 6, 7, 8),
+				new Reference(Book.Ephesians, 1, 1, 2, 3, 4, 5, 6, 7, 8),
+				new Reference(Book.Ephesians, 1, 1, 2, 3, 4, 5, 6, 7, 8),
+				new Reference(Book.Ephesians, 1, 1, 8),
+				new Reference(Book.Ecclesiastes, 4, 1, 4),
+				new Reference(Book.Ecclesiastes, 4, 1, 4),
+				new Reference(Book.Genesis, 1, 1, 2, 3),
+				new Reference(Book.Psalms, 125, 1, 2, 3, 4, 5)
+		};
+
+		for(int i = 0; i < references.length; i++) {
+			Reference ref = Reference.parseReference(references[i]);
+
+			assertNotNull(ref);
+
+			assertTrue(ref.equals(refObjects[i]));
+			assertTrue(refObjects[i].equals(ref));
+
+			assertEquals(0, ref.compareTo(refObjects[i]));
+			assertEquals(0, refObjects[i].compareTo(ref));
+
+			assertEquals(ref.hashCode(), refObjects[i].hashCode());
+			assertEquals(refObjects[i].hashCode(), ref.hashCode());
+
+			assertEquals(refObjects[i], ref);
+			assertEquals(ref, refObjects[i]);
+		}
+	}
+
 //	//this test shows that for any book except Judges, Jude, Philippians, and
 //	//Philemon, I can successfully parse its name based on the first three letters
 //	//of the word that was unput. For Judges and Jude, I need a fourth letter to

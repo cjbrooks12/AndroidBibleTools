@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * verse ::= number
  *
  * verseSequence ::= verse punctuation verse
- * verseList ::= (punctuation) { [verse | verseSequence] punctuation } [verse | verseSequence]
+ * verseList ::= { [verse | verseSequence] punctuation }
  *
  *
  * ParseException Error Codes:
@@ -70,7 +70,7 @@ public class ReferenceParser {
 
 		int chapter = chapter();
 		if(chapter == -1) {
-			throw new ParseException("Cannot parse Verse [" + reference + "]: expected number after book", 2);
+			throw new ParseException("Cannot parse Passage [" + reference + "]: expected number after book", 2);
 		}
 
 		boolean hasPunctuation = punctuation();
@@ -78,11 +78,12 @@ public class ReferenceParser {
 
 		if(hasPunctuation) {
 			verseList = verseList();
+
 			if(verseList.size() > 0) {
 				return new Reference(book, chapter, verseList);
 			}
 			else {
-				throw new ParseException("Cannot parse Verse [" + reference + "]: expected verse list after book", 2);
+				throw new ParseException("Cannot parse Passage [" + reference + "]: expected verse list after book", 2);
 			}
 		}
 		else {
@@ -150,7 +151,7 @@ public class ReferenceParser {
 
 		//book ::= word (punctuation)
 		if(a != null && a.equals(Token.Type.WORD)) {
-			Book book = Book.parseBook(a.getIntValue() + " " + a.getStringValue());
+			Book book = Book.parseBook(a.getStringValue());
 
 			if(book != null) {
 				punctuation();
@@ -190,26 +191,28 @@ public class ReferenceParser {
 		}
 	}
 
-	//verseSequence ::= verse punctuation verse
+	//verseSequence ::= verse dash verse
 	private ArrayList<Integer> verseSequence() {
 		int a = verse();
 		if(a != -1) {
-			boolean hasPunctuation = punctuation();
+			ArrayList<Integer> verses = new ArrayList<>();
+			Token dash = ts.get();
 
-			if(hasPunctuation) {
+			if(dash != null && dash.equals(Token.Type.DASH)) {
 				int b = verse();
 				if(b != -1) {
-					ArrayList<Integer> verses = new ArrayList<>();
 					for(int i = a; i <= b; i++) {
 						verses.add(i);
 					}
 					return verses;
 				}
 				else {
+					ts.unget(dash);
 					ts.unget(new Token(Token.Type.NUMBER, a));
 				}
 			}
 			else {
+				ts.unget(dash);
 				ts.unget(new Token(Token.Type.NUMBER, a));
 			}
 		}
@@ -217,15 +220,12 @@ public class ReferenceParser {
 		return new ArrayList<>();
 	}
 
-	//verseList ::= (punctuation) { [verse | verseSequence] punctuation } [verse | verseSequence]
-    private ArrayList<Integer> verseList() {
-        ArrayList<Integer> verseList = new ArrayList<Integer>();
-
-		punctuation();
-
+	//verseList ::= { [verse | verseSequence] comma }
+	private ArrayList<Integer> verseList() {
+		ArrayList<Integer> verseList = new ArrayList<>();
 		while (true) {
 			ArrayList<Integer> b = verseSequence();
-			if (b.size() > 0) {
+			if (b != null && b.size() > 0) {
 				for(Integer i : b) {
 					if(!verseList.contains(i)) {
 						verseList.add(i);
@@ -234,13 +234,13 @@ public class ReferenceParser {
 			}
 			else {
 				int c = verse();
-				if (c != -1 && !verseList.contains(c)) {
+				if (c > 0 &&  !verseList.contains(c)) {
 					verseList.add(c);
 				}
 			}
 
 			boolean hasPunctuation = punctuation();
-			if(!hasPunctuation) {
+			if (!hasPunctuation) {
 				return verseList;
 			}
 		}

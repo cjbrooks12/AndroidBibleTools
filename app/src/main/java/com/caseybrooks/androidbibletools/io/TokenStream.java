@@ -38,10 +38,10 @@ public class TokenStream {
 					return new Token(Token.Type.DASH);
 				case '.':
 					return new Token(Token.Type.DOT);
-//				case '/':
-//					return new Token(Token.Type.SLASH);
-//				case '\\':
-//					return new Token(Token.Type.BACKSLASH);
+				case '/':
+					return new Token(Token.Type.SLASH);
+				case '\\':
+					return new Token(Token.Type.BACKSLASH);
 				case '0':
 				case '1':
 				case '2':

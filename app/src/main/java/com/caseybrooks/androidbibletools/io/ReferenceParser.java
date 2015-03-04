@@ -8,15 +8,14 @@ import java.util.ArrayList;
 
 /** The class used to parse a String into Reference objects. Uses the following grammar
  *
- *
- * Passage ::= book chapter ((punctuation) verseList)
- * Verse ::= book chapter verse
+ * Passage ::= book (punctuation) chapter ((punctuation) verseList)
+ * Verse ::= book (punctuation) chapter (punctuation) verse
  *
  * number ::= { [0..9] }
  * word ::= { [a..zA..Z] }
- * punctuation ::= [;:,.]
+ * punctuation ::= [;:,.-\/]
  *
- * book ::= ([123]) word (punctuation)
+ * book ::= ([123]) word
  * chapter ::= number
  * verse ::= number
  *
@@ -27,9 +26,6 @@ import java.util.ArrayList;
  * ParseException Error Codes:
  * 1: could not determine the name of a book from the given input string
  */
-
-
-
 
 public class ReferenceParser {
 	String reference;
@@ -43,6 +39,8 @@ public class ReferenceParser {
 
 		//Book will throw its own exception if it fails to parse
 		Book book = book();
+
+		punctuation();
 
 		int chapter = chapter();
 		if(chapter == -1) {
@@ -59,7 +57,7 @@ public class ReferenceParser {
 		return new Reference(book, chapter, verse);
 	}
 
-	//Passage ::= book chapter ((punctuation) verseList)
+	//Passage ::= book (punctuation) chapter ((punctuation) verseList)
 	public Reference getPassageReference(String reference) throws ParseException {
 		this.reference = reference;
 		return getPassageReference(new TokenStream(reference));
@@ -130,13 +128,17 @@ public class ReferenceParser {
 		return null;
 	}
 
+	//punctuation ::= [;:,.-\/]
 	private boolean punctuation() {
 		Token a = ts.get();
 		if(a != null && (
 				a.equals(Token.Type.COLON) ||
+				a.equals(Token.Type.SEMICOLON) ||
 				a.equals(Token.Type.COMMA) ||
 				a.equals(Token.Type.DOT) ||
-				a.equals(Token.Type.SEMICOLON))) {
+				a.equals(Token.Type.DASH) ||
+				a.equals(Token.Type.SLASH) ||
+				a.equals(Token.Type.BACKSLASH))) {
 
 			return true;
 		}
@@ -146,7 +148,7 @@ public class ReferenceParser {
 		}
 	}
 
-	//book ::= ([123]) word (punctuation)
+	//book ::= ([123]) word
 	private Book book() throws ParseException {
 		Token a = ts.get();
 
@@ -157,7 +159,6 @@ public class ReferenceParser {
 				Book book = Book.parseBook(a.getIntValue() + " " + b.getStringValue());
 
 				if(book != null) {
-					punctuation();
 					return book;
 				}
 				else {
@@ -176,7 +177,6 @@ public class ReferenceParser {
 			Book book = Book.parseBook(a.getStringValue());
 
 			if(book != null) {
-				punctuation();
 				return book;
 			}
 			else {

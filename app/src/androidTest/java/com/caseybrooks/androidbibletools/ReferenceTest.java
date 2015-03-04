@@ -6,12 +6,6 @@ import com.caseybrooks.androidbibletools.enumeration.Book;
 import junit.framework.TestCase;
 
 public class ReferenceTest extends TestCase {
-
-	public void testLexer() {
-
-	}
-
-
 	public void testReferenceParser() throws Throwable {
 		String[] references = new String[] {
 				"John 3:16",
@@ -25,7 +19,8 @@ public class ReferenceTest extends TestCase {
 				"Ecc 4:1 and 4",
 				"Gen 1:1-3",
 				"Psalm 125",
-				"Galatians 2: 1-5, 19-21, 4-8"
+				"Galatians 2: 1-5, 19-21, 4-8",
+				"1 Timothy 4 5-8"
 		};
 
 		Reference[] refObjects = new Reference[] {
@@ -40,7 +35,8 @@ public class ReferenceTest extends TestCase {
 				new Reference(Book.Ecclesiastes, 4, 1, 4),
 				new Reference(Book.Genesis, 1, 1, 2, 3),
 				new Reference(Book.Psalms, 125, 1, 2, 3, 4, 5),
-				new Reference(Book.Galatians, 2, 1, 2, 3, 4, 5, 19, 20, 21, 6, 7, 8)
+				new Reference(Book.Galatians, 2, 1, 2, 3, 4, 5, 19, 20, 21, 6, 7, 8),
+				new Reference(Book.FirstTimothy, 4, 5, 6, 7, 8)
 		};
 
 		for(int i = 0; i < references.length; i++) {
@@ -116,7 +112,6 @@ public class ReferenceTest extends TestCase {
 		Reference ref2 = new Reference(Book.Mark, 1,
 											  1, 2, 3, 4, 5, 6, 7, 14, 19, 22, 29, 30, 31, 32, 34, 35);
 
-
 		assertEquals(refStringManual1.replaceAll("\\s+", " "), ref1.toString());
 		assertEquals(refStringManual2.replaceAll("\\s+", " "), ref2.toString());
 
@@ -126,18 +121,20 @@ public class ReferenceTest extends TestCase {
 		assertEquals(ref1.toString(), ref3.toString());
 		assertEquals(ref2.toString(), ref4.toString());
 	}
-//
+
 	public void testExtractVerse() throws Throwable {
 		String[] references = new String[] {
 				"Lets see if I can find John 3:16-18, 22-24",
 				"Now how about finding it in http://bible.com/111/gen.3.1.niv Now the serpent was more crafty",
-				"\"Now the serpent was more crafty\"\n\n http://ref.ly/r/niv2011/Ge3.1 via the FaithLife"
+				"\"Now the serpent was more crafty\"\n\n http://ref.ly/r/niv2011/Ge3.1 via the FaithLife",
+				"http://www.biblestudytools.com/kjv/romans/14-1.html"
 		};
 
 		Reference[] refObjects = new Reference[] {
 				new Reference(Book.John, 3, 16, 17, 18, 22, 23, 24),
 				new Reference(Book.Genesis, 3, 1),
-				new Reference(Book.Genesis, 3, 1)
+				new Reference(Book.Genesis, 3, 1),
+				new Reference(Book.Romans, 14, 1)
 		};
 
 		for(int i = 0; i < references.length; i++) {
@@ -148,31 +145,11 @@ public class ReferenceTest extends TestCase {
 			assertEquals(ref, refObjects[i]);
 		}
 	}
-//
+
 //	public void testStringInitializationAndSorting() throws Throwable {
 //		Verse verse1 = new Verse("Ephesians 2:19");
 //		Verse verse2 = new Verse("Ephesians 2:20");
 //		Verse verse3 = new Verse("Ephesians 2:21");
 //		Passage passage = new Passage("Ephesians 2:19-21");
-//
-//
-//
-//
 //	}
-
-    public void testExtractSharedVerse() {
-//        String youVersion = "http://bible.com/111/gen.3.1.niv Now the serpent was more crafty";
-//        Reference youVersionRef = Reference.extractReference(youVersion);
-//        assertNotNull(youVersionRef);
-//        assertEquals(Book.Genesis, youVersionRef.book);
-//        assertEquals(3, youVersionRef.chapter);
-//        assertEquals(1, (int)youVersionRef.verse);
-
-//        String faithlife = "\"Now the serpent was more crafty\"\n\n http://ref.ly/r/niv2011/Ge3.1 via the FaithLife";
-//        Reference faithlifeRef = Reference.extractReference(faithlife);
-//        assertNotNull(faithlifeRef);
-//        assertEquals(Book.Genesis, faithlifeRef.book);
-//        assertEquals(3, faithlifeRef.chapter);
-//        assertEquals(1, (int)faithlifeRef.verse);
-    }
 }

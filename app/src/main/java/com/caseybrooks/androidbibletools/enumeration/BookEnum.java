@@ -10,7 +10,7 @@ import java.util.EnumSet;
 
 //List of differences that need to be accounted for in different translations
 //2 Cor 13 has 13 verses in catholic bibles, when most have 14
-public enum Book {
+public enum BookEnum {
 //  Enum                Name                code    Number of verses in each chapter in the book
     Genesis(            "Genesis",          "Ge",   31, 25, 24, 26, 32, 22, 24, 22, 29, 32, 32, 20, 18, 24, 21, 16, 27, 33, 38, 18, 34, 24, 20, 67, 34, 35, 46, 22, 35, 43, 54, 33, 20, 31, 29, 43, 36, 30, 23, 23, 57, 38, 34, 34, 28, 34, 31, 22, 33, 26),
     Exodus(             "Exodus",           "Ex",   22, 25, 22, 31, 23, 30, 29, 28, 35, 29, 10, 51, 22, 31, 27, 36, 16, 27, 25, 26, 37, 30, 33, 18, 40, 37, 21, 43, 46, 38, 18, 35, 23, 35, 35, 38, 29, 31, 43, 38),
@@ -59,7 +59,7 @@ public enum Book {
     Romans(             "Romans",           "Ro",   32, 29, 31, 25, 21, 23, 25, 39, 33, 21, 36, 21, 14, 23, 33, 27),
     FirstCorinthians(   "1 Corinthians",    "1Co",  31, 16, 23, 21, 13, 20, 40, 13, 27, 33, 34, 31, 13, 40, 58, 24),
     SecondCorinthians(  "2 Corinthians",    "2Co",  24, 17, 18, 18, 21, 18, 16, 24, 15, 18, 33, 21, 14),
-    Galatians(          "Galatians",        "Ga",   24, 21, 29, 31, 26, 18),
+    Galatians(          "Galatians",        "Gal",   24, 21, 29, 31, 26, 18), //OSIS
     Ephesians(          "Ephesians",        "Eph",  23, 22, 21, 32, 33, 24),
     Philippians(        "Philippians",      "Php",  30, 30, 21, 23),
     Colossians(         "Colossians",       "Col",  29, 23, 25, 18),
@@ -83,15 +83,15 @@ public enum Book {
     private final String code; //What is used for building a query URL and for abbreviation
     private final int[] verseCount;
 
-    Book(String name, String code, int... verseCount) {
+    BookEnum(String name, String code, int... verseCount) {
         this.name = name;
         this.code = code;
         this.verseCount = verseCount;
     }
 
-    public static Book parseBook(String name) {
+    public static BookEnum parseBook(String name) {
         String input = name.toLowerCase().trim().replaceAll("\\s", "");
-        for (Book book : EnumSet.allOf(Book.class)) {
+        for (BookEnum book : EnumSet.allOf(BookEnum.class)) {
             String bookName = book.getName().toLowerCase().trim().replaceAll("\\s", "");
             String bookCode = book.getCode().toLowerCase().trim().replaceAll("\\s", "");
 
@@ -125,10 +125,10 @@ public enum Book {
     }
 
     public static String[] getList() {
-		String[] books = new String[Book.values().length];
+		String[] books = new String[BookEnum.values().length];
 
-        for(int i = 0; i < Book.values().length; i++) {
-            books[i] = Book.values()[i].getName();
+        for(int i = 0; i < BookEnum.values().length; i++) {
+            books[i] = BookEnum.values()[i].getName();
         }
 
         return books;

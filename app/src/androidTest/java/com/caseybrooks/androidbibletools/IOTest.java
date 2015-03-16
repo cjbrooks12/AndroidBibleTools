@@ -1,7 +1,7 @@
 package com.caseybrooks.androidbibletools;
 
 import com.caseybrooks.androidbibletools.basic.Passage;
-import com.caseybrooks.androidbibletools.enumeration.Version;
+import com.caseybrooks.androidbibletools.enumeration.VersionEnum;
 
 import junit.framework.TestCase;
 
@@ -9,8 +9,8 @@ public class IOTest extends TestCase {
 
 	public void testXMLCreation() throws Throwable {
 		final Passage passage = new Passage("John 1:1-5");
-		passage.setVersion(Version.ESV);
-		passage.retrieve();
+		passage.setVersion(VersionEnum.ESV);
+		passage.retrieve(PrivateKeys.API_KEY);
 
 		String xmlExpected =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "" +

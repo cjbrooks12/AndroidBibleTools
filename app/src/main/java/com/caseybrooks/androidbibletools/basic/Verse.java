@@ -1,7 +1,11 @@
 package com.caseybrooks.androidbibletools.basic;
 
+import android.support.annotation.NonNull;
+import android.util.Base64;
+
 import com.caseybrooks.androidbibletools.data.Reference;
-import com.caseybrooks.androidbibletools.enumeration.Book;
+import com.caseybrooks.androidbibletools.enumeration.BookEnum;
+import com.caseybrooks.androidbibletools.enumeration.VersionEnum;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -39,6 +43,18 @@ import javax.xml.transform.stream.StreamResult;
  *  and in different formats.
  */
 public class Verse extends AbstractVerse {
+////Verse implementation of a Reference
+////------------------------------------------------------------------------------
+//	public static class Reference extends com.caseybrooks.androidbibletools.data.Reference {
+//		public Reference(Book book, int chapter, int... verses) {
+//			super(book, chapter, verses);
+//		}
+//
+//		public Reference(Book book, int chapter, ArrayList<Integer> verses) {
+//			super(book, chapter, verses);
+//		}
+//	}
+
 //Data Members
 //------------------------------------------------------------------------------
     //Data members that make up the actual verse
@@ -74,13 +90,13 @@ public class Verse extends AbstractVerse {
                 return new Verse(nextRef);
 			}
 			else {
-				for(int i = 0; i < Book.values().length; i++) {
-					if((reference.book == Book.values()[i]) && (i != Book.values().length - 1)) {
-                        Reference nextRef = new Reference(Book.values()[i+1], 1, 1);
+				for(int i = 0; i < BookEnum.values().length; i++) {
+					if((reference.book == BookEnum.values()[i]) && (i != BookEnum.values().length - 1)) {
+                        Reference nextRef = new Reference(BookEnum.values()[i+1], 1, 1);
 						return new Verse(nextRef);
 					}
 				}
-                Reference nextRef = new Reference(Book.values()[0], 1, 1);
+                Reference nextRef = new Reference(BookEnum.values()[0], 1, 1);
 				return new Verse(nextRef);
 			}
 		}
@@ -97,15 +113,15 @@ public class Verse extends AbstractVerse {
                 return new Verse(previousRef);
 			}
 			else {
-				Book newBook;
-				for(int i = 0; i < Book.values().length; i++) {
-					if((reference.book == Book.values()[i]) && (i != 0)) {
-						newBook = Book.values()[i-1];
+				BookEnum newBook;
+				for(int i = 0; i < BookEnum.values().length; i++) {
+					if((reference.book == BookEnum.values()[i]) && (i != 0)) {
+						newBook = BookEnum.values()[i-1];
                         Reference previousRef = new Reference(newBook, newBook.numChapters(), newBook.lastVerseInBook());
                         return new Verse(previousRef);
 					}
 				}
-				newBook = Book.values()[Book.values().length - 1];
+				newBook = BookEnum.values()[BookEnum.values().length - 1];
                 Reference previousRef = new Reference(newBook, newBook.numChapters(), newBook.lastVerseInBook());
                 return new Verse(previousRef);
 			}
@@ -172,6 +188,20 @@ public class Verse extends AbstractVerse {
 		}
 	}
 
+	public static Verse fromXML(org.jsoup.nodes.Element passageRoot) {
+		try {
+			Verse verse = new Verse(passageRoot.attr("reference"));
+			verse.setVersion(VersionEnum.parseVersion(passageRoot.attr("version")));
+			verse.setText(passageRoot.text());
+
+			return verse;
+		}
+		catch(ParseException pe) {
+			pe.printStackTrace();
+			return null;
+		}
+	}
+
 
 //Comparison methods for sorting
 //------------------------------------------------------------------------------
@@ -185,15 +215,15 @@ public class Verse extends AbstractVerse {
     //  3: Verses are not adjacent, but are in different chapters of the same Book
     //  4: Verses are not adjacent, and aren't even in the same Book
     @Override
-    public int compareTo(AbstractVerse verse) {
+    public int compareTo(@NonNull AbstractVerse verse) {
         Verse lhs = this;
         Verse rhs = (Verse) verse;
 
         //get the position of each book as an integer so we can work with it
         int aBook = -1, bBook = -1;
-        for(int i = 0; i < Book.values().length; i++) {
-            if(Book.values()[i] == lhs.reference.book) aBook = i;
-            if(Book.values()[i] == rhs.reference.book) bBook = i;
+        for(int i = 0; i < BookEnum.values().length; i++) {
+            if(BookEnum.values()[i] == lhs.reference.book) aBook = i;
+            if(BookEnum.values()[i] == rhs.reference.book) bBook = i;
         }
 
         if(aBook - bBook == 1) {
@@ -236,40 +266,61 @@ public class Verse extends AbstractVerse {
     }
 
 	@Override
-    public boolean equals(AbstractVerse verse) {
-        Verse lhs = this;
-        Verse rhs = (Verse) verse;
+    public boolean equals(Object verse) {
+		if(verse instanceof Verse) {
+			Verse lhs = this;
+			Verse rhs = (Verse) verse;
 
-        return (lhs.reference.book == rhs.reference.book) &&
-               (lhs.reference.chapter == rhs.reference.chapter) &&
-               (lhs.reference.verses.get(0) == rhs.reference.verses.get(0));
+			return lhs.reference.equals(rhs.reference);
+		}
+		else {
+			return false;
+		}
     }
 
 //Retrieve verse from the internet
 //------------------------------------------------------------------------------
-    String APIKey = "9vso4MjssaJe27tn3uqahfYZsUUU8T5XGK3iOr9g";
+	@Override
+	public String getURL(OnlineBible service) {
+		switch(service) {
+		case BibleGateway:
+		case BibleStudyTools:
+		case BlueLetterBible:
+		case YouVersion:
+		case Biblia:
+			return "http://biblia.com/books/" +
+					version.getCode() + "/" +
+					reference.book.getCode() +
+					reference.chapter + "." +
+					reference.verse;
+		default:
+			return null;
+		}
+	}
 
 	@Override
-    public String getURL() {
-//		return "http://" + APIKey + "bibles.org/v2/versions/eng-ESV:Galatians.2.19/verses.xml";
-		return "http://www.biblestudytools.com/" + version.getCode() + "/" +
-			   reference.book.getName().toLowerCase().replaceAll(" ", "-") + "/" +
-			   reference.chapter + "-" + reference.verse + ".html";
-    }
-
-    @Override
-	public Verse retrieve() throws IOException {
+	public void retrieve(String APIKey) throws IOException {
 		if(listener != null) listener.onPreDownload();
-		Document doc = Jsoup.connect(getURL()).get();
 
-		Elements scripture = doc.select(".verse-" + reference.verse);
-		scripture.select("a").remove();
-		scripture.select("strong").remove();
-		verseText = scripture.text();
+		String verseID = "eng-" +
+				version.getCode() + ":" +
+				reference.book.getCode() +"." +
+				reference.chapter;
 
-		if(listener != null) listener.onPostDownload();
+		String url = "http://" + APIKey + ":x@bibles.org/v2/chapters/" +
+				verseID + "/verses.xml?include_marginalia=false";
 
+		String header = APIKey + ":x";
+		String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);
 
-		return this;
+		Document doc = Jsoup.connect(url).header("Authorization", "Basic " + encodedHeader).get();
+
+		Elements scripture = doc.select("verse[id=" + verseID + "." + reference.verse + "]");
+		Document textHTML = Jsoup.parse(scripture.select("text").text());
+		textHTML.select("sup").remove();
+
+		setText(textHTML.text());
+
+		if(listener != null) listener.onDownloadSuccess();
 	}
 }

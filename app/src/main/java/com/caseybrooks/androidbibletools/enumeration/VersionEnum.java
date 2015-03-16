@@ -8,7 +8,7 @@ import java.util.EnumSet;
  *   parseBook will attempt to find the appropriate enumeration given a
  *   string of the version's full name or its code.
  */
-public enum Version {
+public enum VersionEnum {
     //TODO: add support for all versions available on BibleStudyTools
     ASV("American Standard Version", "asv"),
     ESV("English Standard Version", "esv"),
@@ -28,7 +28,7 @@ public enum Version {
     private final String name;
     private final String code;
 
-    private Version(String name, String code) {
+    private VersionEnum(String name, String code) {
         this.name = name;
         this.code = code;
     }
@@ -38,13 +38,13 @@ public enum Version {
      * @param name String to be parsed
      * @return Version the version enum if found
      */
-    public static Version parseVersion(String name) {
+    public static VersionEnum parseVersion(String name) {
         if(name.equalsIgnoreCase("nasb")) return NASB;
         if(name.equalsIgnoreCase("hcsb")) return HCSB;
         if(name.equalsIgnoreCase("gwt")) return GWT;
         if(name.equalsIgnoreCase("nrsv")) return NRSV;
 
-        for (Version version : EnumSet.allOf(Version.class)) {
+        for (VersionEnum version : EnumSet.allOf(VersionEnum.class)) {
             if(version.getName().toLowerCase().contains(name.toLowerCase())) return version;
             else if(version.getCode().contains(name.toLowerCase())) return version;
         }
@@ -61,7 +61,7 @@ public enum Version {
     public static String[] getAllNames() {
         ArrayList<String> versions = new ArrayList<String>();
 
-        for (Version version : EnumSet.allOf(Version.class)) {
+        for (VersionEnum version : EnumSet.allOf(VersionEnum.class)) {
             versions.add(version.getName());
         }
 
@@ -74,7 +74,7 @@ public enum Version {
     public static String[] getAllCodes() {
         ArrayList<String> versions = new ArrayList<String>();
 
-        for (Version version : EnumSet.allOf(Version.class)) {
+        for (VersionEnum version : EnumSet.allOf(VersionEnum.class)) {
             versions.add(version.getCode());
         }
 

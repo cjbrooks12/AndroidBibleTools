@@ -1,8 +1,14 @@
 package com.caseybrooks.androidbibletools.basic;
 
-import com.caseybrooks.androidbibletools.data.Reference;
-import com.caseybrooks.androidbibletools.enumeration.Version;
+import android.support.annotation.NonNull;
+import android.util.Base64;
 
+import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.enumeration.VersionEnum;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -48,7 +54,10 @@ public class Passage extends AbstractVerse {
         super(reference);
 
         Collections.sort(this.reference.verses);
-        this.verses = new ArrayList<Verse>();
+        this.verses = new ArrayList<>();
+		for(Integer verseNum : this.reference.verses) {
+			this.verses.add(new Verse(new Reference(this.reference.book, this.reference.chapter, verseNum)));
+		}
     }
 
     public Passage(String reference) throws ParseException {
@@ -56,6 +65,9 @@ public class Passage extends AbstractVerse {
 
         Collections.sort(this.reference.verses);
         this.verses = new ArrayList<Verse>();
+		for(Integer verseNum : this.reference.verses) {
+			this.verses.add(new Verse(new Reference(this.reference.book, this.reference.chapter, verseNum)));
+		}
 	}
 
 //Setters and Getters
@@ -63,7 +75,7 @@ public class Passage extends AbstractVerse {
 
 
     @Override
-    public void setVersion(Version version) {
+    public void setVersion(VersionEnum version) {
         super.setVersion(version);
         for(Verse verse : verses) {
             verse.setVersion(this.version);
@@ -200,7 +212,36 @@ public class Passage extends AbstractVerse {
 		}
 	}
 
+	public static Passage fromXML(org.jsoup.nodes.Element passageRoot) {
+		try {
+			if(passageRoot.tagName().equals("passage")) {
+				Passage passage = new Passage(passageRoot.attr("reference"));
+				if(passageRoot.childNodeSize() == passage.reference.verses.size()) {
+					passage.setVersion(VersionEnum.parseVersion(passageRoot.attr("version")));
+					passage.setText(passageRoot.text());
+					passage.verses.clear();
 
+					for(org.jsoup.nodes.Element childVerse : passageRoot.children()) {
+						Verse verse = new Verse(new Reference(
+								passage.reference.book,
+								passage.reference.chapter,
+								Integer.parseInt(childVerse.attr("reference"))));
+
+						verse.setVersion(passage.version);
+						verse.setText(childVerse.text());
+						passage.verses.add(verse);
+					}
+					return passage;
+				}
+			}
+
+			return null;
+		}
+		catch(ParseException pe) {
+			pe.printStackTrace();
+			return null;
+		}
+	}
 
 //------------------------------------------------------------------------------
 	public Verse[] getVerses() {
@@ -210,7 +251,7 @@ public class Passage extends AbstractVerse {
 	}
 
 	@Override
-	public int compareTo(AbstractVerse verse) {
+	public int compareTo(@NonNull AbstractVerse verse) {
 		Verse lhs = this.verses.get(0);
 		Verse rhs = ((Passage) verse).verses.get(0);
 
@@ -218,46 +259,63 @@ public class Passage extends AbstractVerse {
 	}
 
 	@Override
-	public boolean equals(AbstractVerse verse) {
-        Verse lhs = this.verses.get(0);
-        Verse rhs = ((Passage) verse).verses.get(0);
+	public boolean equals(Object passage) {
+		if(passage instanceof Passage) {
+			Passage lhs = this;
+			Passage rhs = ((Passage) passage);
 
-		return lhs.compareTo(rhs) == 0;
+			return lhs.reference.equals(rhs.reference);
+		}
+		else return false;
 	}
 
 //Retrieve verse from the Internet
 //------------------------------------------------------------------------------
     @Override
-    public String getURL() {
-        String query = "http://www.biblestudytools.com/" + version.getCode() + "/" +
-                reference.book.getName().toLowerCase().trim().replaceAll(" ",  "-") +
-                "/passage.aspx?q=" +
-                reference.book.getName().toLowerCase().trim().replaceAll(" ",  "-") +
-                "+" +
-                reference.chapter + ":" + reference.verses.get(0);
-
-//		http://www.biblestudytools.com/esv/galatians/passage.aspx?q=galatians+2:20
-
-        if(reference.verses.size() > 1) {
-            query += "-" + reference.verses.get(reference.verses.size()-1);
-        }
-        return query;
+    public String getURL(OnlineBible service) {
+		switch(service) {
+		case BibleGateway:
+		case BibleStudyTools:
+		case BlueLetterBible:
+		case YouVersion:
+		case Biblia:
+			return "http://biblia.com/books/" +
+					version.getCode() + "/" +
+					reference.book.getCode() + reference.chapter;
+		default:
+			return null;
+		}
     }
 
-    @Override
-	public Passage retrieve() throws IOException {
+	@Override
+	public void retrieve(String APIKey) throws IOException {
+		if(listener != null) listener.onPreDownload();
 		allText = null;
-		verses.clear();
 
-		for(int i = 0; i < this.reference.verses.size(); i++) {
-			this.verses.add(
-			   new Verse(new Reference(this.reference.book,
-				  this.reference.chapter,
-				  this.reference.verses.get(i))));
-			verses.get(i).setVersion(this.version);
-			verses.get(i).retrieve();
+		String verseID = "eng-" +
+				version.getCode() + ":" +
+				reference.book.getCode() +"." +
+				reference.chapter;
+
+		String url = "http://" + APIKey + ":x@bibles.org/v2/chapters/" +
+				verseID + "/verses.xml?include_marginalia=false";
+
+		String header = APIKey + ":x";
+		String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);
+
+		Document doc = Jsoup.connect(url).header("Authorization", "Basic " + encodedHeader).get();
+
+		for(int i = 0; i < verses.size(); i++) {
+			Verse verse = verses.get(i);
+
+			Elements scripture = doc.select("verse[id=" + verseID + "." + verse.getReference().verse + "]");
+
+			Document textHTML = Jsoup.parse(scripture.select("text").text());
+			textHTML.select("sup").remove();
+
+			verse.setText(textHTML.text());
 		}
 
-		return this;
+		if(listener != null) listener.onDownloadSuccess();
 	}
 }

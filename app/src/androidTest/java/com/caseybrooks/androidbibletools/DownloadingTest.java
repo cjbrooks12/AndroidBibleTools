@@ -1,31 +1,54 @@
 package com.caseybrooks.androidbibletools;
 
-import android.util.Base64;
 import android.util.Log;
+
+import com.caseybrooks.androidbibletools.basic.Passage;
+import com.caseybrooks.androidbibletools.basic.Verse;
+import com.caseybrooks.androidbibletools.data.Version;
+import com.caseybrooks.androidbibletools.enumeration.VersionEnum;
 
 import junit.framework.TestCase;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import java.util.HashMap;
 
 public class DownloadingTest extends TestCase {
-	public String API_KEY = "9vso4MjssaJe27tn3uqahfYZsUUU8T5XGK3iOr9g";
-
-	public String testURL = "https://" + API_KEY + ":bibles.org/v2/versions/eng-GNTD.xml";
-	public String testURL2 = "http://9vso4MjssaJe27tn3uqahfYZsUUU8T5XGK3iOr9g:x@bibles.org/v2/versions/eng-GNTD.xml";
-
 	public void testDownloadingVerse() throws Throwable {
+		Verse verse = new Verse("Galatians 2:19");
+		verse.setVersion(VersionEnum.ESV);
+		verse.retrieve(PrivateKeys.API_KEY);
 
-		String headerValue = "" + API_KEY + ":x";
+		if(verse.getText().length() == 0) throw new Exception("Downloaded nothing");
+		Log.i("downloading Galatians 2:20", verse.getReference().toString() + " - " + verse.getText());
 
-		// Sending side
-		byte[] data = headerValue.getBytes("UTF-8");
-		String base64 = Base64.encodeToString(data, Base64.DEFAULT);
+		Passage passage = new Passage("Galatians 2:19-21");
+		passage.setVersion(VersionEnum.ESV);
+		passage.retrieve(PrivateKeys.API_KEY);
 
-		Document doc = Jsoup.connect(testURL2).header("Authorization", "Basic " + base64).get();
+		if(passage.getText().length() == 0) throw new Exception("Downloaded nothing");
+		Log.i("downloading Galatians 2:19-21", passage.getReference().toString() + " - " + passage.getText());
+	}
 
-		assertNotNull(doc);
+	public void testGettingVersionsList() throws Throwable {
+		HashMap<String, String> availableLanguages = Version.getAvailableLanguages(PrivateKeys.API_KEY);
+		assertNotNull(availableLanguages);
+		Log.i("Number of languages available", availableLanguages.size() + " languages");
 
-		Log.i("RESPONSE", doc.toString());
+		String langKey = "English (US)";
+		if(availableLanguages.containsKey(langKey)) {
+
+			HashMap<String, Version> versionsList =
+					Version.getAvailableVersions(
+							PrivateKeys.API_KEY,
+							availableLanguages.get(langKey));
+
+			assertNotNull(versionsList);
+			Log.i("Number of versions in language", versionsList.size() + " versions in " + availableLanguages.get(langKey));
+
+			Version esv = versionsList.get("esv");
+			assertNotNull(esv);
+
+			esv.downloadVersionInfo(PrivateKeys.API_KEY);
+			Log.i("ESV Copyright", esv.books.size() + " books " + esv.copyright);
+		}
 	}
 }

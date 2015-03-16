@@ -1,11 +1,13 @@
 package com.caseybrooks.androidbibletools.basic;
 
+import android.support.annotation.NonNull;
+
 import com.caseybrooks.androidbibletools.data.Formatter;
 import com.caseybrooks.androidbibletools.data.Metadata;
 import com.caseybrooks.androidbibletools.data.OnDownloadListener;
 import com.caseybrooks.androidbibletools.data.Reference;
 import com.caseybrooks.androidbibletools.defaults.DefaultFormatter;
-import com.caseybrooks.androidbibletools.enumeration.Version;
+import com.caseybrooks.androidbibletools.enumeration.VersionEnum;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,7 +24,7 @@ import java.util.TreeSet;
 public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 //Data Members
 //------------------------------------------------------------------------------
-	protected Version version;
+	protected VersionEnum version;
     protected final Reference reference;
     protected Formatter formatter;
     protected Metadata metadata;
@@ -37,7 +39,7 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 * @see com.caseybrooks.androidbibletools.data.Reference
 	 */
 	public AbstractVerse(Reference reference) {
-		this.version = Version.KJV;
+		this.version = VersionEnum.KJV;
         this.reference = reference;
         this.formatter = new DefaultFormatter();
         this.metadata = new Metadata();
@@ -55,7 +57,7 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 * @see com.caseybrooks.androidbibletools.data.Reference
 	 */
     public AbstractVerse(String reference) throws ParseException {
-        this.version = Version.KJV;
+        this.version = VersionEnum.KJV;
         this.reference = Reference.parseReference(reference);
         this.formatter = new DefaultFormatter();
         this.metadata = new Metadata();
@@ -67,10 +69,10 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 
 	/**
 	 * Get the currently set Version of this verse
-	 * @return {@link com.caseybrooks.androidbibletools.enumeration.Version}
+	 * @return {@link com.caseybrooks.androidbibletools.enumeration.VersionEnum}
 	 *
 	 */
-	public Version getVersion() {
+	public VersionEnum getVersion() {
 		return version;
 	}
 
@@ -78,9 +80,9 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 * Set the Version of this verse
 	 * @param version the desired Bible translation
 	 *
-	 * @see com.caseybrooks.androidbibletools.enumeration.Version
+	 * @see com.caseybrooks.androidbibletools.enumeration.VersionEnum
 	 */
-    public void setVersion(Version version) {
+    public void setVersion(VersionEnum version) {
 		this.version = version;
 	}
 
@@ -198,21 +200,30 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	public abstract String getText();
 
 	/**
-	 * Get a URL to this verse on BibleStudyTools.com
-	 *
-	 * @return {@link java.lang.String} the URL of this verse on BibleStudyTools.com
+	 * Enumeration for the several online bibles to provide links to
 	 */
-    public abstract String getURL();
+	public enum OnlineBible {
+		Biblia,
+		BibleStudyTools,
+		BibleGateway,
+		BlueLetterBible,
+		YouVersion,
+	}
+	/**
+	 * Get a URL to this verse on Biblia.com by Logos Bible Software
+	 *
+	 * @return {@link java.lang.String} the URL of this verse on Biblia.com
+	 */
+    public abstract String getURL(OnlineBible service);
 
 	/**
 	 * Download the verse from the internet. Should always be called from a non-UI
 	 * thread, as it must access the internet which will throw an exception if
-	 * run on the UI thread.
+	 * run on the UI thread. Uses the Bibles.org API.
 	 *
-	 * @return {@link com.caseybrooks.androidbibletools.basic.AbstractVerse} this verse object
 	 * @throws IOException
 	 */
-	public abstract AbstractVerse retrieve() throws IOException;
+	public abstract void retrieve(String APIKey) throws IOException;
 
 	/**
 	 * Returns a String XML representation of this verse. Is equivalent to calling
@@ -231,6 +242,7 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 */
 	public abstract Element toXML(Document doc);
 
+
 //Comparison methods
 //------------------------------------------------------------------------------
 
@@ -240,12 +252,13 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 * @param verse the verse to compare this to
 	 * @return the int result of comparison
 	 */
-	public abstract int compareTo(AbstractVerse verse);
+	public abstract int compareTo(@NonNull AbstractVerse verse);
 
 	/**
 	 * {@inheritDoc}
-	 * @param verse the cerse to compare this to
+	 * @param o the verse to compare this to
 	 * @return the boolean result of checking for equality
 	 */
-	public abstract boolean equals(AbstractVerse verse);
+	@Override
+	public abstract boolean equals(Object o);
 }

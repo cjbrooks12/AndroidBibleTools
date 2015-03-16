@@ -1,7 +1,7 @@
 package com.caseybrooks.androidbibletools;
 
 import com.caseybrooks.androidbibletools.data.Reference;
-import com.caseybrooks.androidbibletools.enumeration.Book;
+import com.caseybrooks.androidbibletools.enumeration.BookEnum;
 
 import junit.framework.TestCase;
 
@@ -24,19 +24,19 @@ public class ReferenceTest extends TestCase {
 		};
 
 		Reference[] refObjects = new Reference[] {
-				new Reference(Book.John, 3, 16),
-				new Reference(Book.FirstJohn, 3, 16),
-				new Reference(Book.Philippians, 4, 11),
-				new Reference(Book.Ephesians, 1, 1, 2, 3, 4, 5, 6, 7, 8),
-				new Reference(Book.Ephesians, 1, 1, 2, 3, 4, 5, 6, 7, 8),
-				new Reference(Book.Ephesians, 1, 1, 2, 3, 4, 5, 6, 7, 8),
-				new Reference(Book.Ephesians, 1, 1, 8),
-				new Reference(Book.Ecclesiastes, 4, 1, 4),
-				new Reference(Book.Ecclesiastes, 4, 1, 4),
-				new Reference(Book.Genesis, 1, 1, 2, 3),
-				new Reference(Book.Psalms, 125, 1, 2, 3, 4, 5),
-				new Reference(Book.Galatians, 2, 1, 2, 3, 4, 5, 19, 20, 21, 6, 7, 8),
-				new Reference(Book.FirstTimothy, 4, 5, 6, 7, 8)
+				new Reference(BookEnum.John, 3, 16),
+				new Reference(BookEnum.FirstJohn, 3, 16),
+				new Reference(BookEnum.Philippians, 4, 11),
+				new Reference(BookEnum.Ephesians, 1, 1, 2, 3, 4, 5, 6, 7, 8),
+				new Reference(BookEnum.Ephesians, 1, 1, 2, 3, 4, 5, 6, 7, 8),
+				new Reference(BookEnum.Ephesians, 1, 1, 2, 3, 4, 5, 6, 7, 8),
+				new Reference(BookEnum.Ephesians, 1, 1, 8),
+				new Reference(BookEnum.Ecclesiastes, 4, 1, 4),
+				new Reference(BookEnum.Ecclesiastes, 4, 1, 4),
+				new Reference(BookEnum.Genesis, 1, 1, 2, 3),
+				new Reference(BookEnum.Psalms, 125, 1, 2, 3, 4, 5),
+				new Reference(BookEnum.Galatians, 2, 1, 2, 3, 4, 5, 19, 20, 21, 6, 7, 8),
+				new Reference(BookEnum.FirstTimothy, 4, 5, 6, 7, 8)
 		};
 
 		for(int i = 0; i < references.length; i++) {
@@ -73,22 +73,22 @@ public class ReferenceTest extends TestCase {
 //	//of the word that was unput. For Judges and Jude, I need a fourth letter to
 //	//determine which book it is, and I need 5 letters for Philippians and Philemon
 	public void testBookNameLikeness() throws Throwable {
-		String[] bookNames = Book.getList();
+		String[] bookNames = BookEnum.getList();
 
 		for(int i = 0; i < bookNames.length; i++) {
-			Book book;
+			BookEnum book;
 			String pre, post;
 
 			//test parsing the names based on the fewest letters of full name
 			pre = bookNames[i].toLowerCase().trim().replaceAll("\\s", "");
 			if(pre.equals("judges") || pre.equals("jude")) {
-				book = Book.parseBook(pre.substring(0, 4));
+				book = BookEnum.parseBook(pre.substring(0, 4));
 			}
 			else if(pre.equals("philemon") || pre.equals("philippians")) {
-				book = Book.parseBook(pre.substring(0, 5));
+				book = BookEnum.parseBook(pre.substring(0, 5));
 			}
 			else {
-				book = Book.parseBook(pre.substring(0, 3));
+				book = BookEnum.parseBook(pre.substring(0, 3));
 			}
 			post = book.getName().toLowerCase().trim().replaceAll("\\s", "");
 			assertEquals(pre, post);
@@ -96,7 +96,7 @@ public class ReferenceTest extends TestCase {
 			//test parsing the names based on their code. we have already found
 			//the book, so just get its code and parse
 			pre = book.getCode().toLowerCase().trim().replaceAll("\\s", "");
-			book = Book.parseBook(pre);
+			book = BookEnum.parseBook(pre);
 
 			post = book.getCode().toLowerCase().trim().replaceAll("\\s", "");
 			assertEquals(pre, post);
@@ -105,11 +105,11 @@ public class ReferenceTest extends TestCase {
 
 	public void testPrintingReferences() throws Throwable {
 		String refStringManual1 = "John 3:16-19,     24, 27-29, 31, 33";
-		Reference ref1 = new Reference(Book.John, 3,
+		Reference ref1 = new Reference(BookEnum.John, 3,
 											  16, 17, 18, 19, 24, 27, 28, 29, 31, 33);
 
 		String refStringManual2 = "Mark 1:1-7, 14, 19, 22, 29-32, 34-35";
-		Reference ref2 = new Reference(Book.Mark, 1,
+		Reference ref2 = new Reference(BookEnum.Mark, 1,
 											  1, 2, 3, 4, 5, 6, 7, 14, 19, 22, 29, 30, 31, 32, 34, 35);
 
 		assertEquals(refStringManual1.replaceAll("\\s+", " "), ref1.toString());
@@ -131,10 +131,10 @@ public class ReferenceTest extends TestCase {
 		};
 
 		Reference[] refObjects = new Reference[] {
-				new Reference(Book.John, 3, 16, 17, 18, 22, 23, 24),
-				new Reference(Book.Genesis, 3, 1),
-				new Reference(Book.Genesis, 3, 1),
-				new Reference(Book.Romans, 14, 1)
+				new Reference(BookEnum.John, 3, 16, 17, 18, 22, 23, 24),
+				new Reference(BookEnum.Genesis, 3, 1),
+				new Reference(BookEnum.Genesis, 3, 1),
+				new Reference(BookEnum.Romans, 14, 1)
 		};
 
 		for(int i = 0; i < references.length; i++) {

@@ -1,6 +1,6 @@
 package com.caseybrooks.androidbibletools.data;
 
-import com.caseybrooks.androidbibletools.enumeration.Book;
+import com.caseybrooks.androidbibletools.enumeration.BookEnum;
 import com.caseybrooks.androidbibletools.io.ReferenceParser;
 
 import java.text.ParseException;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Reference implements Comparable<Reference> {
-    public final Book book;
+    public final BookEnum book;
     public final int chapter;
     public final int verse;
 //    public final boolean isValid;
@@ -16,7 +16,7 @@ public class Reference implements Comparable<Reference> {
 
 //Parse the input string using recursive descent parsing
 //------------------------------------------------------------------------------
-    public Reference(Book book, int chapter, int... verses) {
+    public Reference(BookEnum book, int chapter, int... verses) {
 		this.book = book;
 		this.chapter = chapter;
 		if(verses.length == 1) {
@@ -36,7 +36,7 @@ public class Reference implements Comparable<Reference> {
 		}
     }
 
-	public Reference(Book book, int chapter, ArrayList<Integer> verses) {
+	public Reference(BookEnum book, int chapter, ArrayList<Integer> verses) {
 		this.book = book;
 		this.chapter = chapter;
 		if(verses.size() == 1) {
@@ -167,9 +167,9 @@ public class Reference implements Comparable<Reference> {
 
         //get the position of each book as an integer so we can work with it
         int aBook = -1, bBook = -1;
-        for(int i = 0; i < Book.values().length; i++) {
-            if(Book.values()[i] == lhs.book) aBook = i;
-            if(Book.values()[i] == rhs.book) bBook = i;
+        for(int i = 0; i < BookEnum.values().length; i++) {
+            if(BookEnum.values()[i] == lhs.book) aBook = i;
+            if(BookEnum.values()[i] == rhs.book) bBook = i;
         }
 
         if(aBook - bBook == 1) {

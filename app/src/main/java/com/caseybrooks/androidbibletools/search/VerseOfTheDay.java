@@ -1,7 +1,7 @@
 package com.caseybrooks.androidbibletools.search;
 
 import com.caseybrooks.androidbibletools.basic.Passage;
-import com.caseybrooks.androidbibletools.enumeration.Version;
+import com.caseybrooks.androidbibletools.enumeration.VersionEnum;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 public class VerseOfTheDay {
-	public static Passage retrieve(Version version) throws IOException {
+	public static Passage retrieve(VersionEnum version, String APIKey) throws IOException {
 		Document doc = Jsoup.connect("http://verseoftheday.com").get();
 
 		Elements reference = doc.select("meta[property=og:title]");
@@ -19,7 +19,7 @@ public class VerseOfTheDay {
         try {
             Passage passage = new Passage(reference.attr("content").substring(18));
             passage.setVersion(version);
-            passage.retrieve();
+            passage.retrieve(APIKey);
             return passage;
         }
         catch(ParseException e) {
@@ -27,6 +27,4 @@ public class VerseOfTheDay {
             return null;
         }
 	}
-
-
 }

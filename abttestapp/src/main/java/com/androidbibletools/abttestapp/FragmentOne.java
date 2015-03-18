@@ -1,0 +1,231 @@
+package com.androidbibletools.abttestapp;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.caseybrooks.androidbibletools.basic.Passage;
+import com.caseybrooks.androidbibletools.data.Bible;
+import com.caseybrooks.androidbibletools.data.Book;
+import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.io.Download;
+import com.caseybrooks.androidbibletools.io.PrivateKeys;
+
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+
+public class FragmentOne extends Fragment {
+	View view;
+
+	Spinner versionSpinner;
+	Spinner bookSpinner;
+
+	EditText referenceEditText;
+	TextView verseTextView;
+	Button parseButton;
+
+
+	HashMap<String, Bible> availableBibles;
+	String selectedBible;
+	Bible selectedBibleObject;
+
+	Passage passage;
+
+	public static FragmentOne newInstance() {
+		FragmentOne fragment = new FragmentOne();
+		Bundle args = new Bundle();
+		fragment.setArguments(args);
+		return fragment;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+		// Inflate the layout for this fragment
+		view = inflater.inflate(R.layout.fragment_fragment_one, container, false);
+
+		initialize();
+		return view;
+	}
+
+	private void initialize() {
+		versionSpinner = (Spinner) view.findViewById(R.id.versionSpinner);
+		bookSpinner = (Spinner) view.findViewById(R.id.bookSpinner);
+		referenceEditText = (EditText) view.findViewById(R.id.referenceEditText);
+		verseTextView = (TextView) view.findViewById(R.id.verseTextView);
+		parseButton = (Button) view.findViewById(R.id.parseButton);
+		parseButton.setOnClickListener(parseButtonClick);
+
+		new PopulateVersions().execute();
+	}
+
+
+	private class PopulateVersions extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				Document doc = Download.availableVersions(PrivateKeys.API_KEY, null);
+				availableBibles = Bible.getAvailableVersions(doc);
+			}
+			catch(IOException ioe) {
+				ioe.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			super.onPostExecute(aVoid);
+
+			Bible[] biblesList = new Bible[availableBibles.size()];
+			availableBibles.values().toArray(biblesList);
+
+			String[] biblesArray = new String[biblesList.length];
+
+			for(int i = 0; i < biblesList.length; i++) {
+				biblesArray[i] = biblesList[i].getVersionId();
+			}
+
+			Arrays.sort(biblesArray);
+			versionSpinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, biblesArray));
+			versionSpinner.setOnItemSelectedListener(versionSpinnerCallback);
+		}
+	}
+
+	private AdapterView.OnItemSelectedListener versionSpinnerCallback = new AdapterView.OnItemSelectedListener() {
+		@Override
+		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+			selectedBible = (String) parent.getAdapter().getItem(position);
+
+			new PopulateBooks().execute();
+		}
+
+		@Override
+		public void onNothingSelected(AdapterView<?> parent) {
+
+		}
+	};
+
+	private class PopulateBooks extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				Document doc = Download.versionInfo(PrivateKeys.API_KEY, selectedBible);
+
+				selectedBibleObject = new Bible(selectedBible);
+				selectedBibleObject.getVersionInfo(doc);
+			}
+			catch(IOException ioe) {
+				ioe.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			super.onPostExecute(aVoid);
+
+			ArrayList<Book> booksList = selectedBibleObject.books;
+
+			String[] booksArray = new String[booksList.size()];
+
+			for(int i = 0; i < booksList.size(); i++) {
+				booksArray[i] = booksList.get(i).getName();
+			}
+
+			bookSpinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, booksArray));
+			bookSpinner.setOnItemSelectedListener(bookSpinnerCallback);
+		}
+	}
+
+	private AdapterView.OnItemSelectedListener bookSpinnerCallback = new AdapterView.OnItemSelectedListener() {
+		@Override
+		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+			String selectedBook = (String) parent.getAdapter().getItem(position);
+
+			referenceEditText.setText(selectedBook);
+		}
+
+		@Override
+		public void onNothingSelected(AdapterView<?> parent) {
+
+		}
+	};
+
+	private class DownloadVerse extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				String referenceString = referenceEditText.getText().toString();
+
+				Reference reference = Reference.parseReference(referenceString, selectedBibleObject);
+				passage = new Passage(reference);
+				Document doc = Download.bibleChapter(PrivateKeys.API_KEY,
+						reference.book.getId(),
+						reference.chapter);
+
+				passage.getVerseInfo(doc);
+			}
+			catch(ParseException pe) {
+				pe.printStackTrace();
+			}
+			catch(IOException ioe) {
+				ioe.printStackTrace();
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			super.onPostExecute(aVoid);
+
+			verseTextView.setText(passage.getText());
+		}
+	}
+
+	private View.OnClickListener parseButtonClick = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			new DownloadVerse().execute();
+		}
+	};
+}

@@ -7,6 +7,7 @@ import com.caseybrooks.androidbibletools.basic.Verse;
 import com.caseybrooks.androidbibletools.data.Bible;
 import com.caseybrooks.androidbibletools.data.Book;
 import com.caseybrooks.androidbibletools.io.Download;
+import com.caseybrooks.androidbibletools.io.PrivateKeys;
 
 import junit.framework.TestCase;
 
@@ -34,8 +35,12 @@ public class DownloadingTest extends TestCase {
 		passage.getVerseInfo(doc2);
 		assertEquals("For through the law I died to the law, so that I might live to God. I have been crucified with Christ. It is no longer I who live, but Christ who lives in me. And the life I now live in the flesh I live by faith in the Son of God, who loved me and gave himself for me. I do not nullify the grace of God, for if righteousness were through the law, then Christ died for no purpose.", passage.getText());
 
-		//test downloading verses in other languages, like Spanish
-		Passage spanishPassage = Passage.parsePassage("Galatians 2:19-21", new Bible("spa-DHH"));
+		//test downloading verses in other languages, like Spanish. First download
+		//the appropriate verseion text, then download the verse after the reference
+		//has been properly parsed in that language
+		Bible DHH = new Bible("spa-DHH");
+		DHH.getVersionInfo(Download.versionInfo(PrivateKeys.API_KEY, DHH.getVersionId()));
+		Passage spanishPassage = Passage.parsePassage("Gálatas 2:19-21", DHH);
 		Document doc3 = Download.bibleChapter(
 				PrivateKeys.API_KEY,
 				spanishPassage.getReference().book.getId(),

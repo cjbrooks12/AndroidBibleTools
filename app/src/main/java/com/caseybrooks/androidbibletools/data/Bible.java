@@ -44,6 +44,12 @@ public class Bible {
 		}
 	}
 
+	/**
+	 * Attemps to parse a given String and determine the name of the
+	 *
+	 * @param bookName the text of the book to attempt to parse
+	 * @return
+	 */
 	public Book parseBook(String bookName) {
 		for(Book book : books) {
 			//attempt to parse the full book name
@@ -85,7 +91,6 @@ public class Bible {
 		doc.select("previous").remove();
 
 		Elements bookElements = doc.select("book");
-
 
 		//parse each <book> element to get the information for that book
 		for(Element book : bookElements) {

@@ -34,7 +34,7 @@ public class Bible {
 		//needing to download anything first
 		books = new ArrayList<>();
 		for(int i = 0; i < DefaultBible.defaultBookName.length; i++) {
-			Book book = new Book(versionId + ":" + DefaultBible.defaultBookAbbr[i]);
+			Book book = new Book(this.versionId + ":" + DefaultBible.defaultBookAbbr[i]);
 			book.setName(DefaultBible.defaultBookName[i]);
 			book.setAbbr(DefaultBible.defaultBookAbbr[i]);
 			book.setChapters(DefaultBible.defaultBookVerseCount[i]);
@@ -68,67 +68,38 @@ public class Bible {
 		return versionId;
 	}
 
-//	public static Bible parseVersion(String bible) {
-//
-//
-//
-//		return null;
-//	}
+	/**
+	 * Populates this Bible with data parsed from the XML response of the
+	 * Bibles.org API to get the full information for the Bible. This includes
+	 * all books and counts for verses and chapters in each book.
+	 *
+	 * @param doc
+	 */
+	public void getVersionInfo(Document doc) {
+		if(listener != null) listener.onPreDownload();
 
-//	/**
-//	 * Downloads the full information for the Bible. This includes the copyright,
-//	 * and all books and counts for verses and chapters in each book.
-//	 *
-//	 * @param APIKey required free API key from Bibles.org/api
-//	 * @throws IOException
-//	 */
-//	public void downloadVersionInfo(String APIKey) throws IOException {
-//		if(listener != null) listener.onPreDownload();
-//
-//		String url = "http://" + APIKey + ":x@bibles.org/v2/versions/" +
-//				id + "/books.xml?include_chapters=true";
-//
-//		String header = APIKey + ":x";
-//		String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);
-//		Document doc = Jsoup.connect(url).header("Authorization", "Basic " + encodedHeader).get();
-//
-//		ArrayList<Book> newBooks = new ArrayList<>();
-//		Elements bookElements = doc.select("book");
-//
-//		//parse each <book> element to get the information for that book
-//		for(Element book : bookElements) {
-//			Book newBook = new Book(book.select("id").text());
-////			newBook.setName(book.select("name").text());
-////			newBook.setAbbr(book.select("abbr").text());
-////			newBook.setOrder(Integer.parseInt(book.select("order").text()));
-//
-//			//parse individual <chapter> elements to get the number of verses in each chapter
-////			Elements chapters = book.select("chapters").select("chapter");
-////			ArrayList<Integer> versesInChapter = new ArrayList<>();
-////			for(Element chapter : chapters) {
-////				if(chapter.childNodeSize() <= 1) continue;
-////
-////				Elements osisEnd = chapter.select("osis_end");
-////
-////				if(osisEnd != null) {
-////					String[] chapterOsisEnd = osisEnd.text().split("\\.");
-////
-////					if(chapterOsisEnd.length != 3) throw new IOException(chapter.toString() + " not split");
-////					int endVerse = Integer.parseInt(chapterOsisEnd[2]);
-////
-////					versesInChapter.add(endVerse);
-////				}
-////			}
-//
-////			newBook.chapters = versesInChapter;
-//
-//			newBooks.add(newBook);
-//		}
-//
-//		this.books = newBooks;
-//
-//		if(listener != null) listener.onPostDownload();
-//	}
+		ArrayList<Book> newBooks = new ArrayList<>();
+
+		doc.select("parent").remove();
+		doc.select("next").remove();
+		doc.select("previous").remove();
+
+		Elements bookElements = doc.select("book");
+
+
+		//parse each <book> element to get the information for that book
+		for(Element book : bookElements) {
+			Book newBook = new Book(book.select("id").text());
+			newBook.setName(book.select("name").text());
+			newBook.setAbbr(book.select("abbr").text());
+			newBook.setOrder(Integer.parseInt(book.select("ord").text()));
+
+			newBooks.add(newBook);
+		}
+		this.books = newBooks;
+
+		if(listener != null) listener.onPostDownload();
+	}
 
 	/**
 	 * Parse the XML response from Bibles.org of available versions. The document

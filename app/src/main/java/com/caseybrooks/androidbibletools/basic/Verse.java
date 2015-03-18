@@ -2,8 +2,9 @@ package com.caseybrooks.androidbibletools.basic;
 
 import android.support.annotation.NonNull;
 
-import com.caseybrooks.androidbibletools.data.Reference;
 import com.caseybrooks.androidbibletools.data.Bible;
+import com.caseybrooks.androidbibletools.data.Optional;
+import com.caseybrooks.androidbibletools.data.Reference;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -52,7 +53,7 @@ public class Verse extends AbstractVerse {
         super(reference);
     }
 
-	public static Verse parseVerse(String reference, Bible bible) throws ParseException {
+	public static Verse parseVerse(String reference, @Optional Bible bible) throws ParseException {
 		Bible ver = (bible == null) ? new Bible("eng-ESV") : bible;
 
 		Reference ref = Reference.parseReference(reference, ver);
@@ -222,14 +223,12 @@ public class Verse extends AbstractVerse {
 //------------------------------------------------------------------------------
 
 	@Override
-	public void loadFromServer(Document doc) {
+	public void getVerseInfo(Document doc) {
 		if(listener != null) listener.onPreDownload();
 
-		String verseID = bible.getVersionId() + ":" +
-				reference.book.getId() +"." +
-				reference.chapter;
+		String verseID = reference.book.getId() +"." + reference.chapter + "." + reference.verse;
 
-		Elements scripture = doc.select("verse[id=" + verseID + "." + reference.verse + "]");
+		Elements scripture = doc.select("verse[id=" + verseID  + "]");
 		Document textHTML = Jsoup.parse(scripture.select("text").text());
 		textHTML.select("sup").remove();
 

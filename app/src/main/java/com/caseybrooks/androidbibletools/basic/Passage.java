@@ -234,13 +234,11 @@ public class Passage extends AbstractVerse {
 //------------------------------------------------------------------------------
 
 	@Override
-	public void loadFromServer(Document doc) {
+	public void getVerseInfo(Document doc) {
 		if(listener != null) listener.onPreDownload();
 		allText = null;
 
-		String verseID = bible.getVersionId() + ":" +
-				reference.book.getId() +"." +
-				reference.chapter;
+		String verseID = reference.book.getId() +"." + reference.chapter;
 
 		for(int i = 0; i < verses.size(); i++) {
 			Verse verse = verses.get(i);

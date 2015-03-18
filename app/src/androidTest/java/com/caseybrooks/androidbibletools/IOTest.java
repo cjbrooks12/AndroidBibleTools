@@ -12,7 +12,7 @@ public class IOTest extends TestCase {
 //
 //		final Passage passage = new Passage(reference);
 //		passage.setBible(new Bible("eng-ESV"));
-//		passage.loadFromServer(PrivateKeys.API_KEY);
+//		passage.getVerseInfo(PrivateKeys.API_KEY);
 //
 //		String xmlExpected =
 //				"<?xml bible=\"1.0\" encoding=\"UTF-8\"?>" + "" +

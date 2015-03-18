@@ -20,10 +20,9 @@ public class VerseOfTheDay {
         try {
             Passage passage = Passage.parsePassage(reference.attr("content").substring(18), bible);
 			Document verseDoc = Download.bibleChapter(APIKey,
-					bible.getVersionId(),
 					passage.getReference().book.getId(),
 					passage.getReference().chapter);
-            passage.loadFromServer(verseDoc);
+            passage.getVerseInfo(verseDoc);
             return passage;
         }
         catch(ParseException e) {

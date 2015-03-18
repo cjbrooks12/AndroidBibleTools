@@ -201,7 +201,7 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 *
 	 * @param doc a Jsoup Document containing the XML response to be parsed
 	 */
-	public abstract void loadFromServer(Document doc);
+	public abstract void getVerseInfo(Document doc);
 
 //	/**
 //	 * Returns a String XML representation of this verse. Is equivalent to calling

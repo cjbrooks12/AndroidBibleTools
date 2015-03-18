@@ -121,7 +121,7 @@ var activeTableTab = "activeTableTab";
 extends <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html" title="class in com.caseybrooks.androidbibletools.basic">AbstractVerse</a></pre>
 <div class="block">The simplest unit of data in this data structure. Each verse contains one
   and only one Bible verse, its corresponding Book, Chapter, and Verse Number,
-  and the version this specific Verse is.
+  and the bible this specific Verse is.
 
   Verse objects are immutable. The necessary core information, the
   verse reference and its getText, cannot be modified once set, as the Verse should
@@ -163,7 +163,7 @@ extends <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVer
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;com.caseybrooks.androidbibletools.basic.<a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html" title="class in com.caseybrooks.androidbibletools.basic">AbstractVerse</a></h3>
-<code><a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#formatter">formatter</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#listener">listener</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#metadata">metadata</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#reference">reference</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#tags">tags</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#version">version</a></code></li>
+<code><a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#formatter">formatter</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#listener">listener</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#metadata">metadata</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#reference">reference</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#tags">tags</a>, <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVerse.html#bible">bible</a></code></li>
 </ul>
 </li>
 </ul>
@@ -243,7 +243,7 @@ extends <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVer
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/caseybrooks/androidbibletools/basic/Verse.html#toXML-org.w3c.dom.Document-">toXML</a></span>(org.w3c.dom.Document&nbsp;doc)</code>
 <div class="block">The structure for a Verse object will be like the following
 
- <verse reference="John 1:5" version="KJV">
+ <verse reference="John 1:5" bible="KJV">
      The light shines in the darkness, and the darkness has not overcome<footnote>Or understood</footnote> it.</div>
 </td>
 </tr>
@@ -388,7 +388,7 @@ extends <a href="../../../../com/caseybrooks/androidbibletools/basic/AbstractVer
 <pre>public&nbsp;org.w3c.dom.Element&nbsp;toXML(org.w3c.dom.Document&nbsp;doc)</pre>
 <div class="block">The structure for a Verse object will be like the following
 
- <verse reference="John 1:5" version="KJV">
+ <verse reference="John 1:5" bible="KJV">
      The light shines in the darkness, and the darkness has not overcome<footnote>Or understood</footnote> it.
  </verse></div>
 <dl>

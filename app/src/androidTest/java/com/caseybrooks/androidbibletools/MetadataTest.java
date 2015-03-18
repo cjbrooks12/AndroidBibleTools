@@ -4,9 +4,9 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 
 import com.caseybrooks.androidbibletools.basic.Verse;
+import com.caseybrooks.androidbibletools.data.Book;
 import com.caseybrooks.androidbibletools.data.Metadata;
 import com.caseybrooks.androidbibletools.data.Reference;
-import com.caseybrooks.androidbibletools.enumeration.BookEnum;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class MetadataTest extends ApplicationTestCase<Application> {
 
 
 	public void testAddingKeys() throws Throwable {
-		Verse verseA = new Verse(new Reference(BookEnum.John, 3, 16));
+		Verse verseA = new Verse(new Reference(new Book("eng-ESV:John"), 3, 16));
 		Metadata metadataA = new Metadata();
 		metadataA.put("STRING", "value a"); //String is a comparable type
 		metadataA.put("INTEGER", 0); //int is comparable
@@ -61,7 +61,7 @@ public class MetadataTest extends ApplicationTestCase<Application> {
 		verseA.setMetadata(metadataA);
 
 		//create a second Metadata object to test comparison of all types
-		Verse verseB = new Verse(new Reference(BookEnum.John, 3, 17));
+		Verse verseB = new Verse(new Reference(new Book("eng-ESV:John"), 3, 17));
 		Metadata metadataB = new Metadata();
 		metadataB.putString("STRING", "value b"); //String is a comparable type
 		metadataB.putInt("INTEGER", 1); //int is comparable
@@ -73,7 +73,7 @@ public class MetadataTest extends ApplicationTestCase<Application> {
 
 		//create a third Metadata object which has the same keys but different classes with those keys
 		//to ensure that it won't compare Objects of different type
-		Verse verseC = new Verse(new Reference(BookEnum.John, 3, 18));
+		Verse verseC = new Verse(new Reference(new Book("eng-ESV:John"), 3, 18));
 		Metadata metadataC = new Metadata();
 		metadataC.putString("COMPARABLE_CLASS", "value c"); //String is a comparable type
 		metadataC.putInt("STRING", 2); //int is comparable
@@ -147,16 +147,16 @@ public class MetadataTest extends ApplicationTestCase<Application> {
 		Metadata.MultiComparator multiComparator = new Metadata.MultiComparator(comparators);
 
 		ArrayList<Verse> verses = new ArrayList<>();
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 10)));
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 9)));
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 8)));
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 7)));
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 6)));
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 5)));
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 4)));
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 3)));
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 2)));
-		verses.add(new Verse(new Reference(BookEnum.Genesis, 1, 1)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 10)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 9)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 8)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 7)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 6)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 5)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 4)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 3)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 2)));
+		verses.add(new Verse(new Reference(new Book("eng-ESV:Gen"), 1, 1)));
 
 		verses.get(0).getMetadata().putBoolean("IS_MENS", false);
 		verses.get(1).getMetadata().putBoolean("IS_MENS", false);

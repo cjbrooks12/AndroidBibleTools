@@ -6,14 +6,11 @@ import com.caseybrooks.androidbibletools.data.Formatter;
 import com.caseybrooks.androidbibletools.data.Metadata;
 import com.caseybrooks.androidbibletools.data.OnDownloadListener;
 import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.data.Bible;
 import com.caseybrooks.androidbibletools.defaults.DefaultFormatter;
-import com.caseybrooks.androidbibletools.enumeration.VersionEnum;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.jsoup.nodes.Document;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.TreeSet;
 
 /**An abstract implementation of a Verse in the Bible. A verse represents a location
@@ -24,8 +21,8 @@ import java.util.TreeSet;
 public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 //Data Members
 //------------------------------------------------------------------------------
-	protected VersionEnum version;
-    protected final Reference reference;
+	protected Bible bible;
+    protected final Reference reference; //always points to one single verse
     protected Formatter formatter;
     protected Metadata metadata;
 	protected TreeSet<Tag> tags;
@@ -39,51 +36,33 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 * @see com.caseybrooks.androidbibletools.data.Reference
 	 */
 	public AbstractVerse(Reference reference) {
-		this.version = VersionEnum.KJV;
+		this.bible = new Bible("eng-esv");
         this.reference = reference;
         this.formatter = new DefaultFormatter();
         this.metadata = new Metadata();
 		this.tags = new TreeSet<>();
 	}
 
-	/**
-	 * Constructor for AbstractVerse that takes a parses a String for a reference
-	 * and creates the Reference if it is able to correctly parse the string
-	 *
-	 * @param reference the Reference that this verse points to in the Bible
-	 *
-	 * @throws ParseException if the String could not be parsed
-	 *
-	 * @see com.caseybrooks.androidbibletools.data.Reference
-	 */
-    public AbstractVerse(String reference) throws ParseException {
-        this.version = VersionEnum.KJV;
-        this.reference = Reference.parseReference(reference);
-        this.formatter = new DefaultFormatter();
-        this.metadata = new Metadata();
-        this.tags = new TreeSet<>();
-	}
-
 //Defined methods
 //------------------------------------------------------------------------------
 
 	/**
-	 * Get the currently set Version of this verse
-	 * @return {@link com.caseybrooks.androidbibletools.enumeration.VersionEnum}
+	 * Get the currently set Bible of this verse
+	 * @return {@link com.caseybrooks.androidbibletools.data.Bible}
 	 *
 	 */
-	public VersionEnum getVersion() {
-		return version;
+	public Bible getBible() {
+		return bible;
 	}
 
 	/**
-	 * Set the Version of this verse
-	 * @param version the desired Bible translation
+	 * Set the Bible of this verse
+	 * @param bible the desired Bible translation
 	 *
-	 * @see com.caseybrooks.androidbibletools.enumeration.VersionEnum
+	 * @see com.caseybrooks.androidbibletools.data.Bible
 	 */
-    public void setVersion(VersionEnum version) {
-		this.version = version;
+    public void setBible(Bible bible) {
+		this.bible = bible;
 	}
 
 	/**
@@ -199,48 +178,47 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 */
 	public abstract String getText();
 
-	/**
-	 * Enumeration for the several online bibles to provide links to
-	 */
-	public enum OnlineBible {
-		Biblia,
-		BibleStudyTools,
-		BibleGateway,
-		BlueLetterBible,
-		YouVersion,
-	}
-	/**
-	 * Get a URL to this verse on Biblia.com by Logos Bible Software
-	 *
-	 * @return {@link java.lang.String} the URL of this verse on Biblia.com
-	 */
-    public abstract String getURL(OnlineBible service);
+//	/**
+//	 * Enumeration for the several online bibles to provide links to
+//	 */
+//	public enum OnlineBible {
+//		Biblia,
+//		BibleStudyTools,
+//		BibleGateway,
+//		BlueLetterBible,
+//		YouVersion,
+//	}
+//	/**
+//	 * Get a URL to this verse on Biblia.com by Logos Bible Software
+//	 *
+//	 * @return {@link java.lang.String} the URL of this verse on Biblia.com
+//	 */
+//    public abstract String getURL(OnlineBible service);
 
 	/**
-	 * Download the verse from the internet. Should always be called from a non-UI
-	 * thread, as it must access the internet which will throw an exception if
-	 * run on the UI thread. Uses the Bibles.org API.
+	 * Load data from the Bibles.org API response into this Verse. Uses either
+	 * the response just downloaded, or a previously cached and parsed file.
 	 *
-	 * @throws IOException
+	 * @param doc a Jsoup Document containing the XML response to be parsed
 	 */
-	public abstract void retrieve(String APIKey) throws IOException;
+	public abstract void loadFromServer(Document doc);
 
-	/**
-	 * Returns a String XML representation of this verse. Is equivalent to calling
-	 * #toXML() and transforming the result to a String.
-	 * @return
-	 */
-	public abstract String toXMLString();
-
-	/**
-	 * Generates an XML representation of this verse, designed to create a consistent
-	 * IO sharing pattern
-	 *
-	 * @param doc the base Document to add this verse as a Node to
-	 * @return {@link org.w3c.dom.Element} a single element of an XML file. May
-	 * be kept as the root or added to another element
-	 */
-	public abstract Element toXML(Document doc);
+//	/**
+//	 * Returns a String XML representation of this verse. Is equivalent to calling
+//	 * #toXML() and transforming the result to a String.
+//	 * @return
+//	 */
+//	public abstract String toXMLString();
+//
+//	/**
+//	 * Generates an XML representation of this verse, designed to create a consistent
+//	 * IO sharing pattern
+//	 *
+//	 * @param doc the base Document to add this verse as a Node to
+//	 * @return {@link org.w3c.dom.Element} a single element of an XML file. May
+//	 * be kept as the root or added to another element
+//	 */
+//	public abstract Element toXML(Document doc);
 
 
 //Comparison methods

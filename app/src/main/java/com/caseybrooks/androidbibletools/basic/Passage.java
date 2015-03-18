@@ -1,32 +1,19 @@
 package com.caseybrooks.androidbibletools.basic;
 
 import android.support.annotation.NonNull;
-import android.util.Base64;
 
+import com.caseybrooks.androidbibletools.data.Bible;
 import com.caseybrooks.androidbibletools.data.Reference;
-import com.caseybrooks.androidbibletools.enumeration.VersionEnum;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.w3c.dom.Element;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 //A Passage is a group of Verse objects that are in a sequence (i.e. Galatians 2:19-21)
 //	A Passage is a basic type, and so its reference is non-modifiable. In addition,
@@ -60,69 +47,43 @@ public class Passage extends AbstractVerse {
 		}
     }
 
-    public Passage(String reference) throws ParseException {
-		super(reference);
+	public static Passage parsePassage(String reference, Bible bible) throws ParseException {
+		Bible ver = (bible == null) ? new Bible("eng-ESV") : bible;
 
-        Collections.sort(this.reference.verses);
-        this.verses = new ArrayList<Verse>();
-		for(Integer verseNum : this.reference.verses) {
-			this.verses.add(new Verse(new Reference(this.reference.book, this.reference.chapter, verseNum)));
-		}
+		Reference ref = Reference.parseReference(reference, ver);
+		Passage passage = new Passage(ref);
+		passage.setBible(ver);
+		return passage;
 	}
 
 //Setters and Getters
 //------------------------------------------------------------------------------
 
-
     @Override
-    public void setVersion(VersionEnum version) {
-        super.setVersion(version);
+    public void setBible(Bible bible) {
+        super.setBible(bible);
         for(Verse verse : verses) {
-            verse.setVersion(this.version);
+            verse.setBible(this.bible);
         }
     }
 
     public Passage setText(String text) {
 		this.verses.clear();
 
+		//parse input string and extract any tags, denoted as standard hastags
+		Matcher m = hashtag.matcher(text);
 
-		//attempt to parse the text as if it were marked up
-
-		if(text.contains("\\{/num (\"\\d+\")?\\}")) {
-			String[] parsedVerses = text.split("\\{/num (\"\\d+\")?\\}");
-
-			if(parsedVerses.length == reference.verses.size()) {
-				for(int i = 0; i < this.reference.verses.size(); i++) {
-					this.verses.add(
-					   new Verse(new Reference(this.reference.book,
-						  this.reference.chapter,
-						  this.reference.verses.get(i))));
-					verses.get(i).setVersion(this.version);
-					verses.get(i).setText(parsedVerses[i]);
-				}
+		while(m.find()) {
+			String match = m.group(1);
+			if(match.charAt(0) == '\"') {
+				addTag(new Tag(match.substring(1, match.length() - 1)));
+			}
+			else {
+				addTag(new Tag(match));
 			}
 		}
 
-		//if the text is not marked up, try to extract as much verse information
-		//as we can. Get hashtags and verse numbers, and leave the rest alone
-		else {
-			//parse input string and extract any tags, denoted as standard hastags
-			Matcher m = hashtag.matcher(text);
-
-			while(m.find()) {
-				String match = m.group(1);
-				if(match.charAt(0) == '\"') {
-					addTag(new Tag(match.substring(1, match.length() - 1)));
-				}
-				else {
-					addTag(new Tag(match));
-				}
-			}
-
-			this.allText = m.replaceAll("");
-//			this.allText = text.replaceAll(markup_num, "").replaceAll(markup_ref, "").replaceAll(markup_tag, "");
-
-		}
+		this.allText = m.replaceAll("");
 
 		return this;
 	}
@@ -163,85 +124,85 @@ public class Passage extends AbstractVerse {
 
 //get the XML representation of this object
 //------------------------------------------------------------------------------
-	@Override
-	public Element toXML(org.w3c.dom.Document doc) {
-		org.w3c.dom.Element root = doc.createElement("passage");
-
-		root.setAttribute("reference", reference.toString());
-		root.setAttribute("version", version.getCode().toUpperCase());
-
-		if(verses.size() > 0) {
-			for(Verse verse : verses) {
-				Element child = verse.toXML(doc);
-				child.removeAttribute("version");
-				child.removeAttribute("reference");
-				child.setAttribute("reference", Integer.toString(verse.getReference().verse));
-
-				root.appendChild(child);
-			}
-		}
-		else {
-			root.appendChild(doc.createTextNode(allText));
-		}
-
-		return root;
-	}
-
-	@Override
-	public String toXMLString() {
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			org.w3c.dom.Document doc = builder.newDocument();
-
-			Element root = toXML(doc);
-			doc.appendChild(root);
-
-			StringWriter writer = new StringWriter();
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.transform(new DOMSource(doc), new StreamResult(writer));
-			return writer.toString();
-		}
-		catch(TransformerException ex) {
-			ex.printStackTrace();
-			return null;
-		}
-		catch(ParserConfigurationException ex) {
-			ex.printStackTrace();
-			return null;
-		}
-	}
-
-	public static Passage fromXML(org.jsoup.nodes.Element passageRoot) {
-		try {
-			if(passageRoot.tagName().equals("passage")) {
-				Passage passage = new Passage(passageRoot.attr("reference"));
-				if(passageRoot.childNodeSize() == passage.reference.verses.size()) {
-					passage.setVersion(VersionEnum.parseVersion(passageRoot.attr("version")));
-					passage.setText(passageRoot.text());
-					passage.verses.clear();
-
-					for(org.jsoup.nodes.Element childVerse : passageRoot.children()) {
-						Verse verse = new Verse(new Reference(
-								passage.reference.book,
-								passage.reference.chapter,
-								Integer.parseInt(childVerse.attr("reference"))));
-
-						verse.setVersion(passage.version);
-						verse.setText(childVerse.text());
-						passage.verses.add(verse);
-					}
-					return passage;
-				}
-			}
-
-			return null;
-		}
-		catch(ParseException pe) {
-			pe.printStackTrace();
-			return null;
-		}
-	}
+//	@Override
+//	public Element toXML(org.w3c.dom.Document doc) {
+//		org.w3c.dom.Element root = doc.createElement("passage");
+//
+//		root.setAttribute("reference", reference.toString());
+//		root.setAttribute("bible", bible.id.toUpperCase());
+//
+//		if(verses.size() > 0) {
+//			for(Verse verse : verses) {
+//				Element child = verse.toXML(doc);
+//				child.removeAttribute("bible");
+//				child.removeAttribute("reference");
+//				child.setAttribute("reference", Integer.toString(verse.getReference().verse));
+//
+//				root.appendChild(child);
+//			}
+//		}
+//		else {
+//			root.appendChild(doc.createTextNode(allText));
+//		}
+//
+//		return root;
+//	}
+//
+//	@Override
+//	public String toXMLString() {
+//		try {
+//			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//			DocumentBuilder builder = factory.newDocumentBuilder();
+//			org.w3c.dom.Document doc = builder.newDocument();
+//
+//			Element root = toXML(doc);
+//			doc.appendChild(root);
+//
+//			StringWriter writer = new StringWriter();
+//			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+//			transformer.transform(new DOMSource(doc), new StreamResult(writer));
+//			return writer.toString();
+//		}
+//		catch(TransformerException ex) {
+//			ex.printStackTrace();
+//			return null;
+//		}
+//		catch(ParserConfigurationException ex) {
+//			ex.printStackTrace();
+//			return null;
+//		}
+//	}
+//
+//	public static Passage fromXML(org.jsoup.nodes.Element passageRoot) {
+//		try {
+//			if(passageRoot.tagName().equals("passage")) {
+//				Bible bible = new Bible(passageRoot.attr("bible"));
+//				Passage passage = new Passage(Reference.parseReference(passageRoot.attr("reference"), bible));
+//				if(passageRoot.childNodeSize() == passage.reference.verses.size()) {
+//					passage.setText(passageRoot.text());
+//					passage.verses.clear();
+//
+//					for(org.jsoup.nodes.Element childVerse : passageRoot.children()) {
+//						Verse verse = new Verse(new Reference(
+//								passage.reference.book,
+//								passage.reference.chapter,
+//								Integer.parseInt(childVerse.attr("reference"))));
+//
+//						verse.setBible(passage.bible);
+//						verse.setText(childVerse.text());
+//						passage.verses.add(verse);
+//					}
+//					return passage;
+//				}
+//			}
+//
+//			return null;
+//		}
+//		catch(ParseException pe) {
+//			pe.printStackTrace();
+//			return null;
+//		}
+//	}
 
 //------------------------------------------------------------------------------
 	public Verse[] getVerses() {
@@ -271,39 +232,15 @@ public class Passage extends AbstractVerse {
 
 //Retrieve verse from the Internet
 //------------------------------------------------------------------------------
-    @Override
-    public String getURL(OnlineBible service) {
-		switch(service) {
-		case BibleGateway:
-		case BibleStudyTools:
-		case BlueLetterBible:
-		case YouVersion:
-		case Biblia:
-			return "http://biblia.com/books/" +
-					version.getCode() + "/" +
-					reference.book.getCode() + reference.chapter;
-		default:
-			return null;
-		}
-    }
 
 	@Override
-	public void retrieve(String APIKey) throws IOException {
+	public void loadFromServer(Document doc) {
 		if(listener != null) listener.onPreDownload();
 		allText = null;
 
-		String verseID = "eng-" +
-				version.getCode() + ":" +
-				reference.book.getCode() +"." +
+		String verseID = bible.getVersionId() + ":" +
+				reference.book.getId() +"." +
 				reference.chapter;
-
-		String url = "http://" + APIKey + ":x@bibles.org/v2/chapters/" +
-				verseID + "/verses.xml?include_marginalia=false";
-
-		String header = APIKey + ":x";
-		String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);
-
-		Document doc = Jsoup.connect(url).header("Authorization", "Basic " + encodedHeader).get();
 
 		for(int i = 0; i < verses.size(); i++) {
 			Verse verse = verses.get(i);
@@ -316,6 +253,6 @@ public class Passage extends AbstractVerse {
 			verse.setText(textHTML.text());
 		}
 
-		if(listener != null) listener.onDownloadSuccess();
+		if(listener != null) listener.onPostDownload();
 	}
 }

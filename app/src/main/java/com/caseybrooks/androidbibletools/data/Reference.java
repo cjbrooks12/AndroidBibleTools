@@ -1,6 +1,5 @@
 package com.caseybrooks.androidbibletools.data;
 
-import com.caseybrooks.androidbibletools.enumeration.BookEnum;
 import com.caseybrooks.androidbibletools.io.ReferenceParser;
 
 import java.text.ParseException;
@@ -8,15 +7,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Reference implements Comparable<Reference> {
-    public final BookEnum book;
+    public final Book book;
     public final int chapter;
     public final int verse;
-//    public final boolean isValid;
     public final ArrayList<Integer> verses;
 
 //Parse the input string using recursive descent parsing
 //------------------------------------------------------------------------------
-    public Reference(BookEnum book, int chapter, int... verses) {
+    public Reference(Book book, int chapter, int... verses) {
 		this.book = book;
 		this.chapter = chapter;
 		if(verses.length == 1) {
@@ -36,7 +34,7 @@ public class Reference implements Comparable<Reference> {
 		}
     }
 
-	public Reference(BookEnum book, int chapter, ArrayList<Integer> verses) {
+	public Reference(Book book, int chapter, ArrayList<Integer> verses) {
 		this.book = book;
 		this.chapter = chapter;
 		if(verses.size() == 1) {
@@ -51,8 +49,8 @@ public class Reference implements Comparable<Reference> {
 		}
 	}
 
-	public static Reference parseReference(String reference) throws ParseException {
-		ReferenceParser parser = new ReferenceParser();
+	public static Reference parseReference(String reference, Bible bible) throws ParseException {
+		ReferenceParser parser = new ReferenceParser(bible);
 
 		return parser.getPassageReference(reference);
 	}
@@ -106,8 +104,8 @@ public class Reference implements Comparable<Reference> {
 //        return true;
 //    }
 //
-    public static Reference extractReference(String reference) {
-		return ReferenceParser.extractReferences(reference);
+    public static Reference extractReference(String reference, Bible bible) {
+		return ReferenceParser.extractReferences(reference, bible);
     }
 
 
@@ -165,27 +163,20 @@ public class Reference implements Comparable<Reference> {
     public int compareTo(Reference rhs) {
         Reference lhs = this;
 
-        //get the position of each book as an integer so we can work with it
-        int aBook = -1, bBook = -1;
-        for(int i = 0; i < BookEnum.values().length; i++) {
-            if(BookEnum.values()[i] == lhs.book) aBook = i;
-            if(BookEnum.values()[i] == rhs.book) bBook = i;
-        }
-
-        if(aBook - bBook == 1) {
+        if(lhs.book.getOrder() - rhs.book.getOrder() == 1) {
             if((lhs.chapter == 1 && lhs.verses.get(0) == 1) &&
                     (rhs.chapter == rhs.book.numChapters() &&
                             (rhs.verses.get(0) == rhs.book.numVersesInChapter(rhs.chapter)))) return 1;
             else return 4;
         }
-        else if(aBook - bBook == -1) {
+        else if(lhs.book.getOrder() - rhs.book.getOrder() == -1) {
             if((rhs.chapter == 1 && rhs.verses.get(0) == 1) &&
                     (lhs.chapter == lhs.book.numChapters() &&
                             (lhs.verses.get(0) == lhs.book.numVersesInChapter(lhs.chapter)))) return -1;
             else return -4;
         }
-        else if(aBook > bBook) return 4;
-        else if(aBook < bBook) return -4;
+        else if(lhs.book.getOrder() > rhs.book.getOrder()) return 4;
+        else if(lhs.book.getOrder() < rhs.book.getOrder()) return -4;
         else {
 			//TODO: get reference comparing for Verse objects (verses == null, verse is defined)
             //same book

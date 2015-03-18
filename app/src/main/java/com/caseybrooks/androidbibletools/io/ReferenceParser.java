@@ -1,7 +1,8 @@
 package com.caseybrooks.androidbibletools.io;
 
+import com.caseybrooks.androidbibletools.data.Bible;
+import com.caseybrooks.androidbibletools.data.Book;
 import com.caseybrooks.androidbibletools.data.Reference;
-import com.caseybrooks.androidbibletools.enumeration.BookEnum;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -28,9 +29,14 @@ import java.util.ArrayList;
  */
 
 public class ReferenceParser {
+	final Bible bible; //we need the bible to get the listing of books
 	String reference;
 	public ArrayList<Integer> verses;
 	TokenStream ts;
+
+	public ReferenceParser(Bible bible) {
+		this.bible = bible;
+	}
 
 	//verse ::= book chapter (punctuation) verse
 	public Reference getVerseReference(String reference) throws ParseException {
@@ -38,7 +44,7 @@ public class ReferenceParser {
 		ts = new TokenStream(reference);
 
 		//Book will throw its own exception if it fails to parse
-		BookEnum book = book();
+		Book book = book();
 
 		punctuation();
 
@@ -67,7 +73,7 @@ public class ReferenceParser {
 		ts = reference;
 
 		//Book will throw its own exception if it fails to parse
-		BookEnum book = book();
+		Book book = book();
 
 		if(book == null) {
 			throw new ParseException("Cannot parse Passage [" + reference + "]: could not match book name", 2);
@@ -109,13 +115,13 @@ public class ReferenceParser {
 		}
 	}
 
-	public static Reference extractReferences(String reference)  {
+	public static Reference extractReferences(String reference, Bible bible)  {
 		TokenStream streamBase = new TokenStream(reference);
 		TokenStream stream = new TokenStream(reference);
 
 		while(stream.toString().length() > 0) {
 			try {
-				return new ReferenceParser().getPassageReference(stream);
+				return new ReferenceParser(bible).getPassageReference(stream);
 			}
 			catch(ParseException e) {
 				streamBase.get();
@@ -123,7 +129,6 @@ public class ReferenceParser {
 				continue;
 			}
 		}
-
 
 		return null;
 	}
@@ -149,14 +154,14 @@ public class ReferenceParser {
 	}
 
 	//book ::= ([123]) word
-	private BookEnum book() throws ParseException {
+	private Book book() throws ParseException {
 		Token a = ts.get();
 
 		//book ::= [123] word (.)
 		if(a != null && a.equals(Token.Type.NUMBER) && a.getIntValue() <= 3 && a.getIntValue() > 0) {
 			Token b = ts.get();
 			if(b != null && b.equals(Token.Type.WORD)) {
-				BookEnum book = BookEnum.parseBook(a.getIntValue() + " " + b.getStringValue());
+				Book book = bible.parseBook(a.getIntValue() + " " + b.getStringValue());
 
 				if(book != null) {
 					return book;
@@ -174,7 +179,7 @@ public class ReferenceParser {
 
 		//book ::= word (punctuation)
 		if(a != null && a.equals(Token.Type.WORD)) {
-			BookEnum book = BookEnum.parseBook(a.getStringValue());
+			Book book = bible.parseBook(a.getStringValue());
 
 			if(book != null) {
 				return book;

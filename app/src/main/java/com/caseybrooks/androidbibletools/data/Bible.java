@@ -94,10 +94,34 @@ public class Bible {
 
 		//parse each <book> element to get the information for that book
 		for(Element book : bookElements) {
-			Book newBook = new Book(book.select("id").text());
+			//get basic information about a Book
+			Book newBook = new Book(book.attr("id"));
 			newBook.setName(book.select("name").text());
 			newBook.setAbbr(book.select("abbr").text());
 			newBook.setOrder(Integer.parseInt(book.select("ord").text()));
+
+			//get info about the number of chapters and verses in a Book
+			ArrayList<Integer> chapterNums = new ArrayList<>();
+			Elements chapters = book.select("chapter");
+
+			for(Element chapter : chapters) {
+				Element osisEnd = chapter.select("osis_end").first();
+				if(osisEnd != null) {
+					String lastVerse = osisEnd.text();
+					lastVerse = lastVerse.replaceAll(chapter.select("id").text() + ".", "");
+					try {
+						chapterNums.add(Integer.parseInt(lastVerse));
+					}
+					catch(NumberFormatException nfe) {
+						nfe.printStackTrace();
+					}
+				}
+			}
+			int[] chaptersArray = new int[chapterNums.size()];
+			for(int i = 0; i < chapterNums.size(); i++) {
+				chaptersArray[i] = chapterNums.get(i);
+			}
+			newBook.setChapters(chaptersArray);
 
 			newBooks.add(newBook);
 		}

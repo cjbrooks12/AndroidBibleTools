@@ -3,12 +3,16 @@ package com.androidbibletools.abttestapp;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -16,6 +20,7 @@ import android.widget.TextView;
 import com.caseybrooks.androidbibletools.basic.Passage;
 import com.caseybrooks.androidbibletools.data.Bible;
 import com.caseybrooks.androidbibletools.data.Book;
+import com.caseybrooks.androidbibletools.data.Formatter;
 import com.caseybrooks.androidbibletools.data.Reference;
 import com.caseybrooks.androidbibletools.io.Download;
 import com.caseybrooks.androidbibletools.io.PrivateKeys;
@@ -28,23 +33,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-
 public class FragmentOne extends Fragment {
 	View view;
 
 	Spinner versionSpinner;
 	Spinner bookSpinner;
+	Spinner chapterSpinner;
+	Spinner verseSpinner;
 
 	EditText referenceEditText;
 	TextView verseTextView;
 	Button parseButton;
 
+	CheckBox showNumbersCheckbox;
+	CheckBox newLinesCheckBox;
 
 	HashMap<String, Bible> availableBibles;
 	String selectedBible;
 	Bible selectedBibleObject;
 
 	Passage passage;
+
+	Book selectedBook;
+	int selectedChapter;
+	int selectedVerse;
 
 	public static FragmentOne newInstance() {
 		FragmentOne fragment = new FragmentOne();
@@ -71,10 +83,19 @@ public class FragmentOne extends Fragment {
 	private void initialize() {
 		versionSpinner = (Spinner) view.findViewById(R.id.versionSpinner);
 		bookSpinner = (Spinner) view.findViewById(R.id.bookSpinner);
+		chapterSpinner = (Spinner) view.findViewById(R.id.chapterSpinner);
+		verseSpinner = (Spinner) view.findViewById(R.id.verseSpinner);
+
 		referenceEditText = (EditText) view.findViewById(R.id.referenceEditText);
 		verseTextView = (TextView) view.findViewById(R.id.verseTextView);
 		parseButton = (Button) view.findViewById(R.id.parseButton);
 		parseButton.setOnClickListener(parseButtonClick);
+
+		showNumbersCheckbox = (CheckBox) view.findViewById(R.id.showNumbersCheckbox);
+		showNumbersCheckbox.setOnCheckedChangeListener(checkedChange);
+
+		newLinesCheckBox = (CheckBox) view.findViewById(R.id.newlinesCheckbox);
+		newLinesCheckBox.setOnCheckedChangeListener(checkedChange);
 
 		new PopulateVersions().execute();
 	}
@@ -173,9 +194,52 @@ public class FragmentOne extends Fragment {
 	private AdapterView.OnItemSelectedListener bookSpinnerCallback = new AdapterView.OnItemSelectedListener() {
 		@Override
 		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-			String selectedBook = (String) parent.getAdapter().getItem(position);
+			selectedBook = selectedBibleObject.parseBook((String) parent.getAdapter().getItem(position));
 
-			referenceEditText.setText(selectedBook);
+			String[] chaptersArray = new String[selectedBook.getChapters().length];
+
+			for(int i = 0; i < chaptersArray.length; i++) {
+				chaptersArray[i] = Integer.toString(i+1);
+			}
+
+			chapterSpinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, chaptersArray));
+			chapterSpinner.setOnItemSelectedListener(chapterSpinnerCallback);
+		}
+
+		@Override
+		public void onNothingSelected(AdapterView<?> parent) {
+
+		}
+	};
+
+	private AdapterView.OnItemSelectedListener chapterSpinnerCallback = new AdapterView.OnItemSelectedListener() {
+		@Override
+		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+			selectedChapter = position + 1;
+
+			String[] versesArray = new String[selectedBook.getChapters()[position]];
+
+			for(int i = 0; i < versesArray.length; i++) {
+				versesArray[i] = Integer.toString(i+1);
+			}
+
+			verseSpinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, versesArray));
+			verseSpinner.setOnItemSelectedListener(verseSpinnerCallback);
+		}
+
+		@Override
+		public void onNothingSelected(AdapterView<?> parent) {
+
+		}
+	};
+
+	private AdapterView.OnItemSelectedListener verseSpinnerCallback = new AdapterView.OnItemSelectedListener() {
+		@Override
+		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+			selectedVerse = position + 1;
+
+			Reference reference = new Reference(selectedBook, selectedChapter, selectedVerse);
+			referenceEditText.setText(reference.toString());
 		}
 
 		@Override
@@ -198,17 +262,16 @@ public class FragmentOne extends Fragment {
 
 				Reference reference = Reference.parseReference(referenceString, selectedBibleObject);
 				passage = new Passage(reference);
+				passage.setFormatter(formatter);
+
 				Document doc = Download.bibleChapter(PrivateKeys.API_KEY,
 						reference.book.getId(),
 						reference.chapter);
 
 				passage.getVerseInfo(doc);
 			}
-			catch(ParseException pe) {
+			catch(ParseException | IOException pe) {
 				pe.printStackTrace();
-			}
-			catch(IOException ioe) {
-				ioe.printStackTrace();
 			}
 
 			return null;
@@ -219,6 +282,7 @@ public class FragmentOne extends Fragment {
 			super.onPostExecute(aVoid);
 
 			verseTextView.setText(passage.getText());
+			referenceEditText.setText(passage.getReference().toString());
 		}
 	}
 
@@ -226,6 +290,45 @@ public class FragmentOne extends Fragment {
 		@Override
 		public void onClick(View v) {
 			new DownloadVerse().execute();
+		}
+	};
+
+	private CompoundButton.OnCheckedChangeListener checkedChange = new CompoundButton.OnCheckedChangeListener() {
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+			verseTextView.setText(Html.fromHtml(passage.getText()));
+		}
+	};
+
+	Formatter formatter = new Formatter() {
+		@Override
+		public String onPreFormat(Reference reference) {
+			return "";
+		}
+
+		@Override
+		public String onFormatNumber(int verseNumber) {
+			return (showNumbersCheckbox.isChecked()) ? "<sup><small>" + verseNumber + "</small></sup>" : "";
+		}
+
+		@Override
+		public String onFormatText(String verseText) {
+			return verseText;
+		}
+
+		@Override
+		public String onFormatSpecial(String special) {
+			return special;
+		}
+
+		@Override
+		public String onFormatNewVerse() {
+			return (newLinesCheckBox.isChecked()) ? "<br/>" : "";
+		}
+
+		@Override
+		public String onPostFormat() {
+			return "";
 		}
 	};
 }

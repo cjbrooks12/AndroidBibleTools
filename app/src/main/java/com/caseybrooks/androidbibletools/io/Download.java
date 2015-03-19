@@ -46,7 +46,7 @@ public class Download {
 	 */
 	public static Document versionInfo(String APIKey, String versionId) throws IOException {
 		String url = "http://" + APIKey + ":x@bibles.org/v2/versions/" +
-				versionId + "/books.xml?include_chapters=false";
+				versionId + "/books.xml?include_chapters=true";
 
 		String header = APIKey + ":x";
 		String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);
@@ -58,7 +58,6 @@ public class Download {
 	 * Download the text for a specified chapter in the Bible
 	 *
 	 * @param APIKey required free API key from Bibles.org/api
-	 * @param versionId id of the bible to download text in
 	 * @param bookId id of the book
 	 * @param chapter chapter number
 	 * @return a Jsoup Document to be parsed or cached

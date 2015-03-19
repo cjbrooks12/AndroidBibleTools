@@ -1,13 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent">
+	android:layout_height="match_parent"
+	android:layout_marginLeft="8dp"
+	android:layout_marginRight="8dp"
+	android:layout_marginBottom="8dp"
+	android:layout_marginTop="8dp">
 
 	<TextView
 		android:id="@+id/fragTitle"
 		android:layout_width="wrap_content"
 		android:layout_height="48dp"
 		android:textSize="24sp"
-		android:gravity="center_vertical"
+		android:gravity="center"
 		android:layout_alignParentTop="true"
 		android:layout_alignParentStart="true"
 		android:layout_alignParentLeft="true"
@@ -25,27 +29,46 @@
 		android:layout_below="@id/hline"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"/>
-
 	<Spinner
 		android:id="@+id/bookSpinner"
 		android:layout_below="@id/versionSpinner"
-		android:layout_width="match_parent"
+		android:layout_toLeftOf="@+id/chapterSpinner"
+		android:layout_toStartOf="@+id/chapterSpinner"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentStart="true"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"/>
+	<Spinner
+		android:id="@+id/chapterSpinner"
+		android:layout_below="@id/versionSpinner"
+		android:layout_toLeftOf="@+id/verseSpinner"
+		android:layout_toStartOf="@+id/verseSpinner"
+		android:layout_width="64dp"
+		android:layout_height="wrap_content"/>
+	<Spinner
+		android:id="@+id/verseSpinner"
+		android:layout_below="@id/versionSpinner"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentEnd="true"
+		android:layout_width="64dp"
 		android:layout_height="wrap_content"/>
 
 	<EditText
 		android:id="@+id/referenceEditText"
-		android:layout_below="@+id/bookSpinner"
+		android:layout_below="@+id/verseSpinner"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"/>
 
 	<ScrollView
 		android:id="@+id/textScrollView"
 		android:layout_below="@+id/referenceEditText"
-		android:layout_above="@+id/parseButton"
+		android:layout_above="@+id/showNumbersCheckbox"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 		<TextView
 			android:id="@+id/verseTextView"
+			android:textSize="18sp"
+			android:fontFamily="sans-serif-light"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"/>
 	</ScrollView>
@@ -58,5 +81,24 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:text="Parse and Download Verse"/>
+
+	<CheckBox
+		android:id="@+id/showNumbersCheckbox"
+		android:layout_above="@id/parseButton"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentStart="true"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Show Numbers"/>
+
+	<CheckBox
+		android:id="@+id/newlinesCheckbox"
+		android:layout_above="@id/parseButton"
+		android:layout_toRightOf="@id/showNumbersCheckbox"
+		android:layout_toEndOf="@id/showNumbersCheckbox"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="New Lines"/>
+
 
 </RelativeLayout>

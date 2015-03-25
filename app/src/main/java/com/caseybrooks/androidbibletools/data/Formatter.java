@@ -10,9 +10,9 @@ public interface Formatter {
     //i.e. to print the reference before all its text
     public String onPreFormat(Reference reference);
 
-    //called when about to format the number for a verse
+    //called when about to format a new ver
     //i.e. change how the numbers will be shown
-    public String onFormatNumber(int verseNumber);
+    public String onFormatVerseStart(int verseNumber);
 
     //called when formatting the main text of a verse
     //i.e. print only first letters of words, random words, etc.
@@ -24,7 +24,7 @@ public interface Formatter {
 
     //called when we have finished formatting one verse and are moving to the next
     //i.e. to insert a newline between all verses
-    public String onFormatNewVerse();
+    public String onFormatVerseEnd();
 
     //called when we have finished all other formatting
     //i.e. to print the reference at the end of all text, or a URL, or copyright info

@@ -22,16 +22,14 @@ public class DownloadingTest extends TestCase {
 
 		Document doc1 = Download.bibleChapter(
 				PrivateKeys.API_KEY,
-				verse.getReference().book.getId(),
-				verse.getReference().chapter);
+				verse.getReference());
 		verse.getVerseInfo(doc1);
 		assertEquals("For through the law I died to the law, so that I might live to God.", verse.getText());
 
 		Passage passage = Passage.parsePassage("Galatians 2:19-21", null);
 		Document doc2 = Download.bibleChapter(
 				PrivateKeys.API_KEY,
-				passage.getReference().book.getId(),
-				passage.getReference().chapter);
+				passage.getReference());
 		passage.getVerseInfo(doc2);
 		assertEquals("For through the law I died to the law, so that I might live to God. I have been crucified with Christ. It is no longer I who live, but Christ who lives in me. And the life I now live in the flesh I live by faith in the Son of God, who loved me and gave himself for me. I do not nullify the grace of God, for if righteousness were through the law, then Christ died for no purpose.", passage.getText());
 
@@ -43,8 +41,7 @@ public class DownloadingTest extends TestCase {
 		Passage spanishPassage = Passage.parsePassage("Gálatas 2:19-21", DHH);
 		Document doc3 = Download.bibleChapter(
 				PrivateKeys.API_KEY,
-				spanishPassage.getReference().book.getId(),
-				spanishPassage.getReference().chapter);
+				spanishPassage.getReference());
 		spanishPassage.getVerseInfo(doc3);
 		assertEquals("Porque por medio de la ley yo he muerto a la ley, a fin de vivir para Dios. Con Cristo he sido crucificado, y ya no soy yo quien vive, sino que es Cristo quien vive en mí. Y la vida que ahora vivo en el cuerpo, la vivo por mi fe en el Hijo de Dios, que me amó y se entregó a la muerte por mí. No quiero rechazar la bondad de Dios; pues si se obtuviera la justicia por medio de la ley, Cristo habría muerto inútilmente.", spanishPassage.getText());
 	}

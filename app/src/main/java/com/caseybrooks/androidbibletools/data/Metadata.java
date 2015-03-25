@@ -159,9 +159,13 @@ public class Metadata {
             else {
                 Object lhs = a.getMetadata().get(key);
                 Object rhs = b.getMetadata().get(key);
-                if (lhs.getClass().equals(rhs.getClass())) {
+				if(lhs == null || rhs == null) {
+					throw new NullPointerException("Cannot compare objects when one or both are null");
+				}
+                else if (lhs.getClass().equals(rhs.getClass())) {
                     return ((Comparable) lhs).compareTo((Comparable) rhs);
-                } else {
+                }
+				else {
                     throw new ClassCastException("Objects are not of the same Class: " + lhs.getClass().toString() + " " + rhs.getClass().toString());
                 }
             }

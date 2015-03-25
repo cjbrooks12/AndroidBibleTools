@@ -22,6 +22,8 @@ public class ReferenceTest extends TestCase {
 		String[] references = new String[] {
 				"John 3:16",
 				"1 John 3:16",
+				"2 John 3:16",
+				"3 John 3:16",
 				"Philippians 4:11",
 				"Eph 1:1-8",
 				"Eph. 1:1 through 8",
@@ -31,13 +33,16 @@ public class ReferenceTest extends TestCase {
 				"Ecc 4:1 and 4",
 				"Gen 1:1-3",
 				"Psalm 125",
+				"Psalms 125",
 				"Galatians 2: 1-5, 19-21, 4-8",
-				"1 Timothy 4 5-8"
+				"1 Timothy 4 5-8",
 		};
 
 		Reference[] refObjects = new Reference[] {
 				new Reference(bible.parseBook("John"), 3, 16),
 				new Reference(bible.parseBook("1John"), 3, 16),
+				new Reference(bible.parseBook("2John"), 3, 16),
+				new Reference(bible.parseBook("3John"), 3, 16),
 				new Reference(bible.parseBook("Phil"), 4, 11),
 				new Reference(bible.parseBook("Eph"), 1, 1, 2, 3, 4, 5, 6, 7, 8),
 				new Reference(bible.parseBook("Eph"), 1, 1, 2, 3, 4, 5, 6, 7, 8),
@@ -46,6 +51,7 @@ public class ReferenceTest extends TestCase {
 				new Reference(bible.parseBook("Eccl"), 4, 1, 4),
 				new Reference(bible.parseBook("Eccl"), 4, 1, 4),
 				new Reference(bible.parseBook("Gen"), 1, 1, 2, 3),
+				new Reference(bible.parseBook("Ps"), 125, 1, 2, 3, 4, 5),
 				new Reference(bible.parseBook("Ps"), 125, 1, 2, 3, 4, 5),
 				new Reference(bible.parseBook("Gal"), 2, 1, 2, 3, 4, 5, 19, 20, 21, 6, 7, 8),
 				new Reference(bible.parseBook("1Tim"), 4, 5, 6, 7, 8)

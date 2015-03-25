@@ -3,6 +3,7 @@ package com.caseybrooks.androidbibletools.io;
 import android.util.Base64;
 
 import com.caseybrooks.androidbibletools.data.Optional;
+import com.caseybrooks.androidbibletools.data.Reference;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -58,15 +59,14 @@ public class Download {
 	 * Download the text for a specified chapter in the Bible
 	 *
 	 * @param APIKey required free API key from Bibles.org/api
-	 * @param bookId id of the book
-	 * @param chapter chapter number
+	 * @param reference the reference of the chapter to be downloaded
 	 * @return a Jsoup Document to be parsed or cached
 	 * @throws IOException
 	 *
 	 * @see com.caseybrooks.androidbibletools.basic.AbstractVerse#getVerseInfo(org.jsoup.nodes.Document)
 	 */
-	public static Document bibleChapter(String APIKey, String bookId, int chapter) throws IOException {
-		String verseID = bookId +"." + chapter;
+	public static Document bibleChapter(String APIKey, Reference reference) throws IOException {
+		String verseID = reference.book.getId() +"." + reference.chapter;
 
 		String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/chapters/" +
 				verseID + "/verses.xml?include_marginalia=false";

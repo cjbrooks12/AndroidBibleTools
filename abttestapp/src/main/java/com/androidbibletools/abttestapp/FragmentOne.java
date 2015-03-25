@@ -305,7 +305,7 @@ public class FragmentOne extends Fragment {
 		}
 
 		@Override
-		public String onFormatNumber(int verseNumber) {
+		public String onFormatVerseStart(int verseNumber) {
 			return (showNumbersCheckbox.isChecked()) ? "<sup><small>" + verseNumber + "</small></sup>" : "";
 		}
 
@@ -320,7 +320,7 @@ public class FragmentOne extends Fragment {
 		}
 
 		@Override
-		public String onFormatNewVerse() {
+		public String onFormatVerseEnd() {
 			return (newLinesCheckBox.isChecked()) ? "<br/>" : "";
 		}
 

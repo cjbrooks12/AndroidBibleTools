@@ -52,21 +52,36 @@ public class Bible {
 	 */
 	public Book parseBook(String bookName) {
 		for(Book book : books) {
-			//attempt to parse the full book name
+			//check equality of the full book name
 			if(bookName.equalsIgnoreCase(book.getName())) {
 				return book;
 			}
+			//equality of the id
+			else if(bookName.equalsIgnoreCase(book.getId())) {
+				return book;
+			}
+			//equality of the abbreviation last, since it is smallest
 			else if(bookName.equalsIgnoreCase(book.getAbbr())) {
 				return book;
 			}
-			else if(bookName.equalsIgnoreCase(book.getId())) {
+
+			//failing equality, check if the name is close
+			else if(bookName.contains(book.getName())) {
 				return book;
 			}
 			else if(book.getName().contains(bookName)) {
 				return book;
 			}
-		}
 
+			//failing close name, check close to abbreviation. Don't check close
+			//to id, since the id should be exactly equal, or at least the abbr
+			else if(book.getAbbr().contains(bookName)) {
+				return book;
+			}
+			else if(bookName.contains(book.getAbbr())) {
+				return book;
+			}
+		}
 		return null;
 	}
 

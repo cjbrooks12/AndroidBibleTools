@@ -1,8 +1,17 @@
 package com.caseybrooks.androidbibletools;
 
+import com.caseybrooks.androidbibletools.basic.Passage;
+import com.caseybrooks.androidbibletools.search.OpenBibleInfo;
+
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
+
 public class IOTest extends TestCase {
+
+	public void testOpenBibleTools() throws Throwable {
+		ArrayList<Passage> passages = OpenBibleInfo.getVersesFromTopic("Dogs");
+	}
 
 //	public void testXMLCreation() throws Throwable {
 //

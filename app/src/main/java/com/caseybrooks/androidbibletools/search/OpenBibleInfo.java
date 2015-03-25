@@ -23,9 +23,9 @@ public class OpenBibleInfo {
         for(Element element : passages) {
             try {
                 Passage passage = Passage.parsePassage(element.select(".bibleref").first().ownText(), null);
-                passage.setText(element.select("p").get(1).text());
+                passage.setText(element.select("p").text());
 
-                String notesString = element.select(".note").get(0).ownText();
+                String notesString = element.select(".note").first().ownText();
                 passage.getMetadata().putInt("UPVOTES", Integer.parseInt(notesString.replaceAll("\\D", "")));
                 passage.getMetadata().putString("SEARCH_TERM", topic.trim());
 

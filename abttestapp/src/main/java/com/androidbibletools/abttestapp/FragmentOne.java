@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +98,6 @@ public class FragmentOne extends Fragment {
 
 		new PopulateVersions().execute();
 	}
-
 
 	private class PopulateVersions extends AsyncTask<Void, Void, Void> {
 

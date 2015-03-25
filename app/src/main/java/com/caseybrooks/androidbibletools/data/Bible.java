@@ -16,12 +16,12 @@ import java.util.HashMap;
  */
 public class Bible {
 	private final String versionId;
-//	public String name;
-//	public String abbr;
-//	public String copyright;
-//	public String copyrightInfo;
-//	public String languageCode;
-//	public String languageName;
+	public String name;
+	public String abbr;
+	public String copyright;
+	public String copyrightInfo;
+	public String languageCode;
+	public String languageName;
 
 	public OnDownloadListener listener;
 
@@ -147,13 +147,13 @@ public class Bible {
 
 		for(Element element : versions) {
 			Bible bible = new Bible(element.select("id").text());
-//			bible.name = element.select("name").text();
-//			bible.abbr = element.select("abbreviation").text();
-//			bible.languageCode = element.select("lang_code").text();
-//			bible.languageName = element.select("lang_name").text();
-//			bible.copyright = element.select("copyright").text();
-//			bible.copyrightInfo = element.select("info").text();
-//
+			bible.name = element.select("name").text();
+			bible.abbr = element.select("abbreviation").text();
+			bible.languageCode = element.select("lang_code").text();
+			bible.languageName = element.select("lang_name").text();
+			bible.copyright = element.select("copyright").text();
+			bible.copyrightInfo = element.select("info").text();
+
 			versionMap.put(element.select("abbreviation").text(), bible);
 		}
 

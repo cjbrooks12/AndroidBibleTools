@@ -1,9 +1,17 @@
 package com.caseybrooks.androidbibletools.defaults;
 
-/**
- * Created by Casey on 3/18/2015.
- */
 public class DefaultBible {
+	public static String defaultBibleId = "eng-ESV";
+	public static String defaultBibleName = "English Standard Version";
+	public static String DefaultBibleAbbr = "ESV";
+	public static String defaultBibleCopyright = "Scripture quotations marked (ESV) are from The Holy Bible, English Standard Version®, copyright © 2001 by Crossway Bibles, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.";
+	public static String defaultBibleInfo = "<h1>English Standard Version</h1> <h3>Version Information</h3> <p>Published in 2001, the English Standard Version stands firmly in the King James tradition and is based directly on the 1971 Revised Standard Version (RSV).</p>";
+	public static String defaultBibleContact = "http://www.crossway.org";
+	public static String defaultBibleLang = "eng-us";
+	public static String defaultBibleLangName = "English (US)";
+	public static String defaultBibleLangNameEnglish = "English";
+	public static String defaultBibleLangCode = "ISO 639-3";
+
 	public static String[] defaultBookName = new String[]{
 		"Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua",
 		"Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles",

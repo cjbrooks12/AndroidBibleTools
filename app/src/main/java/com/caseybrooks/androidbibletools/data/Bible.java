@@ -15,20 +15,43 @@ import java.util.HashMap;
  * a chapter, and the language of the book.
  */
 public class Bible {
+	public enum Exists { YES, NO, MAYBE }
+
 	private final String versionId;
+	public Exists exists;
+
 	public String name;
 	public String abbr;
 	public String copyright;
-	public String copyrightInfo;
-	public String languageCode;
+	public String info;
+	public String contact;
+	public String language;
 	public String languageName;
+	public String languageNameEnglish;
+	public String languageCode;
 
 	public OnDownloadListener listener;
 
 	public ArrayList<Book> books;
 
 	public Bible(String versionId) {
-		this.versionId = (versionId == null) ? "eng-ESV" : versionId;
+		if (versionId == null) {
+			this.versionId = DefaultBible.defaultBibleId;
+			this.name = DefaultBible.defaultBibleName;
+			this.abbr = DefaultBible.DefaultBibleAbbr;
+			this.copyright = DefaultBible.defaultBibleCopyright;
+			this.info = DefaultBible.defaultBibleInfo;
+			this.contact = DefaultBible.defaultBibleContact;
+			this.language = DefaultBible.defaultBibleLang;
+			this.languageName = DefaultBible.defaultBibleLangName;
+			this.languageNameEnglish= DefaultBible.defaultBibleLangNameEnglish;
+			this.languageCode = DefaultBible.defaultBibleLangCode;
+			exists = Exists.YES;
+		}
+		else {
+			this.versionId = versionId;
+			exists = Exists.MAYBE;
+		}
 
 		//set up books with default values to ensure that we can always work without
 		//needing to download anything first
@@ -99,6 +122,15 @@ public class Bible {
 	public void getVersionInfo(Document doc) {
 		if(listener != null) listener.onPreDownload();
 
+		exists = Exists.MAYBE;
+
+		if(doc == null) {
+			//assert to the user that since we couldn't get the version info,
+			//then it must not exist within the limits of this library
+			exists = Exists.NO;
+			return;
+		}
+
 		ArrayList<Book> newBooks = new ArrayList<>();
 
 		doc.select("parent").remove();
@@ -141,6 +173,7 @@ public class Bible {
 			newBooks.add(newBook);
 		}
 		this.books = newBooks;
+		exists = Exists.YES;
 
 		if(listener != null) listener.onPostDownload();
 	}
@@ -164,12 +197,15 @@ public class Bible {
 			Bible bible = new Bible(element.select("id").text());
 			bible.name = element.select("name").text();
 			bible.abbr = element.select("abbreviation").text();
-			bible.languageCode = element.select("lang_code").text();
+			bible.language = element.select("lang").text();
 			bible.languageName = element.select("lang_name").text();
+			bible.languageNameEnglish = element.select("lang_name_english").text();
+			bible.languageCode = element.select("lang_code").text();
 			bible.copyright = element.select("copyright").text();
-			bible.copyrightInfo = element.select("info").text();
+			bible.info = element.select("info").text();
+			bible.contact = element.select("contact_url").text();
 
-			versionMap.put(element.select("abbreviation").text(), bible);
+			versionMap.put(bible.getVersionId(), bible);
 		}
 
 		return versionMap;

@@ -228,8 +228,8 @@ public class Bible {
 
 		for(Element element : versions) {
 			languageMap.put(
-					element.select("lang_name").text(),
-					element.select("lang").text().toLowerCase());
+					element.select("lang").text(),
+					element.select("lang_name").text());
 		}
 
 		return languageMap;

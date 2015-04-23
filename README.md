@@ -3,7 +3,7 @@
 ## What is it?
 AndroidBibleTools is a library for Android designed to make sense of verses from the Bible while providing several peripherals and tools to manage and share your verses in a meaningful way. The tools include the following major points:
 #####<i>Mimic the Bible</i>
-Treat verse objects as if they were the actual verses in your physical Bible. That means things like sorting, cross-references, and footnotes all made easily accessible, and in such as way that the end user doesn't feel like they are missing any kind of functionality.
+Treat verse objects as if they were the actual verses in your physical Bible. If two verses represent the same location in the Bible, then they are considered equal, regardless of the language or translation used. This allows for verses to be sorted in the order they lie in the Bible, and it makes sharing a verse with a friend simple. And since verses refer to more than a bit of text, cross-references and footnotes all made easily accessible, and in such as way that the end user doesn't feel like they are missing any kind of functionality.
 
 #####<i>Take the headache out of the Bible</i>
 Downloading verses is not easy. Parsing text to find references is quite difficult. Getting everyone to share verses in any meaningful way is downright impossible. That is, it would be if not for AndroidBibleTools. Leave all the hard stuff up to me, and just go make wonderful apps, and together, let's turn a pool of Christian apps into a thriving ecosystem. 

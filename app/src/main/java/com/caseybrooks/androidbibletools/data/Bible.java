@@ -133,7 +133,12 @@ public class Bible {
 
 		ArrayList<Book> newBooks = new ArrayList<>();
 
-		doc.select("parent").remove();
+		Element parent = doc.select("parent").first();
+
+		name = parent.select("name").text();
+		abbr = parent.select("id").text().replaceAll(".*-", "");
+		copyright = doc.select("copyright").first().text();
+
 		doc.select("next").remove();
 		doc.select("previous").remove();
 

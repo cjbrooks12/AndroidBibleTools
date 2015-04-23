@@ -1,11 +1,6 @@
 package com.caseybrooks.androidbibletools.io;
 
-import com.caseybrooks.androidbibletools.data.Bible;
-import com.caseybrooks.androidbibletools.data.Book;
 import com.caseybrooks.androidbibletools.data.Reference;
-
-import java.text.ParseException;
-import java.util.ArrayList;
 
 /** The class used to parse a String into Reference objects. Uses the following grammar
  *
@@ -22,115 +17,49 @@ import java.util.ArrayList;
  *
  * verseSequence ::= verse punctuation verse
  * verseList ::= { [verse | verseSequence] punctuation }
- *
- *
- * ParseException Error Codes:
- * 1: could not determine the name of a book from the given input string
  */
 
 public class ReferenceParser {
-	final Bible bible; //we need the bible to get the listing of books
+	Reference.Builder builder;
 	String reference;
-	public ArrayList<Integer> verses;
+
 	TokenStream ts;
 
-	public ReferenceParser(Bible bible) {
-		this.bible = bible;
+	public ReferenceParser(Reference.Builder builder) {
+		this.builder = builder;
 	}
 
 	//verse ::= book chapter (punctuation) verse
-	public Reference getVerseReference(String reference) throws ParseException {
+	public Reference.Builder getVerseReference(String reference) {
 		this.reference = reference;
 		ts = new TokenStream(reference);
 
 		//Book will throw its own exception if it fails to parse
-		Book book = book();
-
+		book();
 		punctuation();
-
-		int chapter = chapter();
-		if(chapter == -1) {
-			throw new ParseException("Cannot parse Verse [" + reference + "]: expected number after book", 2);
-		}
-
+		chapter();
 		punctuation();
+		verse();
 
-		int verse = verse();
-		if(verse == -1) {
-			throw new ParseException("Cannot parse Verse [" + reference + "]: expected a number after chapter", 2);
-		}
-
-		return new Reference(book, chapter, verse);
+		return builder;
 	}
 
 	//Passage ::= book (punctuation) chapter ((punctuation) verseList)
-	public Reference getPassageReference(String reference) throws ParseException {
+	public Reference.Builder getPassageReference(String reference) {
 		this.reference = reference;
 		return getPassageReference(new TokenStream(reference));
 	}
 
-	public Reference getPassageReference(TokenStream reference) throws ParseException {
+	public Reference.Builder getPassageReference(TokenStream reference) {
 		ts = reference;
 
-		//Book will throw its own exception if it fails to parse
-		Book book = book();
-
-		if(book == null) {
-			throw new ParseException("Cannot parse Passage [" + reference + "]: could not match book name", 2);
-		}
-
+		book();
 		punctuation();
+		chapter();
+		punctuation();
+		verseList();
 
-		int chapter = chapter();
-		if(chapter == -1) {
-			throw new ParseException("Cannot parse Passage [" + reference + "]: expected number after book", 2);
-		}
-
-		boolean hasPunctuation = punctuation();
-		ArrayList<Integer> verseList;
-
-		if(hasPunctuation) {
-			verseList = verseList();
-
-			if(verseList.size() > 0) {
-				return new Reference(book, chapter, verseList);
-			}
-			else {
-				throw new ParseException("Cannot parse Passage [" + reference + "]: expected verse list after book", 2);
-			}
-		}
-		else {
-			verseList = verseList();
-
-			//just given the chapter, add all verses in that chapter
-			if(verseList == null || verseList.size() == 0) {
-				verseList = new ArrayList<>();
-
-				for(int i = 1; i <= book.numVersesInChapter(chapter); i++) {
-					verseList.add(i);
-				}
-			}
-
-			return new Reference(book, chapter, verseList);
-		}
-	}
-
-	public static Reference extractReferences(String reference, Bible bible)  {
-		TokenStream streamBase = new TokenStream(reference);
-		TokenStream stream = new TokenStream(reference);
-
-		while(stream.toString().length() > 0) {
-			try {
-				return new ReferenceParser(bible).getPassageReference(stream);
-			}
-			catch(ParseException e) {
-				streamBase.get();
-				stream = new TokenStream(streamBase.toString());
-				continue;
-			}
-		}
-
-		return null;
+		return builder;
 	}
 
 	//punctuation ::= [;:,.-\/]
@@ -154,121 +83,103 @@ public class ReferenceParser {
 	}
 
 	//book ::= ([123]) word
-	private Book book() throws ParseException {
+	private void book() {
 		Token a = ts.get();
 
-		//book ::= [123] word (.)
+		//book ::= [123] word
 		if(a != null && a.equals(Token.Type.NUMBER) && a.getIntValue() <= 3 && a.getIntValue() > 0) {
 			Token b = ts.get();
 			if(b != null && b.equals(Token.Type.WORD)) {
-				Book book = bible.parseBook(a.getIntValue() + " " + b.getStringValue());
-
-				if(book != null) {
-					return book;
-				}
-				else {
-					throw new ParseException("[" + b.getStringValue() + "] is not a valid name for Book", 1);
-				}
+				builder.setBook(a.getIntValue() + " " + b.getStringValue());
 			}
 			else {
 				ts.unget(b);
 				ts.unget(a);
-				return null;
 			}
 		}
 
-		//book ::= word (punctuation)
-		if(a != null && a.equals(Token.Type.WORD)) {
-			Book book = bible.parseBook(a.getStringValue());
-
-			if(book != null) {
-				return book;
-			}
-			else {
-				throw new ParseException("[" + a.getStringValue() + "] is not a valid name for Book", 1);
-			}
+		//book ::= word
+		else if(a != null && a.equals(Token.Type.WORD)) {
+			builder.setBook(a.getStringValue());
 		}
 		else {
 			ts.unget(a);
-			return null;
 		}
 	}
 
 	//chapter ::= number
-	private int chapter() {
+	private boolean chapter() {
 		Token a = ts.get();
 		if(a != null && a.equals(Token.Type.NUMBER) && a.getIntValue() > 0) {
-			return a.getIntValue();
+			builder.setChapter(a.getIntValue());
+			return true;
 		}
 		else {
 			ts.unget(a);
-			return -1;
+			return false;
 		}
 	}
 
 	//verse ::= number
-	private int verse() {
+	private boolean verse() {
 		Token a = ts.get();
 		if(a != null && a.equals(Token.Type.NUMBER) && a.getIntValue() > 0) {
-			return a.getIntValue();
+			builder.addVerse(a.getIntValue());
+			return true;
 		}
 		else {
 			ts.unget(a);
-			return -1;
+			return false;
 		}
 	}
 
-	//verseSequence ::= verse dash verse
-	private ArrayList<Integer> verseSequence() {
-		int a = verse();
-		if(a != -1) {
-			ArrayList<Integer> verses = new ArrayList<>();
-			Token dash = ts.get();
+	//verseSequence ::= number dash number
+	private boolean verseSequence() {
+		Token a = ts.get();
+		if(a != null && a.equals(Token.Type.NUMBER) && a.getIntValue() > 0) {
+			int numA = a.getIntValue();
 
+			Token dash = ts.get();
 			if(dash != null && dash.equals(Token.Type.DASH)) {
-				int b = verse();
-				if(b != -1) {
-					for(int i = a; i <= b; i++) {
-						verses.add(i);
+				Token b = ts.get();
+				if(b != null && b.equals(Token.Type.NUMBER) && b.getIntValue() > 0) {
+					int numB = b.getIntValue();
+
+					for(int i = numA; i <= numB; i++) {
+						builder.addVerse(i);
 					}
-					return verses;
+					return true;
 				}
 				else {
+					ts.unget(b);
 					ts.unget(dash);
-					ts.unget(new Token(Token.Type.NUMBER, a));
+					ts.unget(a);
+					return false;
 				}
 			}
 			else {
 				ts.unget(dash);
-				ts.unget(new Token(Token.Type.NUMBER, a));
+				ts.unget(a);
+				return false;
 			}
 		}
-
-		return new ArrayList<>();
+		else {
+			ts.unget(a);
+			return false;
+		}
 	}
 
 	//verseList ::= { [verse | verseSequence] comma }
-	private ArrayList<Integer> verseList() {
-		ArrayList<Integer> verseList = new ArrayList<>();
+	private void verseList() {
 		while (true) {
-			ArrayList<Integer> b = verseSequence();
-			if (b != null && b.size() > 0) {
-				for(Integer i : b) {
-					if(!verseList.contains(i)) {
-						verseList.add(i);
-					}
-				}
-			}
-			else {
-				int c = verse();
-				if (c > 0 &&  !verseList.contains(c)) {
-					verseList.add(c);
+			if (!verseSequence()) {
+				if(!verse()) {
+					return;
 				}
 			}
 
-			boolean hasPunctuation = punctuation();
-			if (!hasPunctuation) {
-				return verseList;
+			if (!punctuation()) {
+				return;
 			}
 		}
 	}

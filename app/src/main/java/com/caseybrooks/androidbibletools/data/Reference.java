@@ -2,7 +2,6 @@ package com.caseybrooks.androidbibletools.data;
 
 import com.caseybrooks.androidbibletools.io.ReferenceParser;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -12,9 +11,9 @@ public class Reference implements Comparable<Reference> {
     public final int verse;
     public final ArrayList<Integer> verses;
 
-//Parse the input string using recursive descent parsing
+//Make constructors private. Force caller to use of the static initializer methods
 //------------------------------------------------------------------------------
-    public Reference(Book book, int chapter, int... verses) {
+    private Reference(Book book, int chapter, int... verses) {
 		this.book = book;
 		this.chapter = chapter;
 		if(verses.length == 1) {
@@ -34,7 +33,7 @@ public class Reference implements Comparable<Reference> {
 		}
     }
 
-	public Reference(Book book, int chapter, ArrayList<Integer> verses) {
+	private Reference(Book book, int chapter, ArrayList<Integer> verses) {
 		this.book = book;
 		this.chapter = chapter;
 		if(verses.size() == 1) {
@@ -49,65 +48,312 @@ public class Reference implements Comparable<Reference> {
 		}
 	}
 
-	public static Reference parseReference(String reference, Bible bible) throws ParseException {
-		ReferenceParser parser = new ReferenceParser(bible);
+//static initializer methods
+//------------------------------------------------------------------------------
+	/**
+	 * Builder class to aid in creating a reference, especially when working with
+	 * user input. The Builder offers much flexibility is the data that is used to
+	 * construct a Reference, and will do whatever it needs to return some Reference.
+	 * In any situation where insufficient information is given, it chooses to use
+	 * default values or create dummy Books with a not-real book name so that the
+	 * user will at least have something to work with. In this sense, arbitrary
+	 * user input will be accepted and a Reference will be created, but there is
+	 * no guarantee that the verse can be downloaded or have much meaningful information
+	 * associated with it.
+	 */
+	public static class Builder {
+		private Bible bible;
+		private Book book;
 
-		return parser.getPassageReference(reference);
+		private int chapter;
+		private ArrayList<Integer> verses;
+
+		public Builder() {
+			verses = new ArrayList<>();
+		}
+
+		/**
+		 * Attempts to parse the full String into this Builder, extracting the
+		 * book, chapter, and all verses and populating this Builder with the
+		 * extracted information.
+		 *
+		 * @param reference the String reference to be parsed
+		 * @return this Builder object
+		 */
+		public Builder parseReference(String reference) {
+			ReferenceParser parser = new ReferenceParser(this);
+			parser.getPassageReference(reference);
+
+			return this;
+		}
+
+		/**
+		 * Set the book of this Builder
+		 *
+		 * @param book the Book to be set
+		 * @return this Builder object
+		 */
+		public Builder setBook(Book book) {
+			this.book = book;
+
+			return this;
+		}
+
+		/**
+		 * Attempts to parse the bookName according to the bible that was set.
+		 * If that fails, it tries to parse against the default ESV. Failing both,
+		 * it simply creates a Book with the given bookName, but this book
+		 * cannot be downloaded because we can't quite say which verse it is in
+		 * the Bible.
+		 *
+		 * @param bookName the bookname to be parsed
+		 * @return this Builder object
+		 */
+		public Builder setBook(String bookName) {
+			Book parsedBook = null;
+			if(bible != null) {
+				parsedBook = bible.parseBook(bookName);
+			}
+
+			if(parsedBook == null) {
+				parsedBook = new Bible(null).parseBook(bookName);
+
+				if(parsedBook == null) {
+					parsedBook = new Book(null);
+					parsedBook.setName(bookName);
+				}
+			}
+
+			book = parsedBook;
+
+			return this;
+		}
+
+		/**
+		 * Attempts to parse the bookName according to the bible that was set.
+		 * If that fails, it tries to parse against the default ESV. Failing both,
+		 * it simply creates a Book with the given bookName and bookId. The bookId
+		 * is a unique identifier that allows this reference to be downloaded
+		 *
+		 * @param bookName the bookname to be parsed
+		 * @param bookId the unique identifier of the book which enabled downloading it
+		 * @return this Builder object
+		 */
+		public Builder setBook(String bookName, @Optional String bookId) {
+			Book parsedBook = null;
+			if(bible != null) {
+				parsedBook = bible.parseBook(bookName);
+			}
+
+			if(parsedBook == null) {
+				parsedBook = new Bible(null).parseBook(bookName);
+
+				if(parsedBook == null) {
+					if(bookId != null) {
+						parsedBook = new Book(bookId);
+					}
+					else {
+						parsedBook = new Book(null);
+					}
+					parsedBook.setName(bookName);
+				}
+			}
+
+			book = parsedBook;
+
+			return this;
+		}
+
+		/**
+		 * Makes no attempt to parse the bookName, but instead just creates a Book
+		 * with the given parameters.
+		 *
+		 * @param bookName the name of the book
+		 * @param bookId (optional) the unique identifer of the book to enable downloading
+		 * @param bookAbbr (optional) the book's abbreviated name. If not specified, the first three letters of the name will be used
+		 * @param chapters (optional) the list of chapters in this Book
+		 * @return this Builder object
+		 */
+		public Builder setBook(
+				String bookName,
+				@Optional String bookId,
+				@Optional String bookAbbr,
+				@Optional int order,
+				@Optional int[] chapters) {
+
+			Book parsedBook;
+			if(bookId != null) {
+				parsedBook = new Book(bookId);
+			}
+			else {
+				parsedBook = new Book(null);
+			}
+
+			parsedBook.setName(bookName);
+
+			if(bookAbbr != null) {
+				parsedBook.setAbbr(bookAbbr);
+			}
+			else {
+				parsedBook.setAbbr(bookName.substring(0, 3));
+			}
+
+			parsedBook.setChapters(chapters);
+
+			if(order != 0) {
+				parsedBook.setOrder(order);
+			}
+			else {
+				//choose arbitrarily high order to ensure it will always be
+				//sorted to the end of a list of verses
+				parsedBook.setOrder(10000);
+			}
+
+			book = parsedBook;
+
+			return this;
+		}
+
+		/**
+		 * Sets the Bible of this Builder to the given Bible object
+		 *
+		 * @param bible the Bible to be set
+		 * @return this Builder object
+		 */
+		public Builder setBible(Bible bible) {
+			this.bible = bible;
+			return this;
+		}
+
+		/**
+		 * Creates a new Bible with the given name. This Bible cannot be used to
+		 * download verses, but just provides a convenient way to accept arbitrary
+		 * versions from user input as valid versions. If no abbreviation is given,
+		 * one will be created from the first letter of each word in the version
+		 * name, or if it is only one word, it will be copied over.
+		 *
+		 * @param versionName the name of this Bible
+		 * @param versionAbbr (optional) the abbreviation of this Bible
+		 * @return this Builder object
+		 */
+		public Builder setBible(String versionName, @Optional String versionAbbr) {
+			this.bible = new Bible(null);
+			this.bible.name = versionName;
+			return this;
+		}
+
+		/**
+		 * Creates a new Bible with the given name and versionId. The versionId
+		 * is what enables verses to be downloaded, but it is not necessary if you
+		 * just want to work with raw user data and not allow downloading from
+		 * this Bible. If no abbreviation is given, one will be created from the
+		 * first letter of each word in the version name, or if it is only one
+		 * word, it will be copied over.
+		 *
+		 * @param versionName the name of this Bible
+		 * @param versionAbbr (optional) the abbreviation of this Bible
+		 * @param versionId (optional) the unique identifier of this Bible which enables downloading
+		 * @return this Builder object
+		 */
+		public Builder setBible(String versionName, @Optional String versionAbbr, @Optional String versionId) {
+			if(versionId != null) {
+				this.bible = new Bible(versionId);
+			}
+			else {
+				this.bible = new Bible(null);
+			}
+
+			this.bible.name = versionName;
+			return this;
+		}
+
+		/**
+		 * A reference can point to a single chapter, so set that chapter.
+		 *
+		 * @param chapter the chapter to set
+		 * @return this Builder object
+		 */
+		public Builder setChapter(int chapter) {
+			this.chapter = chapter;
+			return this;
+		}
+
+		/**
+		 * Set the list of verses in the specified chapter for the reference. Any
+		 * previously set verses will be removed
+		 *
+		 * @param verses an array of verses to be set
+		 * @return
+		 */
+		public Builder setVerses(int... verses) {
+			this.verses = new ArrayList<>();
+			for(int verse : verses) {
+				this.verses.add(verse);
+			}
+			return this;
+		}
+
+		/**
+		 * Add a verse to the current list of verses if it has not already been added
+		 *
+		 * @param verse the verse to add
+		 * @return this Builder object
+		 */
+		public Builder addVerse(int verse) {
+			if(!verses.contains(verse)) {
+				this.verses.add(verse);
+			}
+			return this;
+		}
+
+		/**
+		 * Given the current state of this Builder, create a Reference. It will
+		 * always produce a non-null reference, but that reference may have default
+		 * values if you were not careful and did not create it well enough. Ideally,
+		 * some reference is better than none, because the reference returned should
+		 * at least contain most of the information you put in, which makes it
+		 * easier to determine what was not valid and fix it.
+		 *
+		 * @return the reference that was incrementally built by this Builder
+		 */
+		public Reference create() {
+			if(verses == null || verses.size() == 0) {
+				//no verses, but chapter was given.
+				if(chapter != 0 ) {
+
+					//book has a count of the chapters, so add all verses in that chapter
+					if(book.getChapters() != null && book.getChapters().length > 0) {
+						int verseCount = book.numVersesInChapter(chapter);
+
+						this.verses = new ArrayList<>();
+						for(int i = 1; i <= verseCount; i++) {
+							this.verses.add(i);
+						}
+					}
+					//book does not have a list of the chapters, so just use use the first verse
+					else {
+						verses = new ArrayList<>();
+						verses.add(1);
+					}
+				}
+				//no verses or chapter given. Set to the first verse of the first chapter
+				else {
+					chapter = 1;
+					verses = new ArrayList<>();
+					verses.add(1);
+				}
+			}
+
+			//the book was not specified, so use the first book of the New Testament
+			// since many translations only have the New Testament.
+			if(book == null) {
+				setBook("Matthew");
+			}
+
+
+			return new Reference(book, chapter, verses);
+		}
 	}
-
-//    public Reference(String expression) throws ParseException {
-//        this(new TokenStream(expression));
-//    }
-//
-//    private Reference(TokenStream ts) throws ParseException {
-//        String expression = ts.toString();
-//        this.ts = ts;
-//        Book book = book();
-//        if(book != null) {
-//            int chapter = chapter();
-//            if(chapter != 0) {
-//                ArrayList<Integer> verseList = verseList();
-//
-//                if(verseList != null && verseList.size() > 0) {
-//                    this.book = book;
-//                    this.chapter = chapter;
-//                    Collections.sort(verseList);
-//                    this.verses = verseList;
-//                    this.verse = verseList.get(0);
-//
-//                    isValid = validate();
-//                }
-//                else {
-//                    throw new ParseException("'" + expression + "' is not formatted correctly(verseList)", 3);
-//                }
-//            }
-//            else {
-//                throw new ParseException("'" + expression + "' is not formatted correctly(chapter)", 2);
-//            }
-//        }
-//        else {
-//            throw new ParseException("'" + expression + "' is not formatted correctly(book)", 1);
-//        }
-//    }
-
-//    public boolean validate() {
-//        if(chapter > book.numChapters() || chapter < 1) return false;
-//        if(verses != null && verses.size() > 0) {
-//            for (Integer i : verses) {
-//                if (i > book.numVersesInChapter(chapter) || i < 1) return false;
-//            }
-//        }
-//        else {
-//            if (verse > book.numVersesInChapter(chapter) || verse < 1) return false;
-//        }
-//
-//        return true;
-//    }
-//
-    public static Reference extractReference(String reference, Bible bible) {
-		return ReferenceParser.extractReferences(reference, bible);
-    }
-
 
     @Override
     public String toString() {
@@ -203,32 +449,32 @@ public class Reference implements Comparable<Reference> {
         }
     }
 
-    public boolean equals(Reference ref) {
-        if(ref == null) return false;
-        if(this.book != ref.book) return false;
-        if(this.chapter != ref.chapter) return false;
-        if(this.verses.size() != ref.verses.size()) return false;
+    public boolean equals(Object other) {
+		if(other == null) return false;
+		if(!(other instanceof Reference)) return false;
+
+		Reference ref = (Reference) other;
+
+//		if(this.book != ref.book) return false;
+		if(this.chapter != ref.chapter) return false;
+		if(this.verses.size() != ref.verses.size()) return false;
 		if(this.verse != ref.verse) return false;
 
 		for(Integer i : this.verses) {
-            if(!ref.verses.contains(i)) return false;
-        }
-        for(Integer i : ref.verses) {
-            if(!this.verses.contains(i)) return false;
-        }
+			if(!ref.verses.contains(i)) return false;
+		}
+		for(Integer i : ref.verses) {
+			if(!this.verses.contains(i)) return false;
+		}
 
-        return true;
+		return true;
+
     }
-
-	public boolean equals(Object ref) {
-		if(ref instanceof Reference) return this.equals((Reference) ref);
-		else return false;
-	}
 
     public int hashCode() {
         int result = book.hashCode();
         result = 31 * result + chapter;
-        result = 31 * result + (verses != null ? verses.hashCode() : 0);
+        result = 31 * result + ((verses != null) ? verses.hashCode() : 0);
         return result;
     }
 }

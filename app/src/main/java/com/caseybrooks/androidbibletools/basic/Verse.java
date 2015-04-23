@@ -2,15 +2,11 @@ package com.caseybrooks.androidbibletools.basic;
 
 import android.support.annotation.NonNull;
 
-import com.caseybrooks.androidbibletools.data.Bible;
-import com.caseybrooks.androidbibletools.data.Optional;
 import com.caseybrooks.androidbibletools.data.Reference;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-
-import java.text.ParseException;
 
 /** The simplest unit of data in this data structure. Each verse contains one
  *  and only one Bible verse, its corresponding Book, Chapter, and Verse Number,
@@ -53,14 +49,14 @@ public class Verse extends AbstractVerse {
         super(reference);
     }
 
-	public static Verse parseVerse(String reference, @Optional Bible bible) throws ParseException {
-		Bible ver = (bible == null) ? new Bible("eng-ESV") : bible;
-
-		Reference ref = Reference.parseReference(reference, ver);
-		Verse verse = new Verse(ref);
-		verse.setBible(ver);
-		return verse;
-	}
+//	public static Verse parseVerse(String reference, @Optional Bible bible) throws ParseException {
+//		Bible ver = (bible == null) ? new Bible("eng-ESV") : bible;
+//
+//		Reference ref = Reference.parseReference(reference, ver);
+//		Verse verse = new Verse(ref);
+//		verse.setBible(ver);
+//		return verse;
+//	}
 
 //Getters and Setters
 //------------------------------------------------------------------------------

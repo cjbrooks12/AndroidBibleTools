@@ -1,6 +1,7 @@
 package com.caseybrooks.androidbibletools.search;
 
 import com.caseybrooks.androidbibletools.basic.Passage;
+import com.caseybrooks.androidbibletools.data.Reference;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -8,7 +9,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 
 public class OpenBibleInfo {
@@ -21,19 +21,18 @@ public class OpenBibleInfo {
         Elements passages = doc.select(".verse");
 
         for(Element element : passages) {
-            try {
-                Passage passage = Passage.parsePassage(element.select(".bibleref").first().ownText(), null);
-                passage.setText(element.select("p").text());
+			Reference ref = new Reference.Builder()
+					.parseReference(element.select(".bibleref").first().ownText())
+					.create();
 
-                String notesString = element.select(".note").first().ownText();
-                passage.getMetadata().putInt("UPVOTES", Integer.parseInt(notesString.replaceAll("\\D", "")));
-                passage.getMetadata().putString("SEARCH_TERM", topic.trim());
+			Passage passage = new Passage(ref);
+			passage.setText(element.select("p").text());
 
-                verses.add(passage);
-            }
-            catch (ParseException e) {
-                e.printStackTrace();
-            }
+			String notesString = element.select(".note").first().ownText();
+			passage.getMetadata().putInt("UPVOTES", Integer.parseInt(notesString.replaceAll("\\D", "")));
+			passage.getMetadata().putString("SEARCH_TERM", topic.trim());
+
+			verses.add(passage);
         }
 
         return verses;

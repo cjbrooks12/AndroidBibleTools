@@ -9,13 +9,7 @@ public class ReferenceTest extends TestCase {
 	Bible bible;
 
 	public ReferenceTest() {
-//		try {
-			bible = new Bible("eng-ESV");
-//			bible.downloadVersionInfo(PrivateKeys.API_KEY);
-//		}
-//		catch(IOException ioe) {
-//			ioe.printStackTrace();
-//		}
+		bible = new Bible("eng-ESV");
 	}
 
 	public void testReferenceParser() throws Throwable {
@@ -38,51 +32,59 @@ public class ReferenceTest extends TestCase {
 				"1 Timothy 4 5-8",
 		};
 
-		Reference[] refObjects = new Reference[] {
-				new Reference(bible.parseBook("John"), 3, 16),
-				new Reference(bible.parseBook("1John"), 3, 16),
-				new Reference(bible.parseBook("2John"), 3, 16),
-				new Reference(bible.parseBook("3John"), 3, 16),
-				new Reference(bible.parseBook("Phil"), 4, 11),
-				new Reference(bible.parseBook("Eph"), 1, 1, 2, 3, 4, 5, 6, 7, 8),
-				new Reference(bible.parseBook("Eph"), 1, 1, 2, 3, 4, 5, 6, 7, 8),
-				new Reference(bible.parseBook("Eph"), 1, 1, 2, 3, 4, 5, 6, 7, 8),
-				new Reference(bible.parseBook("Eph"), 1, 1, 8),
-				new Reference(bible.parseBook("Eccl"), 4, 1, 4),
-				new Reference(bible.parseBook("Eccl"), 4, 1, 4),
-				new Reference(bible.parseBook("Gen"), 1, 1, 2, 3),
-				new Reference(bible.parseBook("Ps"), 125, 1, 2, 3, 4, 5),
-				new Reference(bible.parseBook("Ps"), 125, 1, 2, 3, 4, 5),
-				new Reference(bible.parseBook("Gal"), 2, 1, 2, 3, 4, 5, 19, 20, 21, 6, 7, 8),
-				new Reference(bible.parseBook("1Tim"), 4, 5, 6, 7, 8)
+		Reference.Builder[] refObjects = new Reference.Builder[] {
+				new Reference.Builder().setBook("John").setChapter(3).setVerses(16),
+				new Reference.Builder().setBook("1 John").setChapter(3).setVerses(16),
+				new Reference.Builder().setBook("2 John").setChapter(3).setVerses(16),
+				new Reference.Builder().setBook("3 John").setChapter(3).setVerses(16),
+				new Reference.Builder().setBook("Philippians").setChapter(4).setVerses(11),
+				new Reference.Builder().setBook("Ephesians").setChapter(1).setVerses(1, 2, 3, 4, 5, 6, 7, 8),
+				new Reference.Builder().setBook("Ephesians").setChapter(1).setVerses(1, 2, 3, 4, 5, 6, 7, 8),
+				new Reference.Builder().setBook("Ephesians").setChapter(1).setVerses(1, 2, 3, 4, 5, 6, 7, 8),
+				new Reference.Builder().setBook("Ephesians").setChapter(1).setVerses(1, 8),
+				new Reference.Builder().setBook("Ecclesiastes").setChapter(4).setVerses(1, 4),
+				new Reference.Builder().setBook("Ecclesiastes").setChapter(4).setVerses(1, 4),
+				new Reference.Builder().setBook("Genesis").setChapter(1).setVerses(1, 2, 3),
+				new Reference.Builder().setBook("Psalm").setChapter(125).setVerses(1, 2, 3, 4, 5),
+				new Reference.Builder().setBook("Psalm").setChapter(125).setVerses(1, 2, 3, 4, 5),
+				new Reference.Builder().setBook("Galatians").setChapter(2).setVerses(1, 2, 3, 4, 5, 19, 20, 21, 6, 7, 8),
+				new Reference.Builder().setBook("1 Timothy").setChapter(4).setVerses(5, 6, 7, 8),
 		};
 
 		for(int i = 0; i < references.length; i++) {
-			Reference ref = Reference.parseReference(references[i], bible);
+			Reference ref1 = new Reference.Builder()
+					.setBible(bible)
+					.parseReference(references[i])
+					.create();
+			Reference ref2 = refObjects[i].create();
 
 			//should never return null Reference, but rather throw exception. Check here just to be sure
-			assertNotNull(ref);
+			assertNotNull(ref1);
+			assertNotNull(ref2);
 
 			//test for equality among parsed and entered References by all possible
 			// measures. Also test to make sure that a.equals(b) is no different from
 			// b.equals(a) for each comparison
-			assertTrue(ref.equals(refObjects[i]));
-			assertTrue(refObjects[i].equals(ref));
+			assertEquals(ref1, ref2);
+			assertEquals(ref2, ref1);
 
-			assertEquals(0, ref.compareTo(refObjects[i]));
-			assertEquals(0, refObjects[i].compareTo(ref));
+			assertTrue(ref1.equals(ref2));
+			assertTrue(ref2.equals(ref1));
 
-			assertEquals(ref.hashCode(), refObjects[i].hashCode());
-			assertEquals(refObjects[i].hashCode(), ref.hashCode());
+			assertEquals(0, ref1.compareTo(ref2));
+			assertEquals(0, ref2.compareTo(ref1));
 
-			assertEquals(refObjects[i], ref);
-			assertEquals(ref, refObjects[i]);
+			assertEquals(ref1.hashCode(), ref2.hashCode());
+			assertEquals(ref2.hashCode(), ref1.hashCode());
 
 			//ensure that we can read in a string that the class prints just the same
-			String s = ref.toString();
-			Reference ref2 = Reference.parseReference(s, bible);
+			String s = ref1.toString();
+			Reference ref3 = new Reference.Builder()
+					.setBible(bible)
+					.parseReference(s)
+					.create();
 
-			assertEquals(ref, ref2);
+			assertEquals(ref1, ref3);
 		}
 	}
 
@@ -113,53 +115,65 @@ public class ReferenceTest extends TestCase {
 //			//test parsing the names based on their code. we have already found
 //			//the book, so just get its code and parse
 //			pre = book.getAbbr().toLowerCase().trim().replaceAll("\\s", "");
-////			book = Bible.parseBook(pre);
+//			book = bible.parseBook(pre);
 //
 //			post = book.getAbbr().toLowerCase().trim().replaceAll("\\s", "");
 //			assertEquals(pre, post);
 //		}
 //	}
-
+//
 	public void testPrintingReferences() throws Throwable {
 		String refStringManual1 = "John 3:16-19,     24, 27-29, 31, 33";
-		Reference ref1 = new Reference(bible.parseBook("John"), 3,
-											  16, 17, 18, 19, 24, 27, 28, 29, 31, 33);
+		Reference ref1 = new Reference.Builder()
+				.setBook("John")
+				.setChapter(3)
+				.setVerses(16, 17, 18, 19, 24, 27, 28, 29, 31, 33)
+				.create();
 
 		String refStringManual2 = "Mark 1:1-7, 14, 19, 22, 29-32, 34-35";
-		Reference ref2 = new Reference(bible.parseBook("Mark"), 1,
-											  1, 2, 3, 4, 5, 6, 7, 14, 19, 22, 29, 30, 31, 32, 34, 35);
+		Reference ref2 = new Reference.Builder()
+				.setBook("Mark")
+				.setChapter(1)
+				.setVerses(1, 2, 3, 4, 5, 6, 7, 14, 19, 22, 29, 30, 31, 32, 34, 35)
+				.create();
 
 		assertEquals(refStringManual1.replaceAll("\\s+", " "), ref1.toString());
 		assertEquals(refStringManual2.replaceAll("\\s+", " "), ref2.toString());
 
-		Reference ref3 = Reference.parseReference(ref1.toString(), bible);
-		Reference ref4 = Reference.parseReference(ref2.toString(), bible);
+		Reference ref3 = new Reference.Builder()
+				.setBible(bible)
+				.parseReference(ref1.toString())
+				.create();
+		Reference ref4 = new Reference.Builder()
+				.setBible(bible)
+				.parseReference(ref2.toString())
+				.create();
 
 		assertEquals(ref1.toString(), ref3.toString());
 		assertEquals(ref2.toString(), ref4.toString());
 	}
-
-	public void testExtractVerse() throws Throwable {
-		String[] references = new String[] {
-				"Lets see if I can find John 3:16-18, 22-24",
-				"Now how about finding it in http://bible.com/111/gen.3.1.niv Now the serpent was more crafty",
-				"\"Now the serpent was more crafty\"\n\n http://ref.ly/r/niv2011/Ge3.1 via the FaithLife",
-				"http://www.biblestudytools.com/kjv/romans/14-1.html"
-		};
-
-		Reference[] refObjects = new Reference[] {
-				new Reference(bible.parseBook("John"), 3, 16, 17, 18, 22, 23, 24),
-				new Reference(bible.parseBook("Gen"), 3, 1),
-				new Reference(bible.parseBook("Gen"), 3, 1),
-				new Reference(bible.parseBook("Rom"), 14, 1)
-		};
-
-		for(int i = 0; i < references.length; i++) {
-			Reference ref = Reference.extractReference(references[i], bible);
-
-			//should never return null Reference, but rather throw exception. Check here just to be sure
-			assertNotNull(ref);
-			assertEquals(ref, refObjects[i]);
-		}
-	}
+//
+//	public void testExtractVerse() throws Throwable {
+//		String[] references = new String[] {
+//				"Lets see if I can find John 3:16-18, 22-24",
+//				"Now how about finding it in http://bible.com/111/gen.3.1.niv Now the serpent was more crafty",
+//				"\"Now the serpent was more crafty\"\n\n http://ref.ly/r/niv2011/Ge3.1 via the FaithLife",
+//				"http://www.biblestudytools.com/kjv/romans/14-1.html"
+//		};
+//
+//		Reference.Builder[] refObjects = new Reference.Builder[] {
+//				new Reference.Builder().setBook("John").setChapter(3).setVerses(16, 17, 18, 22, 23, 24),
+//				new Reference.Builder().setBook("Gen").setChapter(3).setVerses(1),
+//				new Reference.Builder().setBook("Gen").setChapter(3).setVerses(1),
+//				new Reference.Builder().setBook("Rom").setChapter(14).setVerses(1)
+//		};
+//
+//		for(int i = 0; i < references.length; i++) {
+//			Reference ref = Reference.extractReference(references[i], bible);
+//
+//			//should never return null Reference, but rather throw exception. Check here just to be sure
+//			assertNotNull(ref);
+//			assertEquals(ref, refObjects[i]);
+//		}
+//	}
 }

@@ -9,7 +9,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -43,18 +42,20 @@ public class Passage extends AbstractVerse {
         Collections.sort(this.reference.verses);
         this.verses = new ArrayList<>();
 		for(Integer verseNum : this.reference.verses) {
-			this.verses.add(new Verse(new Reference(this.reference.book, this.reference.chapter, verseNum)));
+			this.verses.add(new Verse(
+					new Reference.Builder()
+					.setBook(this.reference.book).setChapter(this.reference.chapter).setVerses(verseNum).create()));
 		}
     }
 
-	public static Passage parsePassage(String reference, Bible bible) throws ParseException {
-		Bible ver = (bible == null) ? new Bible("eng-ESV") : bible;
-
-		Reference ref = Reference.parseReference(reference, ver);
-		Passage passage = new Passage(ref);
-		passage.setBible(ver);
-		return passage;
-	}
+//	public static Passage parsePassage(String reference, Bible bible) throws ParseException {
+//		Bible ver = (bible == null) ? new Bible("eng-ESV") : bible;
+//
+//		Reference ref = Reference.parseReference(reference, ver);
+//		Passage passage = new Passage(ref);
+//		passage.setBible(ver);
+//		return passage;
+//	}
 
 //Setters and Getters
 //------------------------------------------------------------------------------

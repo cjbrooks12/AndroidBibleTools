@@ -54,4 +54,29 @@ public class Book {
 		return chapters[chapters.length - 1];
 	}
 
+	/**
+	 * Two Books are considered the same if they represent the same location in
+	 * the Bible. In other words, if they have the same Order. Books may be called
+	 * something different in other languages, but they will be the same Book if
+	 * they have the same Order.
+	 *
+	 * @param o the other book to compare to
+	 * @return whether the two books represent the same Book in the Bible
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if(o == null) return false;
+		if(!(o instanceof Book)) return false;
+
+		Book other = (Book) o;
+
+		if(this.order != other.order) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return order;
+	}
 }

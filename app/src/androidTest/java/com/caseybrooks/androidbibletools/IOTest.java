@@ -8,7 +8,6 @@ import junit.framework.TestCase;
 import java.util.ArrayList;
 
 public class IOTest extends TestCase {
-
 	public void testOpenBibleTools() throws Throwable {
 		ArrayList<Passage> passages = OpenBibleInfo.getVersesFromTopic("Dogs");
 	}

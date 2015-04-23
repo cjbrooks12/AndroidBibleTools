@@ -9,7 +9,7 @@ public class ReferenceTest extends TestCase {
 	Bible bible;
 
 	public ReferenceTest() {
-		bible = new Bible("eng-ESV");
+		bible = new Bible(null);
 	}
 
 	public void testReferenceParser() throws Throwable {

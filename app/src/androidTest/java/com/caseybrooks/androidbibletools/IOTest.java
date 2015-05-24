@@ -1,7 +1,7 @@
 package com.caseybrooks.androidbibletools;
 
 import com.caseybrooks.androidbibletools.basic.Passage;
-import com.caseybrooks.androidbibletools.search.OpenBibleInfo;
+import com.caseybrooks.androidbibletools.providers.openbible.OpenBibleInfo;
 
 import junit.framework.TestCase;
 

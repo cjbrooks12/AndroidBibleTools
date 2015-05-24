@@ -1,7 +1,7 @@
 package com.caseybrooks.androidbibletools.defaults;
 
 import com.caseybrooks.androidbibletools.data.Formatter;
-import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.basic.Reference;
 
 import java.util.Random;
 

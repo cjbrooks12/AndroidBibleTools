@@ -1,6 +1,4 @@
-package com.caseybrooks.androidbibletools.data;
-
-import com.caseybrooks.androidbibletools.basic.AbstractVerse;
+package com.caseybrooks.androidbibletools.basic;
 
 import java.util.ArrayList;
 import java.util.HashMap;

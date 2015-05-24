@@ -1,7 +1,7 @@
 package com.caseybrooks.androidbibletools;
 
-import com.caseybrooks.androidbibletools.data.Bible;
-import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.basic.Bible;
+import com.caseybrooks.androidbibletools.basic.Reference;
 
 import junit.framework.TestCase;
 
@@ -9,7 +9,7 @@ public class ReferenceTest extends TestCase {
 	Bible bible;
 
 	public ReferenceTest() {
-		bible = new Bible(null);
+		bible = new Bible();
 	}
 
 	public void testReferenceParser() throws Throwable {
@@ -114,14 +114,14 @@ public class ReferenceTest extends TestCase {
 //
 //			//test parsing the names based on their code. we have already found
 //			//the book, so just get its code and parse
-//			pre = book.getAbbr().toLowerCase().trim().replaceAll("\\s", "");
+//			pre = book.getAbbreviation().toLowerCase().trim().replaceAll("\\s", "");
 //			book = bible.parseBook(pre);
 //
-//			post = book.getAbbr().toLowerCase().trim().replaceAll("\\s", "");
+//			post = book.getAbbreviation().toLowerCase().trim().replaceAll("\\s", "");
 //			assertEquals(pre, post);
 //		}
 //	}
-//
+
 	public void testPrintingReferences() throws Throwable {
 		String refStringManual1 = "John 3:16-19,     24, 27-29, 31, 33";
 		Reference ref1 = new Reference.Builder()
@@ -152,7 +152,7 @@ public class ReferenceTest extends TestCase {
 		assertEquals(ref1.toString(), ref3.toString());
 		assertEquals(ref2.toString(), ref4.toString());
 	}
-//
+
 //	public void testExtractVerse() throws Throwable {
 //		String[] references = new String[] {
 //				"Lets see if I can find John 3:16-18, 22-24",

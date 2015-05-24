@@ -1,14 +1,14 @@
-package com.caseybrooks.androidbibletools;
+package com.caseybrooks.androidbibletools.ABSTest;
 
 import android.util.Log;
 
-import com.caseybrooks.androidbibletools.basic.Passage;
-import com.caseybrooks.androidbibletools.basic.Verse;
-import com.caseybrooks.androidbibletools.data.Bible;
-import com.caseybrooks.androidbibletools.data.Book;
-import com.caseybrooks.androidbibletools.data.Reference;
-import com.caseybrooks.androidbibletools.io.Download;
+import com.caseybrooks.androidbibletools.basic.Bible;
+import com.caseybrooks.androidbibletools.basic.Book;
+import com.caseybrooks.androidbibletools.basic.Reference;
 import com.caseybrooks.androidbibletools.io.PrivateKeys;
+import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
+import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
+import com.caseybrooks.androidbibletools.providers.abs.ABSVerse;
 
 import junit.framework.TestCase;
 
@@ -18,62 +18,76 @@ import java.util.HashMap;
 
 public class DownloadingTest extends TestCase {
 	public void testDownloadingVerse() throws Throwable {
-		Verse verse = new Verse(
-				new Reference.Builder().parseReference("Galatians 2:19").create());
-		assertNotNull(verse);
+		ABSBible baseBible = new ABSBible(PrivateKeys.API_KEY, "eng-ESV");
+		assertTrue(baseBible.isAvailable());
+		baseBible.parseDocument(baseBible.getDocument());
 
-		Document doc1 = Download.bibleChapter(
+		for(Book book : baseBible.getBooks()) {
+			Log.e("", book.toString());
+		}
+
+		ABSVerse verse = new ABSVerse(
 				PrivateKeys.API_KEY,
-				verse.getReference());
-		verse.getVerseInfo(doc1);
+				new Reference.Builder()
+						.setBible(baseBible)
+						.parseReference("Galatians 2:19")
+						.create());
+		assertNotNull(verse);
+		assertTrue(verse.isAvailable());
+		verse.parseDocument(verse.getDocument());
 		assertEquals("For through the law I died to the law, so that I might live to God.", verse.getText());
 
-		Passage passage = new Passage(
-				new Reference.Builder().parseReference("Galatians 2:19-21").create());
-		Document doc2 = Download.bibleChapter(
+		ABSPassage passage = new ABSPassage(
 				PrivateKeys.API_KEY,
-				passage.getReference());
-		passage.getVerseInfo(doc2);
+				new Reference.Builder()
+						.setBible(baseBible)
+						.parseReference("Galatians 2:19-21")
+						.create());
+		assertNotNull(passage);
+		assertTrue(passage.isAvailable());
+		passage.parseDocument(passage.getDocument());
 		assertEquals("For through the law I died to the law, so that I might live to God. I have been crucified with Christ. It is no longer I who live, but Christ who lives in me. And the life I now live in the flesh I live by faith in the Son of God, who loved me and gave himself for me. I do not nullify the grace of God, for if righteousness were through the law, then Christ died for no purpose.", passage.getText());
 
 		//test downloading verses in other languages, like Spanish. First download
 		//the appropriate version text, then download the verse after the reference
 		//has been properly parsed in that language
-		Bible DHH = new Bible("spa-DHH");
-		DHH.getVersionInfo(Download.versionInfo(PrivateKeys.API_KEY, DHH.getVersionId()));
-		Passage spanishPassage = new Passage(
-				new Reference.Builder().setBible(DHH).parseReference("Gálatas 2:19-21").create());
-		Document doc3 = Download.bibleChapter(
+		ABSBible DHH = new ABSBible(PrivateKeys.API_KEY, "spa-DHH");
+		DHH.parseDocument(DHH.getDocument());
+		ABSPassage spanishPassage = new ABSPassage(
 				PrivateKeys.API_KEY,
-				spanishPassage.getReference());
-		spanishPassage.getVerseInfo(doc3);
+				new Reference.Builder()
+						.setBible(DHH)
+						.parseReference("Gálatas 2:19-21")
+						.create());
+		assertTrue(spanishPassage.isAvailable());
+		spanishPassage.parseDocument(spanishPassage.getDocument());
 		assertEquals("Porque por medio de la ley yo he muerto a la ley, a fin de vivir para Dios. Con Cristo he sido crucificado, y ya no soy yo quien vive, sino que es Cristo quien vive en mí. Y la vida que ahora vivo en el cuerpo, la vivo por mi fe en el Hijo de Dios, que me amó y se entregó a la muerte por mí. No quiero rechazar la bondad de Dios; pues si se obtuviera la justicia por medio de la ley, Cristo habría muerto inútilmente.", spanishPassage.getText());
 	}
 
 	public void testGettingVersionsList() throws Throwable {
-		Document availableVersions = Download.availableVersions(PrivateKeys.API_KEY, null);
-		HashMap<String, String> availableLanguages = Bible.getAvailableLanguages(availableVersions);
+		Document availableVersions = ABSBible.availableVersionsDoc(PrivateKeys.API_KEY, null);
+		HashMap<String, String> availableLanguages = ABSBible.getAvailableLanguages(availableVersions);
 
 		assertNotNull(availableLanguages);
 		Log.i("No. Available Langs", availableLanguages.size() + " languages");
 
 		String langKey = "English (US)";
 		if(availableLanguages.containsKey(langKey)) {
-			HashMap<String, Bible> versionsList = Bible.getAvailableVersions(availableVersions);
+			HashMap<String, Bible> versionsList = ABSBible.parseAvailableVersions(availableVersions);
 
 			assertNotNull(versionsList);
 			Log.i("No. Versions", versionsList.size() + " versions in " + availableLanguages.get(langKey));
 
-			Bible esv = versionsList.get("ESV");
+			ABSBible esv = (ABSBible) versionsList.get("ESV");
 			assertNotNull(esv);
 
-			esv.getVersionInfo(Download.versionInfo(PrivateKeys.API_KEY, esv.getVersionId()));
+			esv.parseDocument(esv.getDocument());
 
 			Book galatians = esv.parseBook("Galatians");
 			assertNotNull(galatians);
 			assertEquals("Galatians", galatians.getName());
-			assertEquals("Gal", galatians.getAbbr());
-			assertEquals(48, galatians.getOrder());
+			assertEquals("Gal", galatians.getAbbreviation());
+			assertEquals(48, galatians.getLocation());
 		}
 	}
 }

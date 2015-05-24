@@ -1,6 +1,6 @@
 package com.caseybrooks.androidbibletools.io;
 
-import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.basic.Reference;
 
 /** The class used to parse a String into Reference objects. Uses the following grammar
  *

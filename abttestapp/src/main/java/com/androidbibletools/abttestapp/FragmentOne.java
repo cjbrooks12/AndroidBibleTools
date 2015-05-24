@@ -17,10 +17,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.caseybrooks.androidbibletools.basic.Passage;
-import com.caseybrooks.androidbibletools.data.Bible;
-import com.caseybrooks.androidbibletools.data.Book;
+import com.caseybrooks.androidbibletools.basic.Bible;
+import com.caseybrooks.androidbibletools.basic.Book;
 import com.caseybrooks.androidbibletools.data.Formatter;
-import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.basic.Reference;
 import com.caseybrooks.androidbibletools.io.Download;
 import com.caseybrooks.androidbibletools.io.PrivateKeys;
 

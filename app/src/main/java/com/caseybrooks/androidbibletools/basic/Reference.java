@@ -1,14 +1,27 @@
-package com.caseybrooks.androidbibletools.data;
+package com.caseybrooks.androidbibletools.basic;
 
+import com.caseybrooks.androidbibletools.data.Optional;
 import com.caseybrooks.androidbibletools.io.ReferenceParser;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Reference implements Comparable<Reference> {
+/**
+ * A generic Reference for a Bible verse. A Reference simply refers to a location
+ * in the Bible, as denoted by a book, a chapter, and a list of verses contained
+ * within this chapter. The chapter and verses are represented as integers, and
+ * the Book, while represented as a String as the name, is supplemented by an
+ * integer as its position in the Bible. This class is final, because any type
+ * of Bible verse should always be able to reference another by use of the same
+ * Reference, entirely independent of the Bible version, language, or service
+ * providing the verse text. A reference for a Verse should be compatible with
+ * any other implementation of a Verse, and a reference for a Passage should
+ * be compatible with any other implementation of a Passage, a Verse reference
+ * will always take first verse in a Passage reference.
+ */
+public final class Reference implements Comparable<Reference> {
     public final Book book;
     public final int chapter;
-    public final int verse;
     public final ArrayList<Integer> verses;
 
 //Make constructors private. Force caller to use of the static initializer methods
@@ -16,36 +29,20 @@ public class Reference implements Comparable<Reference> {
     private Reference(Book book, int chapter, int... verses) {
 		this.book = book;
 		this.chapter = chapter;
-		if(verses.length == 1) {
-			this.verses = new ArrayList<>();
-			this.verses.add(verses[0]);
-			verse = verses[0];
-		}
-		else {
-			verse = 0;
-			this.verses = new ArrayList<>();
+		this.verses = new ArrayList<>();
 
-			for(int i : verses) {
-				this.verses.add(i);
-			}
-
-			Collections.sort(this.verses);
+		for(int i : verses) {
+			this.verses.add(i);
 		}
+
+		Collections.sort(this.verses);
     }
 
 	private Reference(Book book, int chapter, ArrayList<Integer> verses) {
 		this.book = book;
 		this.chapter = chapter;
-		if(verses.size() == 1) {
-			this.verses = new ArrayList<>();
-			this.verses.add(verses.get(0));
-			verse = verses.get(0);
-		}
-		else {
-			verse = 0;
-			this.verses = verses;
-			Collections.sort(this.verses);
-		}
+		this.verses = verses;
+		Collections.sort(this.verses);
 	}
 
 //static initializer methods
@@ -116,45 +113,10 @@ public class Reference implements Comparable<Reference> {
 			}
 
 			if(parsedBook == null) {
-				parsedBook = new Bible(null).parseBook(bookName);
+				parsedBook = new Bible().parseBook(bookName);
 
 				if(parsedBook == null) {
-					parsedBook = new Book(null);
-					parsedBook.setName(bookName);
-				}
-			}
-
-			book = parsedBook;
-
-			return this;
-		}
-
-		/**
-		 * Attempts to parse the bookName according to the bible that was set.
-		 * If that fails, it tries to parse against the default ESV. Failing both,
-		 * it simply creates a Book with the given bookName and bookId. The bookId
-		 * is a unique identifier that allows this reference to be downloaded
-		 *
-		 * @param bookName the bookname to be parsed
-		 * @param bookId the unique identifier of the book which enabled downloading it
-		 * @return this Builder object
-		 */
-		public Builder setBook(String bookName, @Optional String bookId) {
-			Book parsedBook = null;
-			if(bible != null) {
-				parsedBook = bible.parseBook(bookName);
-			}
-
-			if(parsedBook == null) {
-				parsedBook = new Bible(null).parseBook(bookName);
-
-				if(parsedBook == null) {
-					if(bookId != null) {
-						parsedBook = new Book(bookId);
-					}
-					else {
-						parsedBook = new Book(null);
-					}
+					parsedBook = new Book();
 					parsedBook.setName(bookName);
 				}
 			}
@@ -169,44 +131,37 @@ public class Reference implements Comparable<Reference> {
 		 * with the given parameters.
 		 *
 		 * @param bookName the name of the book
-		 * @param bookId (optional) the unique identifer of the book to enable downloading
 		 * @param bookAbbr (optional) the book's abbreviated name. If not specified, the first three letters of the name will be used
 		 * @param chapters (optional) the list of chapters in this Book
 		 * @return this Builder object
 		 */
 		public Builder setBook(
 				String bookName,
-				@Optional String bookId,
 				@Optional String bookAbbr,
-				@Optional int order,
+				@Optional int location,
 				@Optional int[] chapters) {
 
-			Book parsedBook;
-			if(bookId != null) {
-				parsedBook = new Book(bookId);
-			}
-			else {
-				parsedBook = new Book(null);
-			}
-
+			Book parsedBook = new Book();
 			parsedBook.setName(bookName);
 
 			if(bookAbbr != null) {
-				parsedBook.setAbbr(bookAbbr);
+				parsedBook.setAbbreviation(bookAbbr);
 			}
 			else {
-				parsedBook.setAbbr(bookName.substring(0, 3));
+				parsedBook.setAbbreviation(bookName.substring(0, 3));
 			}
 
-			parsedBook.setChapters(chapters);
+			if(chapters != null) {
+				parsedBook.setChapters(chapters);
+			}
 
-			if(order != 0) {
-				parsedBook.setOrder(order);
+			if(location != 0) {
+				parsedBook.setLocation(location);
 			}
 			else {
 				//choose arbitrarily high order to ensure it will always be
 				//sorted to the end of a list of verses
-				parsedBook.setOrder(10000);
+				parsedBook.setLocation(10000);
 			}
 
 			book = parsedBook;
@@ -237,33 +192,9 @@ public class Reference implements Comparable<Reference> {
 		 * @return this Builder object
 		 */
 		public Builder setBible(String versionName, @Optional String versionAbbr) {
-			this.bible = new Bible(null);
+			this.bible = new Bible();
 			this.bible.name = versionName;
-			return this;
-		}
-
-		/**
-		 * Creates a new Bible with the given name and versionId. The versionId
-		 * is what enables verses to be downloaded, but it is not necessary if you
-		 * just want to work with raw user data and not allow downloading from
-		 * this Bible. If no abbreviation is given, one will be created from the
-		 * first letter of each word in the version name, or if it is only one
-		 * word, it will be copied over.
-		 *
-		 * @param versionName the name of this Bible
-		 * @param versionAbbr (optional) the abbreviation of this Bible
-		 * @param versionId (optional) the unique identifier of this Bible which enables downloading
-		 * @return this Builder object
-		 */
-		public Builder setBible(String versionName, @Optional String versionAbbr, @Optional String versionId) {
-			if(versionId != null) {
-				this.bible = new Bible(versionId);
-			}
-			else {
-				this.bible = new Bible(null);
-			}
-
-			this.bible.name = versionName;
+			if(versionAbbr != null) this.bible.abbr = versionAbbr;
 			return this;
 		}
 
@@ -361,38 +292,30 @@ public class Reference implements Comparable<Reference> {
         refString += " " + chapter;
         refString += ":";
 
-		if(verses.size() == 0) {
-			refString += verse;
-		}
-        else if(verses.size() == 1) {
-            refString += verse;
-        }
-        else {
-            refString += verses.get(0);
-            int lastVerse = verses.get(0);
+		refString += verses.get(0);
+		int lastVerse = verses.get(0);
 
-            int i = 1;
-            while(i < verses.size()) {
-                if(verses.get(i) == lastVerse + 1) {
-                    refString += "-";
-                    while(true) {
-                        if (i < verses.size() && verses.get(i) == lastVerse + 1) {
-                            lastVerse++;
-                            i++;
-                        }
-                        else {
-                            refString += Integer.toString(lastVerse);
-                            break;
-                        }
-                    }
-                }
-                else {
-                    refString += ", " + verses.get(i);
-                    lastVerse = verses.get(i);
-                    i++;
-                }
-            }
-        }
+		int i = 1;
+		while(i < verses.size()) {
+			if(verses.get(i) == lastVerse + 1) {
+				refString += "-";
+				while(true) {
+					if (i < verses.size() && verses.get(i) == lastVerse + 1) {
+						lastVerse++;
+						i++;
+					}
+					else {
+						refString += Integer.toString(lastVerse);
+						break;
+					}
+				}
+			}
+			else {
+				refString += ", " + verses.get(i);
+				lastVerse = verses.get(i);
+				i++;
+			}
+		}
 
         return refString;
     }
@@ -409,22 +332,21 @@ public class Reference implements Comparable<Reference> {
     public int compareTo(Reference rhs) {
         Reference lhs = this;
 
-        if(lhs.book.getOrder() - rhs.book.getOrder() == 1) {
+        if(lhs.book.getLocation() - rhs.book.getLocation() == 1) {
             if((lhs.chapter == 1 && lhs.verses.get(0) == 1) &&
                     (rhs.chapter == rhs.book.numChapters() &&
                             (rhs.verses.get(0) == rhs.book.numVersesInChapter(rhs.chapter)))) return 1;
             else return 4;
         }
-        else if(lhs.book.getOrder() - rhs.book.getOrder() == -1) {
+        else if(lhs.book.getLocation() - rhs.book.getLocation() == -1) {
             if((rhs.chapter == 1 && rhs.verses.get(0) == 1) &&
                     (lhs.chapter == lhs.book.numChapters() &&
                             (lhs.verses.get(0) == lhs.book.numVersesInChapter(lhs.chapter)))) return -1;
             else return -4;
         }
-        else if(lhs.book.getOrder() > rhs.book.getOrder()) return 4;
-        else if(lhs.book.getOrder() < rhs.book.getOrder()) return -4;
+        else if(lhs.book.getLocation() > rhs.book.getLocation()) return 4;
+        else if(lhs.book.getLocation() < rhs.book.getLocation()) return -4;
         else {
-			//TODO: get reference comparing for Verse objects (verses == null, verse is defined)
             //same book
             if(lhs.chapter - rhs.chapter == 1) {
                 if((lhs.verses.get(0) == 1) &&
@@ -458,7 +380,6 @@ public class Reference implements Comparable<Reference> {
 //		if(this.book != ref.book) return false;
 		if(this.chapter != ref.chapter) return false;
 		if(this.verses.size() != ref.verses.size()) return false;
-		if(this.verse != ref.verse) return false;
 
 		for(Integer i : this.verses) {
 			if(!ref.verses.contains(i)) return false;
@@ -474,7 +395,7 @@ public class Reference implements Comparable<Reference> {
     public int hashCode() {
         int result = book.hashCode();
         result = 31 * result + chapter;
-        result = 31 * result + ((verses != null) ? verses.hashCode() : 0);
+        result = 31 * result + verses.hashCode();
         return result;
     }
 }

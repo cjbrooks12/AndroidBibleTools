@@ -2,12 +2,6 @@ package com.caseybrooks.androidbibletools.basic;
 
 import android.support.annotation.NonNull;
 
-import com.caseybrooks.androidbibletools.data.Reference;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
 /** The simplest unit of data in this data structure. Each verse contains one
  *  and only one Bible verse, its corresponding Book, Chapter, and Verse Number,
  *  and the bible this specific Verse is.
@@ -26,21 +20,8 @@ import org.jsoup.select.Elements;
  *  and in different formats.
  */
 public class Verse extends AbstractVerse {
-////Verse implementation of a Reference
-////------------------------------------------------------------------------------
-//	public static class Reference extends com.caseybrooks.androidbibletools.data.Reference {
-//		public Reference(Book book, int chapter, int... verses) {
-//			super(book, chapter, verses);
-//		}
-//
-//		public Reference(Book book, int chapter, ArrayList<Integer> verses) {
-//			super(book, chapter, verses);
-//		}
-//	}
-
 //Data Members
 //------------------------------------------------------------------------------
-    //Data members that make up the actual verse
     protected String verseText;
 
 //Constructors
@@ -48,15 +29,6 @@ public class Verse extends AbstractVerse {
     public Verse(Reference reference) {
         super(reference);
     }
-
-//	public static Verse parseVerse(String reference, @Optional Bible bible) throws ParseException {
-//		Bible ver = (bible == null) ? new Bible("eng-ESV") : bible;
-//
-//		Reference ref = Reference.parseReference(reference, ver);
-//		Verse verse = new Verse(ref);
-//		verse.setBible(ver);
-//		return verse;
-//	}
 
 //Getters and Setters
 //------------------------------------------------------------------------------
@@ -214,22 +186,4 @@ public class Verse extends AbstractVerse {
 			return false;
 		}
     }
-
-//Retrieve verse from the internet
-//------------------------------------------------------------------------------
-
-	@Override
-	public void getVerseInfo(Document doc) {
-		if(listener != null) listener.onPreDownload();
-
-		String verseID = reference.book.getId() +"." + reference.chapter + "." + reference.verse;
-
-		Elements scripture = doc.select("verse[id=" + verseID  + "]");
-		Document textHTML = Jsoup.parse(scripture.select("text").text());
-		textHTML.select("sup").remove();
-
-		setText(textHTML.text());
-
-		if(listener != null) listener.onPostDownload();
-	}
 }

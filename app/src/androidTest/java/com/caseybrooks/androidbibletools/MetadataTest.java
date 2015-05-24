@@ -3,10 +3,10 @@ package com.caseybrooks.androidbibletools;
 import android.app.Application;
 import android.test.ApplicationTestCase;
 
+import com.caseybrooks.androidbibletools.basic.Book;
+import com.caseybrooks.androidbibletools.basic.Metadata;
+import com.caseybrooks.androidbibletools.basic.Reference;
 import com.caseybrooks.androidbibletools.basic.Verse;
-import com.caseybrooks.androidbibletools.data.Book;
-import com.caseybrooks.androidbibletools.data.Metadata;
-import com.caseybrooks.androidbibletools.data.Reference;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,7 +43,11 @@ public class MetadataTest extends ApplicationTestCase<Application> {
 
 	public void testAddingKeys() throws Throwable {
 		Verse verseA = new Verse(
-				new Reference.Builder().setBook(new Book("eng-ESV:John")).setChapter(3).setVerses(16).create());
+				new Reference.Builder()
+						.setBook(new Book())
+						.setChapter(3)
+						.setVerses(16)
+						.create());
 		Metadata metadataA = new Metadata();
 		metadataA.put("STRING", "value a"); //String is a comparable type
 		metadataA.put("INTEGER", 0); //int is comparable
@@ -62,7 +66,11 @@ public class MetadataTest extends ApplicationTestCase<Application> {
 		verseA.setMetadata(metadataA);
 
 		//create a second Metadata object to test comparison of all types
-		Verse verseB = new Verse(new Reference.Builder().setBook(new Book("eng-ESV:John")).setChapter(3).setVerses(17).create());
+		Verse verseB = new Verse(new Reference.Builder()
+				.setBook(new Book())
+				.setChapter(3)
+				.setVerses(17)
+				.create());
 		Metadata metadataB = new Metadata();
 		metadataB.putString("STRING", "value b"); //String is a comparable type
 		metadataB.putInt("INTEGER", 1); //int is comparable
@@ -74,7 +82,11 @@ public class MetadataTest extends ApplicationTestCase<Application> {
 
 		//create a third Metadata object which has the same keys but different classes with those keys
 		//to ensure that it won't compare Objects of different type
-		Verse verseC = new Verse(new Reference.Builder().setBook(new Book("eng-ESV:John")).setChapter(3).setVerses(18).create());
+		Verse verseC = new Verse(new Reference.Builder()
+				.setBook(new Book())
+				.setChapter(3)
+				.setVerses(18)
+				.create());
 		Metadata metadataC = new Metadata();
 		metadataC.putString("COMPARABLE_CLASS", "value c"); //String is a comparable type
 		metadataC.putInt("STRING", 2); //int is comparable
@@ -150,52 +162,52 @@ public class MetadataTest extends ApplicationTestCase<Application> {
 		ArrayList<Verse> verses = new ArrayList<>();
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(10).create()));
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(9).create()));
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(8).create()));
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(7).create()));
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(6).create()));
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(5).create()));
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(4).create()));
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(3).create()));
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(2).create()));
 		verses.add(new Verse(
 				new Reference.Builder()
-					.setBook(new Book("eng-ESV:Gen"))
+					.setBook(new Book())
 					.setChapter(1)
 					.setVerses(1).create()));
 

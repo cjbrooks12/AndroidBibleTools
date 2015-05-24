@@ -1,7 +1,7 @@
-package com.caseybrooks.androidbibletools.search;
+package com.caseybrooks.androidbibletools.providers.openbible;
 
 import com.caseybrooks.androidbibletools.basic.Passage;
-import com.caseybrooks.androidbibletools.data.Reference;
+import com.caseybrooks.androidbibletools.basic.Reference;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

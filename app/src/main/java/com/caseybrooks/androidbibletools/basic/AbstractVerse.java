@@ -3,13 +3,7 @@ package com.caseybrooks.androidbibletools.basic;
 import android.support.annotation.NonNull;
 
 import com.caseybrooks.androidbibletools.data.Formatter;
-import com.caseybrooks.androidbibletools.data.Metadata;
-import com.caseybrooks.androidbibletools.data.OnDownloadListener;
-import com.caseybrooks.androidbibletools.data.Reference;
-import com.caseybrooks.androidbibletools.data.Bible;
 import com.caseybrooks.androidbibletools.defaults.DefaultFormatter;
-
-import org.jsoup.nodes.Document;
 
 import java.util.TreeSet;
 
@@ -22,21 +16,20 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 //Data Members
 //------------------------------------------------------------------------------
 	protected Bible bible;
-    protected final Reference reference; //always points to one single verse
+    protected final Reference reference; //always points to one location in the Bible
     protected Formatter formatter;
     protected Metadata metadata;
 	protected TreeSet<Tag> tags;
-	protected OnDownloadListener listener;
 
 	/**
 	 * Constructor for AbstractVerse that takes a Reference object as initialization
 	 *
 	 * @param reference the Reference that this verse points to in the Bible
 	 *
-	 * @see com.caseybrooks.androidbibletools.data.Reference
+	 * @see Reference
 	 */
 	public AbstractVerse(Reference reference) {
-		this.bible = new Bible("eng-esv");
+		this.bible = new Bible();
         this.reference = reference;
         this.formatter = new DefaultFormatter();
         this.metadata = new Metadata();
@@ -45,10 +38,9 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 
 //Defined methods
 //------------------------------------------------------------------------------
-
 	/**
 	 * Get the currently set Bible of this verse
-	 * @return {@link com.caseybrooks.androidbibletools.data.Bible}
+	 * @return {@link Bible}
 	 *
 	 */
 	public Bible getBible() {
@@ -59,7 +51,7 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 * Set the Bible of this verse
 	 * @param bible the desired Bible translation
 	 *
-	 * @see com.caseybrooks.androidbibletools.data.Bible
+	 * @see Bible
 	 */
     public void setBible(Bible bible) {
 		this.bible = bible;
@@ -68,7 +60,7 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	/**
 	 * Get the Reference this verse points to
 	 *
-	 * @return {@link com.caseybrooks.androidbibletools.data.Reference}
+	 * @return {@link Reference}
 	 */
     public Reference getReference() {
 		return reference;
@@ -100,7 +92,7 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	/**
 	 * Get the HashMap of arbitrary metadata associated with this verse
 	 *
-	 * @return {@link com.caseybrooks.androidbibletools.data.Metadata}
+	 * @return {@link Metadata}
 	 */
     public Metadata getMetadata() { return metadata; }
 
@@ -109,21 +101,10 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 *
 	 * @param metadata the MetaData object to set
 	 *
-	 * @see com.caseybrooks.androidbibletools.data.Metadata
+	 * @see Metadata
 	 */
     public void setMetadata(Metadata metadata) {
 		this.metadata = metadata;
-	}
-
-	/**
-	 * Register a callback to notify the start and end of downloading the text
-	 * of this verse
-	 * @param listener the callback that will run
-	 *
-	 * @see com.caseybrooks.androidbibletools.data.OnDownloadListener
-	 */
-	public void setOnDownloadListener(OnDownloadListener listener) {
-		this.listener = listener;
 	}
 
 //Tags
@@ -179,30 +160,11 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	public abstract String getText();
 
 //	/**
-//	 * Enumeration for the several online bibles to provide links to
-//	 */
-//	public enum OnlineBible {
-//		Biblia,
-//		BibleStudyTools,
-//		BibleGateway,
-//		BlueLetterBible,
-//		YouVersion,
-//	}
-//	/**
 //	 * Get a URL to this verse on Biblia.com by Logos Bible Software
 //	 *
 //	 * @return {@link java.lang.String} the URL of this verse on Biblia.com
 //	 */
 //    public abstract String getURL(OnlineBible service);
-
-	/**
-	 * Load data from the Bibles.org API response into this Verse. Uses either
-	 * the response just downloaded, or a previously cached and parsed file.
-	 *
-	 * @param doc a Jsoup Document containing the XML response to be parsed
-	 */
-	public abstract void getVerseInfo(Document doc);
-
 //	/**
 //	 * Returns a String XML representation of this verse. Is equivalent to calling
 //	 * #toXML() and transforming the result to a String.

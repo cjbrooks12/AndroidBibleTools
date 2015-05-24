@@ -2,17 +2,8 @@ package com.caseybrooks.androidbibletools.basic;
 
 import android.support.annotation.NonNull;
 
-import com.caseybrooks.androidbibletools.data.Bible;
-import com.caseybrooks.androidbibletools.data.Reference;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 //A Passage is a group of Verse objects that are in a sequence (i.e. Galatians 2:19-21)
 //	A Passage is a basic type, and so its reference is non-modifiable. In addition,
@@ -29,10 +20,8 @@ public class Passage extends AbstractVerse {
 //Data Members
 //------------------------------------------------------------------------------
 	//Data that makes up the Passage
-	private ArrayList<Verse> verses;
-	private String allText;
-
-	private static Pattern hashtag = Pattern.compile("#((\\w+)|(\"[\\w ]+\"))");
+	protected ArrayList<Verse> verses;
+	protected String allText;
 
 	//Constructors
 //------------------------------------------------------------------------------
@@ -48,15 +37,6 @@ public class Passage extends AbstractVerse {
 		}
     }
 
-//	public static Passage parsePassage(String reference, Bible bible) throws ParseException {
-//		Bible ver = (bible == null) ? new Bible("eng-ESV") : bible;
-//
-//		Reference ref = Reference.parseReference(reference, ver);
-//		Passage passage = new Passage(ref);
-//		passage.setBible(ver);
-//		return passage;
-//	}
-
 //Setters and Getters
 //------------------------------------------------------------------------------
 
@@ -70,25 +50,17 @@ public class Passage extends AbstractVerse {
 
     public Passage setText(String text) {
 		this.verses.clear();
-
-		//parse input string and extract any tags, denoted as standard hastags
-		Matcher m = hashtag.matcher(text);
-
-		while(m.find()) {
-			String match = m.group(1);
-			if(match.charAt(0) == '\"') {
-				addTag(new Tag(match.substring(1, match.length() - 1)));
-			}
-			else {
-				addTag(new Tag(match));
-			}
-		}
-
-		this.allText = m.replaceAll("");
-
+		this.allText = text;
 		return this;
 	}
 
+	/**
+	 * Get the formatted text of this Passage. If the verses are listed indiviually,
+	 * format each verse individually according to the Formatter. Otherwise, just show
+	 * the full block of text and format it the best it can.
+	 *
+	 * @return the formatted Passage text
+	 */
 	@Override
 	public String getText() {
         if(verses.size() > 0) {
@@ -99,7 +71,7 @@ public class Passage extends AbstractVerse {
             for (int i = 0; i < verses.size(); i++) {
                 Verse verse = verses.get(i);
 
-                text += formatter.onFormatVerseStart(verse.reference.verse);
+                text += formatter.onFormatVerseStart(verse.reference.verses.get(0));
                 text += formatter.onFormatText(verse.verseText);
 
                 if (i < verses.size() - 1) {
@@ -229,29 +201,5 @@ public class Passage extends AbstractVerse {
 			return lhs.reference.equals(rhs.reference);
 		}
 		else return false;
-	}
-
-//Retrieve verse from the Internet
-//------------------------------------------------------------------------------
-
-	@Override
-	public void getVerseInfo(Document doc) {
-		if(listener != null) listener.onPreDownload();
-		allText = null;
-
-		String verseID = reference.book.getId() +"." + reference.chapter;
-
-		for(int i = 0; i < verses.size(); i++) {
-			Verse verse = verses.get(i);
-
-			Elements scripture = doc.select("verse[id=" + verseID + "." + verse.getReference().verse + "]");
-
-			Document textHTML = Jsoup.parse(scripture.select("text").text());
-			textHTML.select("sup").remove();
-
-			verse.setText(textHTML.text());
-		}
-
-		if(listener != null) listener.onPostDownload();
 	}
 }

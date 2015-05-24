@@ -1,24 +1,18 @@
-package com.caseybrooks.androidbibletools.data;
+package com.caseybrooks.androidbibletools.basic;
 
 public class Book {
-	private final String id;
 	private String name;
-	private String abbr;
-	private int order;
+	private String abbreviation;
+	private int location;
 	private int[] chapters;
 
-	public Book(String id) {
-		this.id = id;
-	}
-
-	public String getId() { return id; }
 	public String getName() { return name; }
-	public String getAbbr() { return abbr; }
-	public int getOrder() { return order; }
+	public String getAbbreviation() { return abbreviation; }
+	public int getLocation() { return location; }
 
 	public void setName(String name) { this.name = name; }
-	public void setAbbr(String abbr) { this.abbr = abbr; }
-	public void setOrder(int order) { this.order = order; }
+	public void setAbbreviation(String abbreviation) { this.abbreviation = abbreviation; }
+	public void setLocation(int location) { this.location = location; }
 
 	public int[] getChapters() { return chapters; }
 	public void setChapters(int[] chapters) { this.chapters = chapters; }
@@ -70,13 +64,20 @@ public class Book {
 
 		Book other = (Book) o;
 
-		if(this.order != other.order) return false;
+		if(this.location != other.location) return false;
 
 		return true;
 	}
 
+	/**
+	 * The hashcode is simply the exact location in the Bible this Book exists.
+	 * In the case of two hashcodes being equal, it is assumed that the Books
+	 * are the same, even if the books are of different languages.
+	 *
+	 * @return the hashcode
+	 */
 	@Override
 	public int hashCode() {
-		return order;
+		return location;
 	}
 }

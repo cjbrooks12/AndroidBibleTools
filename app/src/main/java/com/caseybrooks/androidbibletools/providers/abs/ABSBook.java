@@ -10,23 +10,23 @@ import java.io.IOException;
 public class ABSBook extends Book implements Downloadable {
 
 
-	public String getBookId() {
-		return bookId;
+	public String getId() {
+		return id;
 	}
 
-	public void setBookId(String bookId) {
-		this.bookId = bookId;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public ABSBook() {
-		this.bookId = null;
+		this.id = null;
 	}
 
-	public ABSBook(String bookId) {
-		this.bookId = bookId;
+	public ABSBook(String id) {
+		this.id = id;
 	}
 
-	protected String bookId;
+	protected String id;
 
 	@Override
 	public boolean isAvailable() {
@@ -47,7 +47,7 @@ public class ABSBook extends Book implements Downloadable {
 	public String toString() {
 		String s = getName() + " ";
 		for(int chapter : getChapters()) s += chapter + ", ";
-		s += getBookId();
+		s += getId();
 		return s;
 	}
 }

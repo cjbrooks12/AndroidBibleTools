@@ -15,7 +15,24 @@ import java.io.IOException;
 
 public class ABSPassage extends Passage implements Downloadable {
 	protected String APIKey;
-	protected String verseId;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getAPIKey() {
+		return APIKey;
+	}
+
+	public void setAPIKey(String APIKey) {
+		this.APIKey = APIKey;
+	}
+
+	protected String id;
 
 	public ABSPassage(Reference reference) {
 		super(reference);
@@ -27,23 +44,23 @@ public class ABSPassage extends Passage implements Downloadable {
 
 		try {
 			ABSBook absBook = (ABSBook) reference.book;
-			this.verseId = absBook.getBookId() +"." + reference.chapter;
+			this.id = absBook.getId() +"." + reference.chapter;
 		}
 		catch(ClassCastException cce) {
-			this.verseId = null;
+			this.id = null;
 		}
 	}
 
 	@Override
 	public boolean isAvailable() {
-		return (APIKey != null) && (verseId != null);
+		return (APIKey != null) && (id != null);
 	}
 
 	@Override
 	public Document getDocument() throws IOException {
 		if(reference != null) {
 			String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/chapters/" +
-					verseId + "/verses.xml?include_marginalia=false";
+					id + "/verses.xml?include_marginalia=false";
 
 			String header = APIKey + ":x";
 			String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);
@@ -62,7 +79,7 @@ public class ABSPassage extends Passage implements Downloadable {
 		for(int i = 0; i < verses.size(); i++) {
 			Verse verse = verses.get(i);
 
-			Elements scripture = doc.select("verse[id=" + verseId + "." + verse.getReference().verses.get(0) + "]");
+			Elements scripture = doc.select("verse[id=" + id + "." + verse.getReference().verses.get(0) + "]");
 
 			Document textHTML = Jsoup.parse(scripture.select("text").text());
 			textHTML.select("sup").remove();

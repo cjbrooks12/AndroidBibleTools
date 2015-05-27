@@ -20,7 +20,7 @@ public class ABSBible extends Bible implements Downloadable {
 //Data Members
 //------------------------------------------------------------------------------
 	protected String APIKey;
-	protected String versionId;
+	protected String id;
 
 	protected String language;
 	protected String languageName;
@@ -35,25 +35,25 @@ public class ABSBible extends Bible implements Downloadable {
 	public ABSBible() {
 		super();
 		this.APIKey = null;
-		this.versionId = null;
+		this.id = null;
 	}
 
-	public ABSBible(String versionId) {
+	public ABSBible(String id) {
 		super();
 		this.APIKey = null;
-		this.versionId = versionId;
+		this.id = id;
 	}
 
-	public ABSBible(String APIKey, String versionId) {
+	public ABSBible(String APIKey, String id) {
 		super();
 		this.APIKey = APIKey;
-		this.versionId = versionId;
+		this.id = id;
 	}
 
 //Getters and Setters
 //------------------------------------------------------------------------------
-	public String getVersionId() {
-		return versionId;
+	public String getId() {
+		return id;
 	}
 
 	public String getLanguage() {
@@ -116,13 +116,13 @@ public class ABSBible extends Bible implements Downloadable {
 //------------------------------------------------------------------------------
 	@Override
 	public boolean isAvailable() {
-		return versionId != null;
+		return id != null;
 	}
 
 	@Override
 	public Document getDocument() throws IOException {
 		String url = "http://" + APIKey + ":x@bibles.org/v2/versions/" +
-				versionId + "/books.xml?include_chapters=true";
+				id + "/books.xml?include_chapters=true";
 
 		String header = APIKey + ":x";
 		String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);
@@ -154,7 +154,7 @@ public class ABSBible extends Bible implements Downloadable {
 		for(Element book : bookElements) {
 			//get basic information about a Book
 			ABSBook newBook = new ABSBook();
-			newBook.setBookId(book.attr("id"));
+			newBook.setId(book.attr("id"));
 			newBook.setName(book.select("name").text());
 			newBook.setAbbreviation(book.select("abbr").text());
 			newBook.setLocation(Integer.parseInt(book.select("ord").text()));

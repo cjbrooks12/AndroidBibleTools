@@ -41,13 +41,13 @@ public class Download {
 //	 * the full name of the Bible, etc.
 //	 *
 //	 * @param APIKey required free API key from Bibles.org/api
-//	 * @param versionId id of the desired Bible version to get info for
+//	 * @param id id of the desired Bible version to get info for
 //	 * @return a Jsoup Document to be parsed or cached
 //	 * @throws IOException
 //	 */
-//	public static Document versionInfo(String APIKey, String versionId) throws IOException {
+//	public static Document versionInfo(String APIKey, String id) throws IOException {
 //		String url = "http://" + APIKey + ":x@bibles.org/v2/versions/" +
-//				versionId + "/books.xml?include_chapters=true";
+//				id + "/books.xml?include_chapters=true";
 //
 //		String header = APIKey + ":x";
 //		String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);

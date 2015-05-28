@@ -1,9 +1,10 @@
 package com.caseybrooks.androidbibletools.providers.votd;
 
 import com.caseybrooks.androidbibletools.basic.Bible;
-import com.caseybrooks.androidbibletools.data.Downloadable;
+import com.caseybrooks.androidbibletools.basic.Passage;
 import com.caseybrooks.androidbibletools.basic.Reference;
-import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
+import com.caseybrooks.androidbibletools.basic.Tag;
+import com.caseybrooks.androidbibletools.data.Downloadable;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,23 +13,25 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 public class VerseOfTheDay implements Downloadable {
-	String APIKey;
-	ABSPassage passage;
-	Bible bible;
+	private Passage passage;
+	private long date;
 
-	public VerseOfTheDay(String APIKey) {
-		this.APIKey = APIKey;
-		bible = new Bible();
+
+	public VerseOfTheDay() {
+		this.date = 0l;
 	}
 
-	public VerseOfTheDay(String APIKey, Bible bible) {
-		this.APIKey = APIKey;
-		this.bible = bible;
+	public VerseOfTheDay(long date) {
+		this.date = date;
+	}
+
+	public Passage getPassage() {
+		return passage;
 	}
 
 	@Override
 	public boolean isAvailable() {
-		return APIKey != null;
+		return true;
 	}
 
 	@Override
@@ -38,18 +41,21 @@ public class VerseOfTheDay implements Downloadable {
 
 	@Override
 	public boolean parseDocument(Document doc) {
-		Elements reference = doc.select("meta[property=og:title]");
-		Reference ref = new Reference.Builder()
-				.setBible(bible)
-				.parseReference(reference.attr("content").substring(18))
-				.create();
-		try {
-			passage = new ABSPassage(APIKey, ref);
-			return passage.parseDocument(passage.getDocument());
-		}
-		catch(IOException ioe) {
-			ioe.printStackTrace();
-			return false;
-		}
+		Elements scripture = doc.select(".scripture");
+		Elements verseReference = scripture.select("a");
+
+		passage = new Passage(
+				new Reference.Builder()
+				.setBible(new Bible())
+				.parseReference(verseReference.text())
+				.create()
+		);
+
+		scripture.select(".reference").remove();
+
+		passage.setText(scripture.text());
+		passage.setTags(new Tag("VOTD"));
+
+		return true;
 	}
 }

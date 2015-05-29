@@ -6,6 +6,7 @@ import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.basic.Book;
 import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.data.Optional;
+import com.caseybrooks.androidbibletools.defaults.DefaultBible;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,8 +20,8 @@ import java.util.HashMap;
 public class ABSBible extends Bible implements Downloadable {
 //Data Members
 //------------------------------------------------------------------------------
-	protected String APIKey;
-	protected String id;
+	protected final String APIKey;
+	protected final String id;
 
 	protected String language;
 	protected String languageName;
@@ -32,22 +33,21 @@ public class ABSBible extends Bible implements Downloadable {
 
 //Constructors
 //------------------------------------------------------------------------------
-	public ABSBible() {
-		super();
-		this.APIKey = null;
-		this.id = null;
-	}
-
-	public ABSBible(String id) {
-		super();
-		this.APIKey = null;
-		this.id = id;
-	}
-
 	public ABSBible(String APIKey, String id) {
 		super();
 		this.APIKey = APIKey;
-		this.id = id;
+		this.id = (id != null) ? id : "eng-ESV";
+
+		books = new ArrayList<>();
+		for(int i = 0; i < DefaultBible.defaultBookName.length; i++) {
+			ABSBook book = new ABSBook(APIKey, this.id + ":" + DefaultBible.defaultBookAbbr[i]);
+			book.setName(DefaultBible.defaultBookName[i]);
+			book.setAbbreviation(DefaultBible.defaultBookAbbr[i]);
+			book.setChapters(DefaultBible.defaultBookVerseCount[i]);
+			book.setLocation(i+1);
+
+			books.add(book);
+		}
 	}
 
 //Getters and Setters
@@ -116,7 +116,7 @@ public class ABSBible extends Bible implements Downloadable {
 //------------------------------------------------------------------------------
 	@Override
 	public boolean isAvailable() {
-		return id != null;
+		return APIKey != null && id != null;
 	}
 
 	@Override
@@ -153,8 +153,7 @@ public class ABSBible extends Bible implements Downloadable {
 		//parse each <book> element to get the information for that book
 		for(Element book : bookElements) {
 			//get basic information about a Book
-			ABSBook newBook = new ABSBook();
-			newBook.setId(book.attr("id"));
+			ABSBook newBook = new ABSBook(APIKey, book.attr("id"));
 			newBook.setName(book.select("name").text());
 			newBook.setAbbreviation(book.select("abbr").text());
 			newBook.setLocation(Integer.parseInt(book.select("ord").text()));
@@ -230,7 +229,7 @@ public class ABSBible extends Bible implements Downloadable {
 		Elements versions = doc.select("version");
 
 		for(Element element : versions) {
-			ABSBible bible = new ABSBible(element.attr("id"));
+			ABSBible bible = new ABSBible(null, element.attr("id"));
 			bible.setName(element.select("name").text());
 			bible.setAbbr(element.select("abbreviation").text());
 			bible.setLanguage(element.select("lang").text());

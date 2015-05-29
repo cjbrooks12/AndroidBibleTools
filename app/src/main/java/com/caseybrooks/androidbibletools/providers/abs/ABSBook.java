@@ -8,29 +8,21 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 
 public class ABSBook extends Book implements Downloadable {
+	protected final String APIKey;
+	protected final String id;
 
+	public ABSBook(String APIKey, String id) {
+		this.APIKey = APIKey;
+		this.id = (id != null) ? id : "eng-ESV:Matt";
+	}
 
 	public String getId() {
 		return id;
 	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public ABSBook() {
-		this.id = null;
-	}
-
-	public ABSBook(String id) {
-		this.id = id;
-	}
-
-	protected String id;
-
 	@Override
 	public boolean isAvailable() {
-		return false;
+		return APIKey != null && id != null;
 	}
 
 	@Override

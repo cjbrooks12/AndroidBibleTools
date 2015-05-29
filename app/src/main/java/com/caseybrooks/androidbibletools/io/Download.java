@@ -1,15 +1,5 @@
 package com.caseybrooks.androidbibletools.io;
 
-import android.util.Base64;
-
-import com.caseybrooks.androidbibletools.data.Optional;
-import com.caseybrooks.androidbibletools.basic.Reference;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import java.io.IOException;
-
 public class Download {
 
 //	/**

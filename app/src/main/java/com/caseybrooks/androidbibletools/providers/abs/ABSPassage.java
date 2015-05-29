@@ -14,40 +14,28 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 public class ABSPassage extends Passage implements Downloadable {
-	protected String APIKey;
+	protected final String APIKey;
+	protected final String id;
 
 	public String getId() {
 		return id;
 	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	public String getAPIKey() {
 		return APIKey;
 	}
 
-	public void setAPIKey(String APIKey) {
-		this.APIKey = APIKey;
-	}
 
-	protected String id;
-
-	public ABSPassage(Reference reference) {
-		super(reference);
-	}
 
 	public ABSPassage(String APIKey, Reference reference) {
 		super(reference);
 		this.APIKey = APIKey;
 
-		try {
+		if(reference.book instanceof ABSBook) {
 			ABSBook absBook = (ABSBook) reference.book;
-			this.id = absBook.getId() +"." + reference.chapter;
+			this.id = absBook.getId() + "." + reference.chapter;
 		}
-		catch(ClassCastException cce) {
-			this.id = null;
+		else {
+			this.id = "Matt.1";
 		}
 	}
 

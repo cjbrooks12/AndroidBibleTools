@@ -13,62 +13,44 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 public class ABSVerse extends Verse implements Downloadable {
-	protected String id;
+	protected final String id;
+	protected final String APIKey;
 
-	public String getAPIKey() {
-		return APIKey;
-	}
-
-	public void setAPIKey(String APIKey) {
+	public ABSVerse(String APIKey, Reference reference) {
+		super(reference);
 		this.APIKey = APIKey;
+
+		if(reference.book instanceof ABSBook) {
+			ABSBook absBook = (ABSBook) reference.book;
+			this.id = absBook.getId() + "." + reference.chapter;
+		}
+		else {
+			this.id = "Matt.1";
+		}
 	}
 
 	public String getId() {
 		return id;
 	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	protected String APIKey;
-
-	public ABSVerse(Reference reference) {
-		super(reference);
-	}
-
-	public ABSVerse(String APIKey, Reference reference) {
-		super(reference);
-		this.APIKey = APIKey;
-
-		try {
-			ABSBook absBook = (ABSBook) reference.book;
-			this.id = absBook.getId() + "." + reference.chapter;
-		}
-		catch(ClassCastException cce) {
-			this.id = null;
-		}
+	public String getAPIKey() {
+		return APIKey;
 	}
 
 	@Override
 	public boolean isAvailable() {
-		return id != null;
+		return APIKey != null && id != null;
 	}
 
 	@Override
 	public Document getDocument() throws IOException {
-		if(reference != null && id != null) {
-			String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/chapters/" +
-					id + "/verses.xml?include_marginalia=false";
+		String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/chapters/" +
+				id + "/verses.xml?include_marginalia=false";
 
-			String header = APIKey + ":x";
-			String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);
+		String header = APIKey + ":x";
+		String encodedHeader = Base64.encodeToString(header.getBytes("UTF-8"), Base64.DEFAULT);
 
-			return Jsoup.connect(url).header("Authorization", "Basic " + encodedHeader).get();
-		}
-		else {
-			return null;
-		}
+		return Jsoup.connect(url).header("Authorization", "Basic " + encodedHeader).get();
 	}
 
 	@Override

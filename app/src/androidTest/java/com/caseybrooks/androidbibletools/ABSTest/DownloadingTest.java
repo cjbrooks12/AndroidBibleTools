@@ -20,7 +20,7 @@ public class DownloadingTest extends TestCase {
 	public void testDownloadingVerse() throws Throwable {
 		ABSBible baseBible = new ABSBible(PrivateKeys.API_KEY, "eng-ESV");
 		assertTrue(baseBible.isAvailable());
-		baseBible.parseDocument(baseBible.getDocument());
+//		baseBible.parseDocument(baseBible.getDocument());
 
 		for(Book book : baseBible.getBooks()) {
 			Log.e("", book.toString());

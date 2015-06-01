@@ -240,7 +240,7 @@ public class ABSBible extends Bible implements Downloadable {
 			bible.setInfo(element.select("info").text());
 			bible.setContact(element.select("contact_url").text());
 
-			versionMap.put(bible.name, bible);
+			versionMap.put(bible.getId(), bible);
 		}
 
 		return versionMap;

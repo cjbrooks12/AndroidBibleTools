@@ -55,7 +55,20 @@ public class ABSVerse extends Verse implements Downloadable {
 
 	@Override
 	public boolean parseDocument(Document doc) {
-		Elements scripture = doc.select("verse[id=" + id + "." + reference.verses.get(0) + "]");
+		String id_base = doc.select("verse").attr("id");
+		String[] id_split = id_base.split("\\.");
+
+		if(id_split.length == 3) {
+			id_base = id_split[0] + "." + id_split[1] + "." + reference.verses.get(0);
+		}
+		else {
+			String s = "";
+			for(String ss : id_split) s += ss + " ";
+			setText("split not correct " + s);
+			return false;
+		}
+
+		Elements scripture = doc.select("verse[id=" + id_base + "]");
 		Document textHTML = Jsoup.parse(scripture.select("text").text());
 		textHTML.select("sup").remove();
 		String text = textHTML.text();
@@ -65,6 +78,8 @@ public class ABSVerse extends Verse implements Downloadable {
 			return true;
 		}
 		else {
+			setText("could not parse");
+
 			return false;
 		}
 	}

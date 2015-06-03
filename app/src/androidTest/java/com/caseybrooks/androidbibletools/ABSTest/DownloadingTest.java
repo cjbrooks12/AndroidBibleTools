@@ -60,8 +60,14 @@ public class DownloadingTest extends TestCase {
 						.parseReference("Gálatas 2:19-21")
 						.create());
 		assertTrue(spanishPassage.isAvailable());
-		spanishPassage.parseDocument(spanishPassage.getDocument());
+		Document spanishDoc = spanishPassage.getDocument();
+		spanishPassage.parseDocument(spanishDoc);
 		assertEquals("Porque por medio de la ley yo he muerto a la ley, a fin de vivir para Dios. Con Cristo he sido crucificado, y ya no soy yo quien vive, sino que es Cristo quien vive en mí. Y la vida que ahora vivo en el cuerpo, la vivo por mi fe en el Hijo de Dios, que me amó y se entregó a la muerte por mí. No quiero rechazar la bondad de Dios; pues si se obtuviera la justicia por medio de la ley, Cristo habría muerto inútilmente.", spanishPassage.getText());
+
+		//to show that any random passage can parse any document passed to it,
+		ABSPassage brandNewPassage = new ABSPassage(null, new Reference.Builder().parseReference("Gálatas 2:19-21").create());
+		brandNewPassage.parseDocument(spanishDoc);
+		assertEquals("Porque por medio de la ley yo he muerto a la ley, a fin de vivir para Dios. Con Cristo he sido crucificado, y ya no soy yo quien vive, sino que es Cristo quien vive en mí. Y la vida que ahora vivo en el cuerpo, la vivo por mi fe en el Hijo de Dios, que me amó y se entregó a la muerte por mí. No quiero rechazar la bondad de Dios; pues si se obtuviera la justicia por medio de la ley, Cristo habría muerto inútilmente.", brandNewPassage.getText());
 	}
 
 	public void testGettingVersionsList() throws Throwable {

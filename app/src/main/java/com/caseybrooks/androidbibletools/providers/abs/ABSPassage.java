@@ -24,8 +24,6 @@ public class ABSPassage extends Passage implements Downloadable {
 		return APIKey;
 	}
 
-
-
 	public ABSPassage(String APIKey, Reference reference) {
 		super(reference);
 		this.APIKey = APIKey;
@@ -62,18 +60,28 @@ public class ABSPassage extends Passage implements Downloadable {
 
 	@Override
 	public boolean parseDocument(Document doc) {
-		allText = null;
+		String id_base = doc.select("verse").attr("id");
+		String[] id_split = id_base.split("\\.");
+
+		if(id_split.length == 3) {
+			id_base = id_split[0] + "." + id_split[1];
+		}
+		else {
+			return false;
+		}
 
 		for(int i = 0; i < verses.size(); i++) {
 			Verse verse = verses.get(i);
 
-			Elements scripture = doc.select("verse[id=" + id + "." + verse.getReference().verses.get(0) + "]");
+			Elements scripture = doc.select("verse[id=" + id_base + "." + verse.getReference().verses.get(0) + "]");
 
 			Document textHTML = Jsoup.parse(scripture.select("text").text());
 			textHTML.select("sup").remove();
 
 			verse.setText(textHTML.text());
 		}
+
+		allText = null;
 
 		return true;
 	}

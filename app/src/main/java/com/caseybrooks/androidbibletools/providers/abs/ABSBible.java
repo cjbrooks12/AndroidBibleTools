@@ -23,7 +23,7 @@ public class ABSBible extends Bible implements Downloadable {
 	protected final String APIKey;
 	protected final String id;
 
-	protected String language;
+	protected String languageKey;
 	protected String languageName;
 	protected String languageNameEnglish;
 	protected String languageCode;
@@ -56,12 +56,12 @@ public class ABSBible extends Bible implements Downloadable {
 		return id;
 	}
 
-	public String getLanguage() {
-		return language;
+	public String getLanguageKey() {
+		return languageKey;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
+	public void setLanguageKey(String language) {
+		this.languageKey = languageKey;
 	}
 
 	public String getLanguageName() {
@@ -232,7 +232,8 @@ public class ABSBible extends Bible implements Downloadable {
 			ABSBible bible = new ABSBible(null, element.attr("id"));
 			bible.setName(element.select("name").text());
 			bible.setAbbreviation(element.select("abbreviation").text());
-			bible.setLanguage(element.select("lang").text());
+			bible.setLanguage(element.select("lang_name").text());
+			bible.setLanguageKey(element.select("lang").text());
 			bible.setLanguageName(element.select("lang_name").text());
 			bible.setLanguageNameEnglish(element.select("lang_name_english").text());
 			bible.setLanguageCode(element.select("lang_code").text());

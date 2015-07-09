@@ -117,23 +117,22 @@ public class Bible {
 		if(this == o) {
 			return true;
 		}
-		if(!(o instanceof Bible)) {
+		if(o == null || !(o instanceof Bible)) {
 			return false;
 		}
 
 		Bible bible = (Bible) o;
 
-		if(abbreviation != null ? !abbreviation.equals(bible.abbreviation) : bible.abbreviation != null) {
-			return false;
-		}
-		if(language != null ? !language.equals(bible.language) : bible.language != null) {
-			return false;
-		}
-		if(name != null ? !name.equals(bible.name) : bible.name != null) {
-			return false;
-		}
+		if(
+			getName().equalsIgnoreCase(bible.getName()) &&
+			getAbbreviation().equalsIgnoreCase(bible.getAbbreviation()) &&
+			getLanguage().equalsIgnoreCase(bible.getLanguage())) {
 
-		return true;
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override

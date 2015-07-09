@@ -3,7 +3,7 @@ package com.caseybrooks.androidbibletools.defaults;
 public class DefaultBible {
 	public static String defaultBibleId = "eng-ESV";
 	public static String defaultBibleName = "English Standard Version";
-	public static String DefaultBibleAbbr = "ESV";
+	public static String defaultBibleAbbr = "ESV";
 	public static String defaultBibleCopyright = "Scripture quotations marked (ESV) are from The Holy Bible, English Standard Version®, copyright © 2001 by Crossway Bibles, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.";
 	public static String defaultBibleInfo = "<h1>English Standard Version</h1> <h3>Version Information</h3> <p>Published in 2001, the English Standard Version stands firmly in the King James tradition and is based directly on the 1971 Revised Standard Version (RSV).</p>";
 	public static String defaultBibleContact = "http://www.crossway.org";
@@ -85,7 +85,7 @@ public class DefaultBible {
 			{ 32, 29, 31, 25, 21, 23, 25, 39, 33, 21, 36, 21, 14, 23, 33, 27 },
 			{ 31, 16, 23, 21, 13, 20, 40, 13, 27, 33, 34, 31, 13, 40, 58, 24 },
 			{ 24, 17, 18, 18, 21, 18, 16, 24, 15, 18, 33, 21, 14 },
-			{  24, 21, 29, 31, 26, 18 }, //OSIS
+			{  24, 21, 29, 31, 26, 18 },
 			{ 23, 22, 21, 32, 33, 24 },
 			{ 30, 30, 21, 23 },
 			{ 29, 23, 25, 18 },

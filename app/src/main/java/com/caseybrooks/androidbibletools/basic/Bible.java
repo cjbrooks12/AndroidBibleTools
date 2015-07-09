@@ -14,14 +14,16 @@ public class Bible {
 //Data Members
 //------------------------------------------------------------------------------
 	protected String name;
-	protected String abbr;
+	protected String abbreviation;
+	protected String language;
 	protected ArrayList<Book> books;
 
 //Constructors
 //------------------------------------------------------------------------------
 	public Bible() {
 		this.name = DefaultBible.defaultBibleName;
-		this.abbr = DefaultBible.DefaultBibleAbbr;
+		this.abbreviation = DefaultBible.defaultBibleAbbr;
+		this.language = DefaultBible.defaultBibleLangName;
 
 		//set up books with default values to ensure that we can always work without
 		//needing to download anything first
@@ -47,12 +49,20 @@ public class Bible {
 		this.name = name;
 	}
 
-	public String getAbbr() {
-		return abbr;
+	public String getAbbreviation() {
+		return abbreviation;
 	}
 
-	public void setAbbr(String abbr) {
-		this.abbr = abbr;
+	public void setAbbreviation(String abbreviation) {
+		this.abbreviation = abbreviation;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
 	public ArrayList<Book> getBooks() {
@@ -100,5 +110,37 @@ public class Bible {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) {
+			return true;
+		}
+		if(!(o instanceof Bible)) {
+			return false;
+		}
+
+		Bible bible = (Bible) o;
+
+		if(abbreviation != null ? !abbreviation.equals(bible.abbreviation) : bible.abbreviation != null) {
+			return false;
+		}
+		if(language != null ? !language.equals(bible.language) : bible.language != null) {
+			return false;
+		}
+		if(name != null ? !name.equals(bible.name) : bible.name != null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = name != null ? name.hashCode() : 0;
+		result = 31 * result + (abbreviation != null ? abbreviation.hashCode() : 0);
+		result = 31 * result + (language != null ? language.hashCode() : 0);
+		return result;
 	}
 }

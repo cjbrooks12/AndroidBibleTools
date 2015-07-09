@@ -141,7 +141,7 @@ public class ABSBible extends Bible implements Downloadable {
 		Element parent = doc.select("parent").first();
 
 		name = parent.select("name").text();
-		abbr = parent.select("id").text().replaceAll(".*-", "");
+		abbreviation = parent.select("id").text().replaceAll(".*-", "");
 		copyright = doc.select("copyright").first().text();
 
 		doc.select("next").remove();
@@ -155,7 +155,7 @@ public class ABSBible extends Bible implements Downloadable {
 			//get basic information about a Book
 			ABSBook newBook = new ABSBook(APIKey, book.attr("id"));
 			newBook.setName(book.select("name").text());
-			newBook.setAbbreviation(book.select("abbr").text());
+			newBook.setAbbreviation(book.select("abbreviation").text());
 			newBook.setLocation(Integer.parseInt(book.select("ord").text()));
 
 			//get info about the number of chapters and verses in a Book
@@ -231,7 +231,7 @@ public class ABSBible extends Bible implements Downloadable {
 		for(Element element : versions) {
 			ABSBible bible = new ABSBible(null, element.attr("id"));
 			bible.setName(element.select("name").text());
-			bible.setAbbr(element.select("abbreviation").text());
+			bible.setAbbreviation(element.select("abbreviation").text());
 			bible.setLanguage(element.select("lang").text());
 			bible.setLanguageName(element.select("lang_name").text());
 			bible.setLanguageNameEnglish(element.select("lang_name_english").text());

@@ -194,7 +194,7 @@ public final class Reference implements Comparable<Reference> {
 		public Builder setBible(String versionName, @Optional String versionAbbr) {
 			this.bible = new Bible();
 			this.bible.name = versionName;
-			if(versionAbbr != null) this.bible.abbr = versionAbbr;
+			if(versionAbbr != null) this.bible.abbreviation = versionAbbr;
 			return this;
 		}
 

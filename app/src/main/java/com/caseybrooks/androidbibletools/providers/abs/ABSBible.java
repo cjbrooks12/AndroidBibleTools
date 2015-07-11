@@ -231,7 +231,7 @@ public class ABSBible extends Bible implements Downloadable {
 		for(Element element : versions) {
 			ABSBible bible = new ABSBible(null, element.attr("id"));
 			bible.setName(element.select("name").text());
-			bible.setAbbreviation(element.select("abbr").text());
+			bible.setAbbreviation(element.select("abbreviation").text());
 			bible.setLanguage(element.select("lang_name").text());
 			bible.setLanguageKey(element.select("lang").text());
 			bible.setLanguageName(element.select("lang_name").text());

@@ -1,3 +1,4 @@
 <resources>
 	<string name="app_name">AndroidBibleTools</string>
+	<string name="bibles_org_key"></string>
 </resources>

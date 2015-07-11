@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.caseybrooks.androidbibletools.R;
 import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.defaults.DefaultBible;
-import com.caseybrooks.androidbibletools.io.PrivateKeys;
 import com.caseybrooks.androidbibletools.io.ABTUtility;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
 
@@ -48,11 +48,12 @@ public class BiblePickerSettings {
 				abbreviation.equalsIgnoreCase("") ||
 				language.equalsIgnoreCase(""))
 		{
-			return new ABSBible(PrivateKeys.API_KEY, DefaultBible.defaultBibleId);
+			return new ABSBible(context.getResources().getString(R.string.bibles_org_key),
+					DefaultBible.defaultBibleId);
 		}
 		else {
 			if(!id.equalsIgnoreCase("")) {
-				ABSBible bible = new ABSBible(PrivateKeys.API_KEY, id);
+				ABSBible bible = new ABSBible(context.getResources().getString(R.string.bibles_org_key), id);
 				bible.setName(name);
 				bible.setLanguage(language);
 				bible.setAbbreviation(abbreviation);

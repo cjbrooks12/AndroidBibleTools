@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.caseybrooks.androidbibletools.R;
 import com.caseybrooks.androidbibletools.basic.Bible;
-import com.caseybrooks.androidbibletools.io.PrivateKeys;
 import com.caseybrooks.androidbibletools.io.ABTUtility;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
 
@@ -63,8 +62,6 @@ public class BiblePicker extends LinearLayout {
 	public BiblePicker(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.context = context;
-
-		initialize();
 	}
 
 	public void initialize() {
@@ -116,7 +113,8 @@ public class BiblePicker extends LinearLayout {
 			try {
 				bibles = ABSBible.parseAvailableVersions(
 						ABSBible.availableVersionsDoc(
-								PrivateKeys.API_KEY, null
+								context.getResources().getString(R.string.bibles_org_key)
+								, null
 						));
 			}
 			catch(IOException ioe) {

@@ -155,7 +155,7 @@ public class ABSBible extends Bible implements Downloadable {
 			//get basic information about a Book
 			ABSBook newBook = new ABSBook(APIKey, book.attr("id"));
 			newBook.setName(book.select("name").text());
-			newBook.setAbbreviation(book.select("abbreviation").text());
+			newBook.setAbbreviation(book.select("abbr").text());
 			newBook.setLocation(Integer.parseInt(book.select("ord").text()));
 
 			//get info about the number of chapters and verses in a Book
@@ -231,7 +231,7 @@ public class ABSBible extends Bible implements Downloadable {
 		for(Element element : versions) {
 			ABSBible bible = new ABSBible(null, element.attr("id"));
 			bible.setName(element.select("name").text());
-			bible.setAbbreviation(element.select("abbreviation").text());
+			bible.setAbbreviation(element.select("abbr").text());
 			bible.setLanguage(element.select("lang_name").text());
 			bible.setLanguageKey(element.select("lang").text());
 			bible.setLanguageName(element.select("lang_name").text());

@@ -1,6 +1,7 @@
 package com.caseybrooks.androidbibletools;
 
 import com.caseybrooks.androidbibletools.basic.Bible;
+import com.caseybrooks.androidbibletools.basic.Book;
 import com.caseybrooks.androidbibletools.basic.Reference;
 
 import junit.framework.TestCase;
@@ -10,6 +11,24 @@ public class ReferenceTest extends TestCase {
 
 	public ReferenceTest() {
 		bible = new Bible();
+
+		Book foDaGalatiaPeopo = new Book();
+		foDaGalatiaPeopo.setName("Fo Da Galatia Peopo");
+		foDaGalatiaPeopo.setAbbreviation("Gal");
+		foDaGalatiaPeopo.setChapters(10, 10, 10, 10, 10);
+		bible.getBooks().add(foDaGalatiaPeopo);
+
+		Book aabbccddeeffgg = new Book();
+		aabbccddeeffgg.setName("AA BB CC DD EE FF GG");
+		aabbccddeeffgg.setAbbreviation("abc");
+		aabbccddeeffgg.setChapters(10, 10, 10, 10, 10);
+		bible.getBooks().add(aabbccddeeffgg);
+
+		Book belAndtheDragon = new Book();
+		belAndtheDragon.setName("The Cool Kid");
+		belAndtheDragon.setAbbreviation("Bel");
+		belAndtheDragon.setChapters(10, 10, 10, 10, 10);
+		bible.getBooks().add(belAndtheDragon);
 	}
 
 	public void testReferenceParser() throws Throwable {
@@ -30,6 +49,9 @@ public class ReferenceTest extends TestCase {
 				"Psalms 125",
 				"Galatians 2: 1-5, 19-21, 4-8",
 				"1 Timothy 4 5-8",
+				"Fo Da Galatia Peopo 4:2",
+				"Bel And The Dragon 4:2",
+				"1 AA BB CC DD EE FF GG 4:2",
 		};
 
 		Reference.Builder[] refObjects = new Reference.Builder[] {
@@ -49,6 +71,9 @@ public class ReferenceTest extends TestCase {
 				new Reference.Builder().setBook("Psalm").setChapter(125).setVerses(1, 2, 3, 4, 5),
 				new Reference.Builder().setBook("Galatians").setChapter(2).setVerses(1, 2, 3, 4, 5, 19, 20, 21, 6, 7, 8),
 				new Reference.Builder().setBook("1 Timothy").setChapter(4).setVerses(5, 6, 7, 8),
+				new Reference.Builder().setBook("Fo Da Galatia Peopo").setChapter(4).setVerses(2),
+				new Reference.Builder().setBook("Bel And The Dragon").setChapter(4).setVerses(2),
+				new Reference.Builder().setBook("1 AA BB CC DD EE FF GG").setChapter(4).setVerses(2),
 		};
 
 		for(int i = 0; i < references.length; i++) {
@@ -176,4 +201,67 @@ public class ReferenceTest extends TestCase {
 //			assertEquals(ref, refObjects[i]);
 //		}
 //	}
+
+	public void testDefaultingFlags() {
+		Reference.Builder builder = new Reference.Builder();
+
+		int[] flags = new int[] {
+				Reference.Builder.DEFAULT_BIBLE_FLAG,
+				Reference.Builder.DEFAULT_BOOK_FLAG,
+				Reference.Builder.DEFAULT_CHAPTER_FLAG,
+				Reference.Builder.DEFAULT_VERSES_FLAG
+		};
+
+		//ensure all flags start off unset
+		for(int flag : flags) {
+			assertEquals(false, builder.checkFlag(flag));
+		}
+
+		//check the value of each bit when set
+		for(int flaga : flags) {
+			builder.setFlag(flaga);
+			assertEquals(true, builder.checkFlag(flaga));
+
+			//ensure only the one bit flag is set
+			for(int flagb : flags) {
+				if(flaga == flagb) {
+					assertEquals(true, builder.checkFlag(flagb));
+				}
+				else {
+					assertEquals(false, builder.checkFlag(flagb));
+				}
+			}
+
+			builder.unsetFlag(flaga);
+			assertEquals(false, builder.checkFlag(flaga));
+		}
+
+		//check the value of each bit when all bits are set
+		for(int flag : flags) {
+			builder.setFlag(flag);
+		}
+		for(int flag : flags) {
+			assertEquals(true, builder.checkFlag(flag));
+		}
+
+		//reset flags and test if they work in the reference creation
+		for(int flag : flags) {
+			builder.setFlag(flag);
+		}
+
+		builder.setBible(bible);
+
+		builder.setBook("Queen Elizabeth")
+				.setChapter(1)
+				.setVerses(5, 6, 7)
+		;
+		Reference ref = builder.create();
+
+		assertEquals("Queen Elizabeth 1:5-7", ref.toString());
+
+		assertEquals(false, builder.checkFlag(Reference.Builder.DEFAULT_BIBLE_FLAG));
+		assertEquals(true, builder.checkFlag(Reference.Builder.DEFAULT_BOOK_FLAG));
+		assertEquals(false, builder.checkFlag(Reference.Builder.DEFAULT_CHAPTER_FLAG));
+		assertEquals(false, builder.checkFlag(Reference.Builder.DEFAULT_VERSES_FLAG));
+	}
 }

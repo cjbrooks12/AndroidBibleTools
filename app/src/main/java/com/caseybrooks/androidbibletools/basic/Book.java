@@ -15,7 +15,7 @@ public class Book {
 	public void setLocation(int location) { this.location = location; }
 
 	public int[] getChapters() { return chapters; }
-	public void setChapters(int[] chapters) { this.chapters = chapters; }
+	public void setChapters(int... chapters) { this.chapters = chapters; }
 
 	/**
 	 * Get the number of chapters in this Book

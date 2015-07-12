@@ -59,6 +59,13 @@ public final class Reference implements Comparable<Reference> {
 	 * associated with it.
 	 */
 	public static class Builder {
+		public static int DEFAULT_BIBLE_FLAG = 0x1;
+		public static int DEFAULT_BOOK_FLAG = 0x2;
+		public static int DEFAULT_CHAPTER_FLAG = 0x4;
+		public static int DEFAULT_VERSES_FLAG = 0x8;
+
+		private int flags = 0;
+
 		private Bible bible;
 		private Book book;
 
@@ -93,6 +100,9 @@ public final class Reference implements Comparable<Reference> {
 		public Builder setBook(Book book) {
 			this.book = book;
 
+			//since we are having the Book provided, assume that it is not defaulted
+			unsetFlag(DEFAULT_BOOK_FLAG);
+
 			return this;
 		}
 
@@ -107,23 +117,52 @@ public final class Reference implements Comparable<Reference> {
 		 * @return this Builder object
 		 */
 		public Builder setBook(String bookName) {
+			if(bookName == null) {
+				bookName = "";
+			}
 			Book parsedBook = null;
+
+			//Bible is provided, try parse with it
 			if(bible != null) {
 				parsedBook = bible.parseBook(bookName);
-			}
 
-			if(parsedBook == null) {
-				parsedBook = new Bible().parseBook(bookName);
+				//successful with provided Bible
+				if(parsedBook != null) {
+					unsetFlag(DEFAULT_BIBLE_FLAG);
+					unsetFlag(DEFAULT_BOOK_FLAG);
 
-				if(parsedBook == null) {
-					parsedBook = new Book();
-					parsedBook.setName(bookName);
+					book = parsedBook;
+					return this;
 				}
+
+				//unsuccessful with provided Bible, try again with default bible
+			}
+			else {
+				setFlag(DEFAULT_BIBLE_FLAG);
 			}
 
-			book = parsedBook;
+			//either no Bible was provided, or the provided Bible failed to parse
+			parsedBook = new Bible().parseBook(bookName);
 
-			return this;
+			//successful only with default Bible
+			if(parsedBook != null) {
+				setFlag(DEFAULT_BIBLE_FLAG);
+				unsetFlag(DEFAULT_BOOK_FLAG);
+
+				book = parsedBook;
+				return this;
+			}
+
+			//unsuccessful parse with default Bible, we can safely assume default
+			//book in the provided bible, whether it was default or not
+			else {
+				parsedBook = new Book();
+				parsedBook.setName(bookName);
+				setFlag(DEFAULT_BOOK_FLAG);
+
+				book = parsedBook;
+				return this;
+			}
 		}
 
 		/**
@@ -159,12 +198,18 @@ public final class Reference implements Comparable<Reference> {
 				parsedBook.setLocation(location);
 			}
 			else {
-				//choose arbitrarily high order to ensure it will always be
+				//choose highest order to ensure it will always be
 				//sorted to the end of a list of verses
-				parsedBook.setLocation(10000);
+				parsedBook.setLocation(Integer.MAX_VALUE);
 			}
 
 			book = parsedBook;
+
+			//we assume that the book is not default, since it is being created now
+			//we also assume that the Bible is not default, since it was not involved
+			//in creating the Book, so we had no way to default it
+			unsetFlag(DEFAULT_BOOK_FLAG);
+			unsetFlag(DEFAULT_BIBLE_FLAG);
 
 			return this;
 		}
@@ -177,6 +222,8 @@ public final class Reference implements Comparable<Reference> {
 		 */
 		public Builder setBible(Bible bible) {
 			this.bible = bible;
+			unsetFlag(DEFAULT_BIBLE_FLAG);
+
 			return this;
 		}
 
@@ -195,6 +242,9 @@ public final class Reference implements Comparable<Reference> {
 			this.bible = new Bible();
 			this.bible.name = versionName;
 			if(versionAbbr != null) this.bible.abbreviation = versionAbbr;
+
+			unsetFlag(DEFAULT_BIBLE_FLAG);
+
 			return this;
 		}
 
@@ -206,6 +256,8 @@ public final class Reference implements Comparable<Reference> {
 		 */
 		public Builder setChapter(int chapter) {
 			this.chapter = chapter;
+			unsetFlag(DEFAULT_CHAPTER_FLAG);
+
 			return this;
 		}
 
@@ -221,6 +273,8 @@ public final class Reference implements Comparable<Reference> {
 			for(int verse : verses) {
 				this.verses.add(verse);
 			}
+			unsetFlag(DEFAULT_VERSES_FLAG);
+
 			return this;
 		}
 
@@ -234,6 +288,8 @@ public final class Reference implements Comparable<Reference> {
 			if(!verses.contains(verse)) {
 				this.verses.add(verse);
 			}
+			unsetFlag(DEFAULT_VERSES_FLAG);
+
 			return this;
 		}
 
@@ -249,9 +305,10 @@ public final class Reference implements Comparable<Reference> {
 		 */
 		public Reference create() {
 			if(verses == null || verses.size() == 0) {
-				//no verses, but chapter was given.
-				if(chapter != 0 ) {
+				setFlag(DEFAULT_VERSES_FLAG);
 
+				//no verses, but chapter was given.
+				if(chapter != 0) {
 					//book has a count of the chapters, so add all verses in that chapter
 					if(book.getChapters() != null && book.getChapters().length > 0) {
 						int verseCount = book.numVersesInChapter(chapter);
@@ -269,6 +326,8 @@ public final class Reference implements Comparable<Reference> {
 				}
 				//no verses or chapter given. Set to the first verse of the first chapter
 				else {
+					setFlag(DEFAULT_CHAPTER_FLAG);
+
 					chapter = 1;
 					verses = new ArrayList<>();
 					verses.add(1);
@@ -279,10 +338,25 @@ public final class Reference implements Comparable<Reference> {
 			// since many translations only have the New Testament.
 			if(book == null) {
 				setBook("Matthew");
+				setFlag(DEFAULT_BOOK_FLAG);
 			}
 
 
 			return new Reference(book, chapter, verses);
+		}
+
+		//bitflags for defaults during creation
+
+		public void setFlag(int flag) {
+			flags = flags | flag;
+		}
+
+		public void unsetFlag(int flag) {
+			flags = (flags & ~flag);
+		}
+
+		public boolean checkFlag(int flag) {
+			return ((flags & flag) == flag);
 		}
 	}
 

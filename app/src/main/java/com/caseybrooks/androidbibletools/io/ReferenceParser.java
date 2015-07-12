@@ -2,6 +2,8 @@ package com.caseybrooks.androidbibletools.io;
 
 import com.caseybrooks.androidbibletools.basic.Reference;
 
+import java.util.ArrayList;
+
 /** The class used to parse a String into Reference objects. Uses the following grammar
  *
  * Passage ::= book (punctuation) chapter ((punctuation) verseList)
@@ -65,6 +67,8 @@ public class ReferenceParser {
 	//punctuation ::= [;:,.-\/]
 	private boolean punctuation() {
 		Token a = ts.get();
+
+		//if actual token is punctuation
 		if(a != null && (
 				a.equals(Token.Type.COLON) ||
 				a.equals(Token.Type.SEMICOLON) ||
@@ -76,35 +80,62 @@ public class ReferenceParser {
 
 			return true;
 		}
+		//if token is a word that implies punctuation
 		else {
-			ts.unget(a);
-			return false;
+			if(a != null && a.equals(Token.Type.WORD)) {
+				if(a.getStringValue().equalsIgnoreCase("and") ||
+						a.getStringValue().equalsIgnoreCase("through") ||
+						a.getStringValue().equalsIgnoreCase("to")) {
+
+					return true;
+				}
+			}
 		}
+
+		ts.unget(a);
+		return false;
 	}
 
-	//book ::= ([123]) word
+	//book ::= ([123]) word+
 	private void book() {
 		Token a = ts.get();
+		boolean includesNumber;
 
-		//book ::= [123] word
+		//optional number between 1 and 3
 		if(a != null && a.equals(Token.Type.NUMBER) && a.getIntValue() <= 3 && a.getIntValue() > 0) {
-			Token b = ts.get();
-			if(b != null && b.equals(Token.Type.WORD)) {
-				builder.setBook(a.getIntValue() + " " + b.getStringValue());
-			}
-			else {
-				ts.unget(b);
-				ts.unget(a);
-			}
-		}
-
-		//book ::= word
-		else if(a != null && a.equals(Token.Type.WORD)) {
-			builder.setBook(a.getStringValue());
+			//token was valid number, leave it out and continue parsing book
+			includesNumber = true;
 		}
 		else {
+			//token wasn't a valid number, put it back in and continue parsing book
 			ts.unget(a);
+			includesNumber = false;
 		}
+
+		//mandatory set of words before a number
+		ArrayList<Token> tokens = new ArrayList<>();
+
+		while(true) {
+			Token t = ts.get();
+			if(t != null && t.equals(Token.Type.WORD)) {
+				tokens.add(t);
+				continue;
+			}
+			else {
+				ts.unget(t);
+				break;
+			}
+		}
+
+		String bookName = (includesNumber) ? a.getIntValue() + " " : "";
+
+		for(Token t : tokens) {
+			bookName += t.getStringValue() + " ";
+		}
+
+		bookName = bookName.trim();
+
+		builder.setBook(bookName);
 	}
 
 	//chapter ::= number
@@ -140,7 +171,11 @@ public class ReferenceParser {
 			int numA = a.getIntValue();
 
 			Token dash = ts.get();
-			if(dash != null && dash.equals(Token.Type.DASH)) {
+			if(dash != null &&
+					(dash.equals(Token.Type.DASH) ||
+					(dash.equals(Token.Type.WORD) && dash.getStringValue().equalsIgnoreCase("through")) ||
+					(dash.equals(Token.Type.WORD) && dash.getStringValue().equalsIgnoreCase("to")))) {
+
 				Token b = ts.get();
 				if(b != null && b.equals(Token.Type.NUMBER) && b.getIntValue() > 0) {
 					int numB = b.getIntValue();

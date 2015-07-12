@@ -94,10 +94,10 @@ public class Bible {
 			}
 
 			//failing equality, check if the name is close
-			else if(bookName.contains(book.getName())) {
+			else if(book.getName().contains(bookName)) {
 				return book;
 			}
-			else if(book.getName().contains(bookName)) {
+			else if(bookName.contains(book.getName())) {
 				return book;
 			}
 

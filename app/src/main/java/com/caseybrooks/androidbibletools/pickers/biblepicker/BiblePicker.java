@@ -62,6 +62,8 @@ public class BiblePicker extends LinearLayout {
 	public BiblePicker(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.context = context;
+
+		initialize();
 	}
 
 	public void initialize() {

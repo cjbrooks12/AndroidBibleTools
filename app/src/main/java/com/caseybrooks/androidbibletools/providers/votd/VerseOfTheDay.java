@@ -35,6 +35,11 @@ public class VerseOfTheDay implements Downloadable {
 	}
 
 	@Override
+	public String getId() {
+		return "";
+	}
+
+	@Override
 	public Document getDocument() throws IOException {
 		return Jsoup.connect("http://verseoftheday.com").get();
 	}

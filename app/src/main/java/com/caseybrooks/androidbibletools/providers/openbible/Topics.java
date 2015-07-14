@@ -32,6 +32,11 @@ public class Topics implements Downloadable {
 	}
 
 	@Override
+	public String getId() {
+		return "";
+	}
+
+	@Override
 	public Document getDocument() throws IOException {
 		String query = "http://www.openbible.info/topics/" + c;
 

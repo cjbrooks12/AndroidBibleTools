@@ -27,6 +27,11 @@ public class TopicalSearch implements Downloadable {
 	}
 
 	@Override
+	public String getId() {
+		return "";
+	}
+
+	@Override
 	public Document getDocument() throws IOException {
 		String query = "http://www.openbible.info/topics/" + topic.trim().replaceAll(" ", "_");
 		return Jsoup.connect(query).get();

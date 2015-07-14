@@ -21,6 +21,8 @@ public class BiblePickerSettings {
 
 	public static final String ID = "ID";
 
+	private static Bible singletonBible;
+
 
 	public static void setSelectedBible(Context context, Bible bible) {
 		PreferenceManager.getDefaultSharedPreferences(context).edit()
@@ -37,35 +39,38 @@ public class BiblePickerSettings {
 	}
 
 	public static Bible getSelectedBible(Context context) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if(singletonBible == null) {
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		String name = prefs.getString(PREFIX + NAME, "") + "";
-		String abbreviation=  prefs.getString(PREFIX + ABBR, "") + "";
-		String language = prefs.getString(PREFIX + LANG, "") + "";
-		String id = prefs.getString(PREFIX + ID, "") + "";
+			String name = prefs.getString(PREFIX + NAME, "") + "";
+			String abbreviation = prefs.getString(PREFIX + ABBR, "") + "";
+			String language = prefs.getString(PREFIX + LANG, "") + "";
+			String id = prefs.getString(PREFIX + ID, "") + "";
 
-		if(name.equalsIgnoreCase("") ||
-				abbreviation.equalsIgnoreCase("") ||
-				language.equalsIgnoreCase(""))
-		{
-			return new ABSBible(context.getResources().getString(R.string.bibles_org_key), null);
-		}
-		else {
-			if(!id.equalsIgnoreCase("")) {
-				ABSBible bible = new ABSBible(context.getResources().getString(R.string.bibles_org_key), id);
-				bible.setName(name);
-				bible.setLanguage(language);
-				bible.setAbbreviation(abbreviation);
-				return bible;
+			if(name.equalsIgnoreCase("") ||
+					abbreviation.equalsIgnoreCase("") ||
+					language.equalsIgnoreCase("")) {
+				singletonBible = new ABSBible(context.getResources().getString(R.string.bibles_org_key), null);
 			}
 			else {
-				Bible bible = new Bible();
-				bible.setName(name);
-				bible.setLanguage(language);
-				bible.setAbbreviation(abbreviation);
-				return bible;
+				if(!id.equalsIgnoreCase("")) {
+					ABSBible bible = new ABSBible(context.getResources().getString(R.string.bibles_org_key), id);
+					bible.setName(name);
+					bible.setLanguage(language);
+					bible.setAbbreviation(abbreviation);
+					singletonBible = bible;
+				}
+				else {
+					Bible bible = new Bible();
+					bible.setName(name);
+					bible.setLanguage(language);
+					bible.setAbbreviation(abbreviation);
+					singletonBible = bible;
+				}
 			}
 		}
+
+		return singletonBible;
 	}
 
 	public static Bible getCachedBible(Context context) {
@@ -78,10 +83,11 @@ public class BiblePickerSettings {
 
 			if(doc != null) {
 				downloadableBible.parseDocument(doc);
-				return (Bible) downloadableBible;
+
+				singletonBible = (Bible) downloadableBible;
 			}
 		}
 
-		return null;
+		return singletonBible;
 	}
 }

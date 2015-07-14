@@ -1,4 +1,4 @@
-package com.caseybrooks.androidbibletools.pickers.biblepicker;
+package com.caseybrooks.androidbibletools.widget.biblepicker;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.caseybrooks.androidbibletools.R;
 import com.caseybrooks.androidbibletools.basic.Bible;
+import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.io.ABTUtility;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
 
@@ -34,7 +35,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 public class BiblePicker extends LinearLayout {
-	//Data Members
+//Data Members
 //------------------------------------------------------------------------------
 	Context context;
 	Bible selectedBible;
@@ -50,7 +51,7 @@ public class BiblePicker extends LinearLayout {
 
 	int colorPrimary, colorAccent, textColor;
 
-	//Constructors and Initialization
+//Constructors and Initialization
 //------------------------------------------------------------------------------
 	public BiblePicker(Context context) {
 		super(context);
@@ -93,7 +94,7 @@ public class BiblePicker extends LinearLayout {
 		new LoadBiblesThread().execute();
 	}
 
-	//Data retreival and manipulation
+//Data retrieval and manipulation
 //------------------------------------------------------------------------------
 	private class LoadBiblesThread extends AsyncTask<Void, Void, Void> {
 		HashMap<String, Bible> bibles;
@@ -114,10 +115,10 @@ public class BiblePicker extends LinearLayout {
 
 			try {
 				bibles = ABSBible.parseAvailableVersions(
-						ABSBible.availableVersionsDoc(
+							ABSBible.availableVersionsDoc(
 								context.getResources().getString(R.string.bibles_org_key)
 								, null
-						));
+							));
 			}
 			catch(IOException ioe) {
 				//assuming we have previously selected a bible, only show that
@@ -145,6 +146,8 @@ public class BiblePicker extends LinearLayout {
 
 	private class LoadSelectedBibleInfoThread extends AsyncTask<Void, Void, Void> {
 
+		boolean success;
+
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
@@ -157,22 +160,25 @@ public class BiblePicker extends LinearLayout {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			if(selectedBible instanceof ABSBible) {
-				ABSBible bible = (ABSBible) selectedBible;
+			if(selectedBible instanceof Downloadable) {
+				Downloadable downloadableBible = (Downloadable) selectedBible;
 
 				try {
-					Document doc = bible.getDocument();
+					Document doc = downloadableBible.getDocument();
 
 					if(doc != null) {
 						ABTUtility.cacheDocument(context, doc, "selectedBible.xml");
+						success = true;
 					}
 					else {
 						publishProgress();
+						success = false;
 					}
 				}
 				catch(IOException ioe) {
 					ioe.printStackTrace();
 					publishProgress();
+					success = false;
 				}
 			}
 
@@ -191,6 +197,10 @@ public class BiblePicker extends LinearLayout {
 			progressText.setVisibility(View.GONE);
 			bibleList.setVisibility(View.VISIBLE);
 			progressBar.setVisibility(View.GONE);
+
+			if(listener != null) {
+				listener.onBibleDownloaded(success);
+			}
 		}
 	}
 
@@ -337,7 +347,7 @@ public class BiblePicker extends LinearLayout {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			Bible bible = adapter.getItem(position);
 			if(listener != null)
-				listener.onBibleSelected(bible);
+				listener.onBibleSelected();
 
 			BiblePickerSettings.setSelectedBible(context, bible);
 			selectedBible = BiblePickerSettings.getSelectedBible(context);

@@ -1,12 +1,10 @@
-package com.caseybrooks.androidbibletools.pickers.biblepicker;
+package com.caseybrooks.androidbibletools.widget.biblepicker;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.caseybrooks.androidbibletools.basic.Bible;
 
 public class BiblePickerFragment extends Fragment implements OnBibleSelectedListener {
 	OnBibleSelectedListener listener;
@@ -28,9 +26,15 @@ public class BiblePickerFragment extends Fragment implements OnBibleSelectedList
 	}
 
 	@Override
-	public void onBibleSelected(Bible bible) {
+	public void onBibleSelected() {
 		if(listener != null)
-			listener.onBibleSelected(bible);
+			listener.onBibleSelected();
+	}
+
+	@Override
+	public void onBibleDownloaded(boolean successfullyDownloaded) {
+		if(listener != null)
+			listener.onBibleDownloaded(successfullyDownloaded);
 	}
 
 	public OnBibleSelectedListener getListener() {

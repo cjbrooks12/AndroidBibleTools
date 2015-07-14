@@ -1,4 +1,4 @@
-package com.caseybrooks.androidbibletools.pickers.biblepicker;
+package com.caseybrooks.androidbibletools.widget.biblepicker;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -42,11 +42,17 @@ public class BiblePickerPreference extends DialogPreference implements OnBibleSe
 	}
 
 	@Override
-	public void onBibleSelected(Bible bible) {
+	public void onBibleSelected() {
 		if(listener != null)
-			listener.onBibleSelected(bible);
+			listener.onBibleSelected();
 
-		setSummary(bible.getName());
+		setSummary(BiblePickerSettings.getSelectedBible(getContext()).getName());
+	}
+
+	@Override
+	public void onBibleDownloaded(boolean successfullyDownloaded) {
+		if(listener != null)
+			listener.onBibleDownloaded(successfullyDownloaded);
 	}
 
 	public OnBibleSelectedListener getListener() {

@@ -22,6 +22,7 @@ public class Passage extends AbstractVerse {
 	//Data that makes up the Passage
 	protected ArrayList<Verse> verses;
 	protected String allText;
+	protected String rawText;
 
 	//Constructors
 //------------------------------------------------------------------------------
@@ -51,11 +52,17 @@ public class Passage extends AbstractVerse {
     public Passage setText(String text) {
 		this.verses.clear();
 		this.allText = text;
+		this.rawText = text;
+		return this;
+	}
+
+	public Passage setRawText(String rawText) {
+		this.rawText = rawText;
 		return this;
 	}
 
 	/**
-	 * Get the formatted text of this Passage. If the verses are listed indiviually,
+	 * Get the formatted text of this Passage. If the verses are listed individually,
 	 * format each verse individually according to the Formatter. Otherwise, just show
 	 * the full block of text and format it the best it can.
 	 *
@@ -94,8 +101,12 @@ public class Passage extends AbstractVerse {
         }
 	}
 
+	@Override
+	public String getRawText() {
+		return rawText;
+	}
 
-//get the XML representation of this object
+	//get the XML representation of this object
 //------------------------------------------------------------------------------
 //	@Override
 //	public Element toXML(org.w3c.dom.Document doc) {

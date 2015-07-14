@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="ReferencePicker">
+		<attr format="reference" name="backgroundDrawable" />
+		<attr format="reference" name="clearButtonDrawable" />
+	</declare-styleable>
+</resources>

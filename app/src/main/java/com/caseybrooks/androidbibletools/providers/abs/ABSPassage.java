@@ -70,18 +70,26 @@ public class ABSPassage extends Passage implements Downloadable {
 			return false;
 		}
 
+		String passageRawText = "";
+
 		for(int i = 0; i < verses.size(); i++) {
 			Verse verse = verses.get(i);
 
 			Elements scripture = doc.select("verse[id=" + id_base + "." + verse.getReference().verses.get(0) + "]");
 
-			Document textHTML = Jsoup.parse(scripture.select("text").text());
+			String verseRawText = scripture.select("text").text();
+			verse.setRawText(verseRawText);
+			passageRawText += verseRawText + " ";
+
+			Document textHTML = Jsoup.parse(verseRawText);
 			textHTML.select("sup").remove();
+			textHTML.select("h3").remove();
 
 			verse.setText(textHTML.text());
 		}
 
 		allText = null;
+		rawText = passageRawText;
 
 		return true;
 	}

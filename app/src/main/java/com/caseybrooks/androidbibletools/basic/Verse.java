@@ -23,6 +23,7 @@ public class Verse extends AbstractVerse {
 //Data Members
 //------------------------------------------------------------------------------
     protected String verseText;
+    protected String rawText;
 
 //Constructors
 //------------------------------------------------------------------------------
@@ -36,6 +37,11 @@ public class Verse extends AbstractVerse {
     //or when downloading the verse in a new Bible.
     public Verse setText(String verseText) {
         this.verseText = verseText;
+        return this;
+    }
+
+    public Verse setRawText(String rawText) {
+        this.rawText = rawText;
         return this;
     }
 
@@ -102,7 +108,12 @@ public class Verse extends AbstractVerse {
         return text.trim();
     }
 
-//Turn this Verse into an XML object
+    @Override
+    public String getRawText() {
+        return rawText;
+    }
+
+    //Turn this Verse into an XML object
 //------------------------------------------------------------------------------
 
 //	/**The structure for a Verse object will be like the following

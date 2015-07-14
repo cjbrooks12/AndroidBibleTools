@@ -159,29 +159,14 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 */
 	public abstract String getText();
 
-//	/**
-//	 * Get a URL to this verse on Biblia.com by Logos Bible Software
-//	 *
-//	 * @return {@link java.lang.String} the URL of this verse on Biblia.com
-//	 */
-//    public abstract String getURL(OnlineBible service);
-//	/**
-//	 * Returns a String XML representation of this verse. Is equivalent to calling
-//	 * #toXML() and transforming the result to a String.
-//	 * @return
-//	 */
-//	public abstract String toXMLString();
-//
-//	/**
-//	 * Generates an XML representation of this verse, designed to create a consistent
-//	 * IO sharing pattern
-//	 *
-//	 * @param doc the base Document to add this verse as a Node to
-//	 * @return {@link org.w3c.dom.Element} a single element of an XML file. May
-//	 * be kept as the root or added to another element
-//	 */
-//	public abstract Element toXML(Document doc);
-
+	/**
+	 * Get the raw, unparsed text for this Verse. In most cases, this will be
+	 * the full verse text provided by the API, not what's left after stripping
+	 * out the HTML formatting.
+	 *
+	 * @return
+	 */
+	public abstract String getRawText();
 
 //Comparison methods
 //------------------------------------------------------------------------------

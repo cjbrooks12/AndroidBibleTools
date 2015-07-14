@@ -1,4 +1,4 @@
-package com.caseybrooks.androidbibletools.pickers.biblepicker;
+package com.caseybrooks.androidbibletools.widget.biblepicker;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,7 +6,7 @@ import android.preference.PreferenceManager;
 
 import com.caseybrooks.androidbibletools.R;
 import com.caseybrooks.androidbibletools.basic.Bible;
-import com.caseybrooks.androidbibletools.defaults.DefaultBible;
+import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.io.ABTUtility;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
 
@@ -28,11 +28,11 @@ public class BiblePickerSettings {
 				.putString(PREFIX + LANG, bible.getLanguage())
 				.putString(PREFIX + ABBR, bible.getAbbreviation()).commit();
 
-		if(bible instanceof ABSBible) {
-			ABSBible absBible = (ABSBible) bible;
+		if(bible instanceof Downloadable) {
+			Downloadable downloadableBible = (Downloadable) bible;
 
 			PreferenceManager.getDefaultSharedPreferences(context).edit()
-					.putString(PREFIX + ID, absBible.getId()).commit();
+					.putString(PREFIX + ID, downloadableBible.getId()).commit();
 		}
 	}
 
@@ -48,8 +48,7 @@ public class BiblePickerSettings {
 				abbreviation.equalsIgnoreCase("") ||
 				language.equalsIgnoreCase(""))
 		{
-			return new ABSBible(context.getResources().getString(R.string.bibles_org_key),
-					DefaultBible.defaultBibleId);
+			return new ABSBible(context.getResources().getString(R.string.bibles_org_key), null);
 		}
 		else {
 			if(!id.equalsIgnoreCase("")) {
@@ -72,14 +71,14 @@ public class BiblePickerSettings {
 	public static Bible getCachedBible(Context context) {
 		Bible bible = getSelectedBible(context);
 
-		if(bible instanceof ABSBible) {
-			ABSBible absBible = (ABSBible) bible;
+		if(bible instanceof Downloadable) {
+			Downloadable downloadableBible = (Downloadable) bible;
 
 			Document doc = ABTUtility.getChachedDocument(context, "selectedBible.xml");
 
 			if(doc != null) {
-				absBible.parseDocument(doc);
-				return absBible;
+				downloadableBible.parseDocument(doc);
+				return (Bible) downloadableBible;
 			}
 		}
 

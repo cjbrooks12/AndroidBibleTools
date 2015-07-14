@@ -69,8 +69,12 @@ public class ABSVerse extends Verse implements Downloadable {
 		}
 
 		Elements scripture = doc.select("verse[id=" + id_base + "]");
+		rawText = scripture.select("text").text();
+
+		//TODO: instead of simply stripping out these areas of the text, try to determine if they are actually common across the API and use it as part of the Formatter
 		Document textHTML = Jsoup.parse(scripture.select("text").text());
 		textHTML.select("sup").remove();
+		textHTML.select("h3").remove();
 		String text = textHTML.text();
 
 		if(text != null && text.length() > 0) {
@@ -78,7 +82,7 @@ public class ABSVerse extends Verse implements Downloadable {
 			return true;
 		}
 		else {
-			setText("could not parse");
+			setText("");
 
 			return false;
 		}

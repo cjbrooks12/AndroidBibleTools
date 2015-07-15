@@ -1,16 +1,12 @@
 package com.caseybrooks.androidbibletools.widget;
 
-import android.app.Activity;
 import android.content.Context;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.caseybrooks.androidbibletools.basic.Bible;
-import com.caseybrooks.androidbibletools.basic.Reference;
-import com.caseybrooks.androidbibletools.data.Formatter;
 import com.caseybrooks.androidbibletools.io.ABTUtility;
-import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
 import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
 import com.caseybrooks.androidbibletools.widget.biblepicker.BiblePickerSettings;
 
@@ -30,14 +26,19 @@ import java.io.IOException;
  * which is persisted automatically into SharedPreferences.
  */
 public class VerseView extends TextView {
-	//Data Members
+//Data Members
 //------------------------------------------------------------------------------
 	Context context;
 
 	Bible selectedBible;
 	ABSPassage verse;
 
-	//Constructors and Initialization
+	boolean displayAsHtml;
+	boolean displayRawText;
+
+	WorkerThread workerThread;
+
+//Constructors and Initialization
 //------------------------------------------------------------------------------
 	public VerseView(Context context) {
 		super(context);
@@ -54,34 +55,37 @@ public class VerseView extends TextView {
 	}
 
 	public void initialize() {
-		getSelectedBible();
+		workerThread = new WorkerThread();
+		displayAsHtml = true;
+		displayRawText = false;
+
+		loadSelectedBible();
 	}
 
-	public void getSelectedBible() {
-		selectedBible = BiblePickerSettings.getCachedBible(context);
-		if(verse != null) {
-			verse.setBible(selectedBible);
-		}
-	}
+	public void loadSelectedBible() {
+		if(workerThread.getState() == Thread.State.NEW)
+			workerThread.start();
 
-	public void setVerse(ABSPassage verse) {
-		this.verse = verse;
-		this.verse.setBible(selectedBible);
-		this.verse.setFormatter(biblePageFormatter);
-	}
-
-	/**
-	 * Writes the contents of the current passage to the TextView. Forces this
-	 * to be done on the UI thread, so this can be safely called from
-	 * any background thread.
-	 */
-	public void displayText() {
-		((Activity) context).runOnUiThread(new Runnable() {
+		workerThread.post(new Runnable() {
 			@Override
 			public void run() {
-				setText(Html.fromHtml(verse.getText()));
+				selectedBible = BiblePickerSettings.getCachedBible(context);
+				if(verse != null) {
+					verse.setBible(selectedBible);
+				}
 			}
 		});
+	}
+
+	public void showText() {
+		String textToShow = displayRawText ? verse.getRawText() : verse.getText();
+
+		if(displayAsHtml) {
+			setText(Html.fromHtml(textToShow));
+		}
+		else {
+			setText(textToShow);
+		}
 	}
 
 	/**
@@ -91,17 +95,30 @@ public class VerseView extends TextView {
 	 *
 	 * @return true if a cached verse was found and could be displayed
 	 */
-	public boolean displayCachedText() {
-		Document doc = ABTUtility.getChachedDocument(context, verse.getId());
+	public void displayCachedText() {
+		if(workerThread.getState() == Thread.State.NEW)
+			workerThread.start();
 
-		if(doc != null) {
-			verse.parseDocument(doc);
-			displayText();
-			return true;
-		}
-		else {
-			return false;
-		}
+		workerThread.post(new Runnable() {
+			@Override
+			public void run() {
+				Document doc = ABTUtility.getChachedDocument(context, verse.getId());
+
+				if(doc != null) {
+					verse.parseDocument(doc);
+					post(new Runnable() {
+						@Override
+						public void run() {
+							showText();
+						}
+					});
+				}
+			}
+		});
+	}
+
+	public boolean hasCachedDocument() {
+		return ABTUtility.getChachedDocument(context, verse.getId()) != null;
 	}
 
 	/**
@@ -111,7 +128,10 @@ public class VerseView extends TextView {
 	 * will display the parsed text as HTML
 	 */
 	public void displayDownloadedText() {
-		new Thread(new Runnable() {
+		if(workerThread.getState() == Thread.State.NEW)
+			workerThread.start();
+
+		workerThread.post(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -119,14 +139,19 @@ public class VerseView extends TextView {
 					if(doc != null) {
 						ABTUtility.cacheDocument(context, doc, verse.getId());
 						verse.parseDocument(doc);
-						displayText();
+						post(new Runnable() {
+							@Override
+							public void run() {
+								showText();
+							}
+						});
 					}
 				}
 				catch(IOException ioe) {
 					ioe.printStackTrace();
 				}
 			}
-		}).start();
+		});
 	}
 
 	/**
@@ -135,41 +160,56 @@ public class VerseView extends TextView {
 	 * internet.
 	 */
 	public void tryCacheOrDownloadText() {
-		if(!displayCachedText()) {
-			displayDownloadedText();
-		}
+		if(workerThread.getState() == Thread.State.NEW)
+			workerThread.start();
+
+		workerThread.post(new Runnable() {
+			@Override
+			public void run() {
+				if(hasCachedDocument()) {
+					displayCachedText();
+				}
+				else {
+					displayDownloadedText();
+				}
+			}
+		});
 	}
 
-	Formatter biblePageFormatter = new Formatter() {
+	public Bible getSelectedBible() {
+		return selectedBible;
+	}
 
-		@Override
-		public String onPreFormat(Reference reference) {
-			return "";
-		}
+	public void setSelectedBible(Bible selectedBible) {
+		this.selectedBible = selectedBible;
+	}
 
-		@Override
-		public String onFormatVerseStart(int i) {
-			return "<b><sup>" + i + "</sup></b> ";
-		}
+	public ABSPassage getVerse() {
+		return verse;
+	}
 
-		@Override
-		public String onFormatText(String s) {
-			return s;
-		}
+	public void setVerse(ABSPassage verse) {
+		this.verse = verse;
+		this.verse.setBible(selectedBible);
+	}
 
-		@Override
-		public String onFormatSpecial(String s) {
-			return s;
-		}
+	public boolean isDisplayingAsHtml() {
+		return displayAsHtml;
+	}
 
-		@Override
-		public String onFormatVerseEnd() {
-			return "<br/>";
-		}
+	public void setDisplayingAsHtml(boolean displayAsHtml) {
+		this.displayAsHtml = displayAsHtml;
+	}
 
-		@Override
-		public String onPostFormat() {
-			return "<br/><br/>" + ((ABSBible) selectedBible).getCopyright();
-		}
-	};
+	public boolean isDisplayingRawText() {
+		return displayRawText;
+	}
+
+	public void setDisplayingRawText(boolean displayRawText) {
+		this.displayRawText = displayRawText;
+	}
+
+	public WorkerThread getWorkerThread() {
+		return workerThread;
+	}
 }

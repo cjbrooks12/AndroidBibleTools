@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class FragmentThree extends Fragment {
-	public static FragmentThree newInstance() {
-		FragmentThree fragment = new FragmentThree();
+	public static Fragment newInstance() {
+		Fragment fragment = new FragmentThree();
 		Bundle args = new Bundle();
 		fragment.setArguments(args);
 		return fragment;

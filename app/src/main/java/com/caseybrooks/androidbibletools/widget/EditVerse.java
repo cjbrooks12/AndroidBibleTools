@@ -1,6 +1,5 @@
 package com.caseybrooks.androidbibletools.widget;
 
-import android.app.Activity;
 import android.content.Context;
 import android.text.Html;
 import android.util.AttributeSet;
@@ -31,6 +30,11 @@ public class EditVerse extends EditText {
 	Bible selectedBible;
 	ABSPassage verse;
 
+	boolean displayAsHtml;
+	boolean displayRawText;
+
+	WorkerThread workerThread;
+
 	//Constructors and Initialization
 //------------------------------------------------------------------------------
 	public EditVerse(Context context) {
@@ -48,33 +52,37 @@ public class EditVerse extends EditText {
 	}
 
 	public void initialize() {
-		getSelectedBible();
+		workerThread = new WorkerThread();
+		displayAsHtml = false;
+		displayRawText = false;
+
+		loadSelectedBible();
 	}
 
-	public void getSelectedBible() {
-		selectedBible = BiblePickerSettings.getCachedBible(context);
-		if(verse != null) {
-			verse.setBible(selectedBible);
-		}
-	}
+	public void loadSelectedBible() {
+		if(workerThread.getState() == Thread.State.NEW)
+			workerThread.start();
 
-	public void setVerse(ABSPassage verse) {
-		this.verse = verse;
-		this.verse.setBible(selectedBible);
-	}
-
-	/**
-	 * Writes the contents of the current passage to the TextView. Forces this
-	 * to be done on the UI thread, so this can be safely called from
-	 * any background thread.
-	 */
-	public void displayText() {
-		((Activity)context).runOnUiThread(new Runnable() {
+		workerThread.post(new Runnable() {
 			@Override
 			public void run() {
-				setText(Html.fromHtml(verse.getText()));
+				selectedBible = BiblePickerSettings.getCachedBible(context);
+				if(verse != null) {
+					verse.setBible(selectedBible);
+				}
 			}
 		});
+	}
+
+	public void showText() {
+		String textToShow = displayRawText ? verse.getRawText() : verse.getText();
+
+		if(displayAsHtml) {
+			setText(Html.fromHtml(textToShow));
+		}
+		else {
+			setText(textToShow);
+		}
 	}
 
 	/**
@@ -84,17 +92,30 @@ public class EditVerse extends EditText {
 	 *
 	 * @return true if a cached verse was found and could be displayed
 	 */
-	public boolean displayCachedText() {
-		Document doc = ABTUtility.getChachedDocument(context, verse.getId());
+	public void displayCachedText() {
+		if(workerThread.getState() == Thread.State.NEW)
+			workerThread.start();
 
-		if(doc != null) {
-			verse.parseDocument(doc);
-			displayText();
-			return true;
-		}
-		else {
-			return false;
-		}
+		workerThread.post(new Runnable() {
+			@Override
+			public void run() {
+				Document doc = ABTUtility.getChachedDocument(context, verse.getId());
+
+				if(doc != null) {
+					verse.parseDocument(doc);
+					post(new Runnable() {
+						@Override
+						public void run() {
+							showText();
+						}
+					});
+				}
+			}
+		});
+	}
+
+	public boolean hasCachedDocument() {
+		return ABTUtility.getChachedDocument(context, verse.getId()) != null;
 	}
 
 	/**
@@ -104,7 +125,10 @@ public class EditVerse extends EditText {
 	 * will display the parsed text as HTML
 	 */
 	public void displayDownloadedText() {
-		new Thread(new Runnable() {
+		if(workerThread.getState() == Thread.State.NEW)
+			workerThread.start();
+
+		workerThread.post(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -112,14 +136,19 @@ public class EditVerse extends EditText {
 					if(doc != null) {
 						ABTUtility.cacheDocument(context, doc, verse.getId());
 						verse.parseDocument(doc);
-						displayText();
+						post(new Runnable() {
+							@Override
+							public void run() {
+								showText();
+							}
+						});
 					}
 				}
 				catch(IOException ioe) {
 					ioe.printStackTrace();
 				}
 			}
-		}).start();
+		});
 	}
 
 	/**
@@ -128,8 +157,56 @@ public class EditVerse extends EditText {
 	 * internet.
 	 */
 	public void tryCacheOrDownloadText() {
-		if(!displayCachedText()) {
-			displayDownloadedText();
-		}
+		if(workerThread.getState() == Thread.State.NEW)
+			workerThread.start();
+
+		workerThread.post(new Runnable() {
+			@Override
+			public void run() {
+				if(hasCachedDocument()) {
+					displayCachedText();
+				}
+				else {
+					displayDownloadedText();
+				}
+			}
+		});
+	}
+
+	public Bible getSelectedBible() {
+		return selectedBible;
+	}
+
+	public void setSelectedBible(Bible selectedBible) {
+		this.selectedBible = selectedBible;
+	}
+
+	public ABSPassage getVerse() {
+		return verse;
+	}
+
+	public void setVerse(ABSPassage verse) {
+		this.verse = verse;
+		this.verse.setBible(selectedBible);
+	}
+
+	public boolean isDisplayingAsHtml() {
+		return displayAsHtml;
+	}
+
+	public void setDisplayingAsHtml(boolean displayAsHtml) {
+		this.displayAsHtml = displayAsHtml;
+	}
+
+	public boolean isDisplayingRawText() {
+		return displayRawText;
+	}
+
+	public void setDisplayingRawText(boolean displayRawText) {
+		this.displayRawText = displayRawText;
+	}
+
+	public WorkerThread getWorkerThread() {
+		return workerThread;
 	}
 }

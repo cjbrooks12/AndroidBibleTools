@@ -122,7 +122,7 @@ public class FragmentTwo extends Fragment {
 		});
 	}
 
-	//Menu
+//Menu
 //------------------------------------------------------------------------------
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {

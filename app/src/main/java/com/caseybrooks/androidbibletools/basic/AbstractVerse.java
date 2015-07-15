@@ -146,7 +146,6 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 
 //Abstract Methods
 //------------------------------------------------------------------------------
-
 	/**
 	 * Get a human-readable text representation of this verse using the set
 	 * {@link com.caseybrooks.androidbibletools.data.Formatter}. Default formatters

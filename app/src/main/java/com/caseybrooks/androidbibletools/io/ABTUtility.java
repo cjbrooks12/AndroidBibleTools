@@ -15,6 +15,17 @@ import java.util.Calendar;
 
 public class ABTUtility {
 
+	public enum CacheTimeout {
+		TwoWeeks(14*24*60*60*1000),
+		OneDay(24*60*60*1000);
+
+		public long millis;
+
+		CacheTimeout(long millis) {
+			this.millis = millis;
+		}
+	}
+
 	/**
 	 * Writes the given Jsoup document to the applications internal cache,
 	 * overwriting any file that already has the given name
@@ -41,7 +52,7 @@ public class ABTUtility {
 		}
 	}
 
-	public static Document getChachedDocument(Context context, String filename) {
+	public static Document getChachedDocument(Context context, String filename, long timeout) {
 		try {
 
 			long cachedTime =
@@ -54,7 +65,7 @@ public class ABTUtility {
 				//if this file was cached more than 2 weeks ago, delete the file
 				//and remove the preference timestamp. Data is stale and should
 				//should not be used.
-				if(Calendar.getInstance().getTimeInMillis() - cachedTime >= 1209600000) {
+				if(Calendar.getInstance().getTimeInMillis() - cachedTime >= timeout) {
 					boolean deletedCorrectly = cacheFile.delete();
 					if(deletedCorrectly) {
 						PreferenceManager.getDefaultSharedPreferences(context)
@@ -72,5 +83,9 @@ public class ABTUtility {
 		}
 
 		return null;
+	}
+
+	public static Document getChachedDocument(Context context, String filename) {
+		return getChachedDocument(context, filename, CacheTimeout.TwoWeeks.millis);
 	}
 }

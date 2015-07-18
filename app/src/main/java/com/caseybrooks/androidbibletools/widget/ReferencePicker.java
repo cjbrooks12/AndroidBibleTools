@@ -10,7 +10,8 @@ import android.widget.AutoCompleteTextView;
 import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.basic.Book;
 import com.caseybrooks.androidbibletools.basic.Reference;
-import com.caseybrooks.androidbibletools.widget.biblepicker.BiblePickerSettings;
+
+import java.util.ArrayList;
 
 /**
  * A simple widget that makes it easy to turn user input into References that can
@@ -30,18 +31,15 @@ import com.caseybrooks.androidbibletools.widget.biblepicker.BiblePickerSettings;
  * chapter of the Bible, so that the entire chapter could be displayed, for example
  * as part of a Bible reader app.
  */
-public class ReferencePicker extends AutoCompleteTextView {
+public class ReferencePicker extends AutoCompleteTextView implements IReferencePicker, IReferencePickerListener {
 //Data Members
 //------------------------------------------------------------------------------
 	Context context;
 
 	ArrayAdapter<String> suggestionsAdapter;
+	IReferencePickerListener listener;
 
-	Bible selectedBible;
-	Reference reference;
-
-	ReferencePickerListener listener;
-	WorkerThread workerThread;
+	ReferenceWorker worker;
 
 //Constructors and Initialization
 //------------------------------------------------------------------------------
@@ -60,7 +58,8 @@ public class ReferencePicker extends AutoCompleteTextView {
 	public void initialize(Context context, AttributeSet attrs) {
 		this.context = context;
 
-		workerThread = new WorkerThread();
+		worker = new ReferenceWorker(context);
+		worker.setListener(this);
 
 		suggestionsAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
 		setAdapter(suggestionsAdapter);
@@ -74,114 +73,85 @@ public class ReferencePicker extends AutoCompleteTextView {
 				return false;
 			}
 		});
-
-		getSelectedBible();
 	}
 
-	public void getSelectedBible() {
-		if(workerThread.getState() == Thread.State.NEW)
-			workerThread.start();
-
-		workerThread.post(new Runnable() {
-			@Override
-			public void run() {
-				selectedBible = BiblePickerSettings.getCachedBible(context);
-
-				post(new Runnable() {
-					@Override
-					public void run() {
-						suggestionsAdapter.clear();
-
-						for(Book book : selectedBible.getBooks()) {
-							suggestionsAdapter.add(book.getName());
-						}
-
-						suggestionsAdapter.notifyDataSetChanged();
-					}
-				});
-			}
-		});
+	@Override
+	public void loadSelectedBible() {
+		worker.loadSelectedBible();
 	}
 
-	public void checkReference() {
-		if(workerThread.getState() == Thread.State.NEW)
-			workerThread.start();
-
-		workerThread.post(new Runnable() {
-			@Override
-			public void run() {
-				if(getText().length() > 0) {
-					post(new Runnable() {
-						 @Override
-						 public void run() {
-							 if(listener != null)
-								 listener.onPreParse(getText().toString());
-						 }
-					 });
-
-					Reference.Builder builder = new Reference.Builder();
-					builder.setBible(selectedBible);
-					builder.parseReference(getText().toString());
-					reference = builder.create();
-
-					//check flags for defaults. If the book is default, then don't post
-					//the reference, just prompt the user to try with default or edit it
-
-					if(!builder.checkFlag(Reference.Builder.DEFAULT_BOOK_FLAG)) {
-						post(new Runnable() {
-							@Override
-							public void run() {
-								setText(reference.toString());
-								if(listener != null)
-									listener.onParseCompleted(reference, true);
-							}
-						});
-					}
-					else {
-						post(new Runnable() {
-							@Override
-							public void run() {
-								if(listener != null)
-									listener.onParseCompleted(reference, false);
-								setError("Cannot parse reference");
-							}
-						});
-					}
-				}
-			}
-		});
-	}
-
-	/**
-	 * Always call checkReference() before this to ensure the most up-to-date
-	 * parse of the reference, and be sure that the reference is even something
-	 * that can be worked with further.
-	 *
-	 * @return the most recently parsed reference, regardless of whether it was
-	 * a fully successful parse.
-	 */
+	@Override
 	public Reference getReference() {
-		return reference;
+		return worker.getReference();
 	}
 
-	public ReferencePickerListener getListener() {
+	public IReferencePickerListener getListener() {
 		return listener;
 	}
 
-	public void setListener(ReferencePickerListener listener) {
+	public void setListener(IReferencePickerListener listener) {
 		this.listener = listener;
 	}
 
-	public void setSelectedBible(Bible selectedBible) {
-		this.selectedBible = selectedBible;
+	@Override
+	public void checkReference(String referenceText) {
+		worker.checkReference(referenceText);
 	}
 
-	public void setReference(Reference reference) {
-		this.reference = reference;
+	public void checkReference() {
+		this.checkReference(getText().toString());
 	}
 
-	public WorkerThread getWorkerThread() {
-		return workerThread;
+	@Override
+	public boolean onBibleLoaded(Bible bible, LoadState state) {
+		boolean handled = false;
+
+		if(listener != null)
+			handled = listener.onBibleLoaded(bible, state);
+
+		if(!handled) {
+			ArrayList<String> items = new ArrayList<>();
+			for(Book book : bible.getBooks()) {
+				items.add(book.getName());
+			}
+
+			suggestionsAdapter.clear();
+			for(String item : items) {
+				suggestionsAdapter.add(item);
+			}
+			suggestionsAdapter.notifyDataSetChanged();
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean onReferenceParsed(final Reference parsedReference, boolean wasSuccessful) {
+		boolean handled = false;
+
+		if(listener != null)
+			handled = listener.onReferenceParsed(parsedReference, wasSuccessful);
+
+		if(!handled) {
+			if(wasSuccessful) {
+				post(new Runnable() {
+					@Override
+					public void run() {
+						setText(parsedReference.toString());
+					}
+				});
+			}
+			else {
+				post(new Runnable() {
+					@Override
+					public void run() {
+						setError("Cannot parse reference");
+					}
+				});
+			}
+		}
+
+		return true;
 	}
 }
 

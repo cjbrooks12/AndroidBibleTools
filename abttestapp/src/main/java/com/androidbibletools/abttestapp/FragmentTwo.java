@@ -10,16 +10,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.caseybrooks.androidbibletools.basic.AbstractVerse;
+import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.basic.Reference;
-import com.caseybrooks.androidbibletools.data.Formatter;
-import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
 import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
+import com.caseybrooks.androidbibletools.widget.IReferencePickerListener;
+import com.caseybrooks.androidbibletools.widget.IVerseViewListener;
+import com.caseybrooks.androidbibletools.widget.LoadState;
 import com.caseybrooks.androidbibletools.widget.ReferencePicker;
-import com.caseybrooks.androidbibletools.widget.ReferencePickerListener;
 import com.caseybrooks.androidbibletools.widget.VerseView;
 import com.caseybrooks.androidbibletools.widget.biblepicker.BiblePickerDialog;
 
-public class FragmentTwo extends Fragment {
+public class FragmentTwo extends Fragment implements IReferencePickerListener, IVerseViewListener {
 	Context context;
 
 	ReferencePicker referencePicker;
@@ -49,7 +51,9 @@ public class FragmentTwo extends Fragment {
 		setHasOptionsMenu(true);
 
 		referencePicker = (ReferencePicker) view.findViewById(R.id.reference_picker);
+		referencePicker.setListener(this);
 		verseView = (VerseView) view.findViewById(R.id.verse_view);
+		verseView.setListener(this);
 
 		return view;
 	}
@@ -66,63 +70,7 @@ public class FragmentTwo extends Fragment {
 		restoreProgress();
 	}
 
-	public void loadBible() {
-		referencePicker.checkReference();
-		referencePicker.setListener(new ReferencePickerListener() {
-			@Override
-			public void onPreParse(String textToParse) {
-
-			}
-
-			@Override
-			public void onParseCompleted(Reference parsedReference, boolean wasSuccessful) {
-				if(wasSuccessful) {
-					saveProgress(parsedReference.toString());
-
-					final ABSPassage passage = new ABSPassage(
-							getResources().getString(R.string.bibles_org_key),
-							parsedReference
-					);
-					passage.setFormatter(new Formatter() {
-						@Override
-						public String onPreFormat(Reference reference) {
-							return "";
-						}
-
-						@Override
-						public String onFormatVerseStart(int i) {
-							return "<b><sup>" + i + "</sup></b>";
-						}
-
-						@Override
-						public String onFormatText(String s) {
-							return s;
-						}
-
-						@Override
-						public String onFormatSpecial(String s) {
-							return s;
-						}
-
-						@Override
-						public String onFormatVerseEnd() {
-							return "</br>";
-						}
-
-						@Override
-						public String onPostFormat() {
-							return "</br></br><small>" + ((ABSBible) passage.getBible()).getCopyright() + "</small>";
-						}
-					});
-					verseView.loadSelectedBible();
-					verseView.setVerse(passage);
-					verseView.tryCacheOrDownloadText();
-				}
-			}
-		});
-	}
-
-//Menu
+	//Menu
 //------------------------------------------------------------------------------
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
@@ -141,7 +89,7 @@ public class FragmentTwo extends Fragment {
 			return true;
 		}
 		if(item.getItemId() == R.id.action_refresh) {
-			loadBible();
+			referencePicker.checkReference();
 			return true;
 		}
 		else {
@@ -158,7 +106,37 @@ public class FragmentTwo extends Fragment {
 	public void restoreProgress() {
 		String progress = context.getSharedPreferences(settings_file, 0).getString(PREFIX + PROGRESS, "Matthew 1:1");
 
+		verseView.loadSelectedBible();
+		referencePicker.loadSelectedBible();
 		referencePicker.setText(progress);
-		loadBible();
+		referencePicker.checkReference();
+	}
+
+	@Override
+	public boolean onBibleLoaded(Bible bible, LoadState state) {
+		return false;
+	}
+
+	@Override
+	public boolean onVerseLoaded(AbstractVerse verse, LoadState state) {
+		return false;
+	}
+
+	@Override
+	public boolean onReferenceParsed(Reference parsedReference, boolean wasSuccessful) {
+		if(wasSuccessful) {
+			saveProgress(parsedReference.toString());
+
+			final ABSPassage passage = new ABSPassage(
+					getResources().getString(R.string.bibles_org_key),
+					parsedReference
+			);
+			verseView.setDisplayingRawText(false);
+			verseView.setDisplayingAsHtml(true);
+			verseView.loadSelectedBible();
+			verseView.setVerse(passage);
+			verseView.tryCacheOrDownloadText();
+		}
+		return false;
 	}
 }

@@ -38,6 +38,14 @@ public class ABSBible extends Bible implements Downloadable {
 		this.APIKey = APIKey;
 		this.id = (id != null) ? id : "eng-ESV";
 
+		this.languageKey = DefaultBible.defaultBibleLang;
+		this.languageName = DefaultBible.defaultBibleLangName;
+		this.languageNameEnglish = DefaultBible.defaultBibleLangNameEnglish;
+		this.languageCode = DefaultBible.defaultBibleLangCode;
+		this.copyright = DefaultBible.defaultBibleCopyright;
+		this.info = DefaultBible.defaultBibleInfo;
+		this.contact = DefaultBible.defaultBibleContact;
+
 		books = new ArrayList<>();
 		for(int i = 0; i < DefaultBible.defaultBookName.length; i++) {
 			ABSBook book = new ABSBook(APIKey, this.id + ":" + DefaultBible.defaultBookAbbr[i]);

@@ -67,7 +67,9 @@ public class ReferencePicker extends AutoCompleteTextView implements IReferenceP
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if(event.getAction() == MotionEvent.ACTION_DOWN) {
-					showDropDown();
+					if(suggestionsAdapter.getCount() > 0) {
+						showDropDown();
+					}
 				}
 
 				return false;

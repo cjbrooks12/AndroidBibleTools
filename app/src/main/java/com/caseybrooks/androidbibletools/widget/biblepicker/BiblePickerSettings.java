@@ -12,6 +12,9 @@ import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
 
 import org.jsoup.nodes.Document;
 
+import java.io.IOException;
+import java.util.Calendar;
+
 public class BiblePickerSettings {
 	private static final String PREFIX = "BIBLEPICKER_";
 
@@ -70,14 +73,51 @@ public class BiblePickerSettings {
 		Bible bible = getSelectedBible(context);
 
 		if(bible instanceof Downloadable) {
-			Document doc = ABTUtility.getChachedDocument(context, "selectedBible.xml");
+			String filename = "selectedBible.xml";
+			Document doc = ABTUtility.getChachedDocument(context, filename);
 
 			if(doc != null) {
 				((Downloadable) bible).parseDocument(doc);
+
+				//if the bible is more than 5 days old, its data is still valid so
+				//we can return the Bible we just pulled from the cache. However,
+				//in order to ensure it is always valid, lets redownload it again
+				//anyway in the background so next time it is the most up to date
+				long cachedTime = PreferenceManager.getDefaultSharedPreferences(context).getLong(filename, 0);
+				long cacheTimeout = ABTUtility.CacheTimeout.OneDay.millis*5; //5 days
+				long now = Calendar.getInstance().getTimeInMillis();
+
+				if((cachedTime != 0) && ((now - cachedTime) >= cacheTimeout)) {
+					redownloadBible(context);
+				}
+
 				return bible;
 			}
 		}
 
 		return new ABSBible(context.getResources().getString(R.string.bibles_org_key, ""), null);
+	}
+
+	public static void redownloadBible(final Context context) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Bible bible = getSelectedBible(context);
+				if(bible instanceof Downloadable) {
+					try {
+						Document doc = ((Downloadable) bible).getDocument();
+
+						if(doc != null) {
+							ABTUtility.cacheDocument(context, doc, "selectedBible.xml");
+							((Downloadable) bible).parseDocument(doc);
+
+						}
+					}
+					catch(IOException ioe) {
+						ioe.printStackTrace();
+					}
+				}
+			}
+		}).start();
 	}
 }

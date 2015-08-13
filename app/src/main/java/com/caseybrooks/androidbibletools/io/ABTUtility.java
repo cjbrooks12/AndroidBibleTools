@@ -69,7 +69,7 @@ public class ABTUtility {
 					boolean deletedCorrectly = cacheFile.delete();
 					if(deletedCorrectly) {
 						PreferenceManager.getDefaultSharedPreferences(context)
-								.edit().remove(filename);
+								.edit().remove(filename).commit();
 					}
 					return null;
 				}

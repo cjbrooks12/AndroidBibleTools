@@ -35,7 +35,7 @@ dependencies {
 }
 ```
 
-And that's it!  You can see it's usage in my other apps [Scripture Now!](https://github.com/cjbrooks12/scripturememory) and [OpenBible.info for Android](https://github.com/cjbrooks12/openbible)
+And that's it!  You can see it's usage in my other apps [Scripture Now!](https://github.com/cjbrooks12/scripturememory) and [OpenBible.info for Android](https://github.com/cjbrooks12/openbible), or in the project included here abttestapp. The code in Scripture Now will likely be the most recent of the three, but the code in the test app will probably be the most accessible.
 
 [Learn more about Jitpack](https://jitpack.io/#cjbrooks12/AndroidBibleTools/0.1.0)
 

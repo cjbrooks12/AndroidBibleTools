@@ -391,43 +391,56 @@ public final class Reference implements Comparable<Reference> {
     public int compareTo(Reference rhs) {
         Reference lhs = this;
 
-        if(lhs.book.getLocation() - rhs.book.getLocation() == 1) {
-            if((lhs.chapter == 1 && lhs.verses.get(0) == 1) &&
-                    (rhs.chapter == rhs.book.numChapters() &&
-                            (rhs.verses.get(0) == rhs.book.numVersesInChapter(rhs.chapter)))) return 1;
-            else return 4;
-        }
-        else if(lhs.book.getLocation() - rhs.book.getLocation() == -1) {
-            if((rhs.chapter == 1 && rhs.verses.get(0) == 1) &&
-                    (lhs.chapter == lhs.book.numChapters() &&
-                            (lhs.verses.get(0) == lhs.book.numVersesInChapter(lhs.chapter)))) return -1;
-            else return -4;
-        }
-        else if(lhs.book.getLocation() > rhs.book.getLocation()) return 4;
-        else if(lhs.book.getLocation() < rhs.book.getLocation()) return -4;
-        else {
-            //same book
-            if(lhs.chapter - rhs.chapter == 1) {
-                if((lhs.verses.get(0) == 1) &&
-                        (rhs.verses.get(0) == rhs.book.numVersesInChapter(rhs.chapter))) return 1;
-                else return 3;
-            }
-            if(lhs.chapter - rhs.chapter == -1) {
-                if((rhs.verses.get(0) == 1) &&
-                        (lhs.verses.get(0) == lhs.book.numVersesInChapter(lhs.chapter))) return -1;
-                else return -3;
-            }
-            else if(lhs.chapter > rhs.chapter) return 3;
-            else if(lhs.chapter < rhs.chapter) return -3;
-            else {
-                //same chapter
-                if(lhs.verses.get(0) - rhs.verses.get(0) == 1) return 1;
-                else if(lhs.verses.get(0) - rhs.verses.get(0) == -1) return -1;
-                else if(lhs.verses.get(0) > rhs.verses.get(0)) return 2;
-                else if(lhs.verses.get(0) < rhs.verses.get(0)) return -2;
-                else return 0; //lhs.verses.get(0) == rhs.verses.get(0)
-            }
-        }
+		try {
+
+			if(lhs.book.getLocation() - rhs.book.getLocation() == 1) {
+				if((lhs.chapter == 1 && lhs.verses.get(0) == 1) &&
+						(rhs.chapter == rhs.book.numChapters() &&
+								(rhs.verses.get(0) == rhs.book.numVersesInChapter(rhs.chapter))))
+					return 1;
+				else return 4;
+			}
+			else if(lhs.book.getLocation() - rhs.book.getLocation() == -1) {
+				if((rhs.chapter == 1 && rhs.verses.get(0) == 1) &&
+						(lhs.chapter == lhs.book.numChapters() &&
+								(lhs.verses.get(0) == lhs.book.numVersesInChapter(lhs.chapter))))
+					return -1;
+				else return -4;
+			}
+			else if(lhs.book.getLocation() > rhs.book.getLocation()) return 4;
+			else if(lhs.book.getLocation() < rhs.book.getLocation()) return -4;
+			else {
+				//same book
+				if(lhs.chapter - rhs.chapter == 1) {
+					if((lhs.verses.get(0) == 1) &&
+							(rhs.verses.get(0) == rhs.book.numVersesInChapter(rhs.chapter)))
+						return 1;
+					else return 3;
+				}
+				if(lhs.chapter - rhs.chapter == -1) {
+					if((rhs.verses.get(0) == 1) &&
+							(lhs.verses.get(0) == lhs.book.numVersesInChapter(lhs.chapter)))
+						return -1;
+					else return -3;
+				}
+				else if(lhs.chapter > rhs.chapter) return 3;
+				else if(lhs.chapter < rhs.chapter) return -3;
+				else {
+					//same chapter
+					if(lhs.verses.get(0) - rhs.verses.get(0) == 1) return 1;
+					else if(lhs.verses.get(0) - rhs.verses.get(0) == -1)
+						return -1;
+					else if(lhs.verses.get(0) > rhs.verses.get(0)) return 2;
+					else if(lhs.verses.get(0) < rhs.verses.get(0)) return -2;
+					else return 0; //lhs.verses.get(0) == rhs.verses.get(0)
+				}
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+
+			return lhs.toString().compareTo(rhs.toString());
+		}
     }
 
     public boolean equals(Object other) {

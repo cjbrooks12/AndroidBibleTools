@@ -117,44 +117,29 @@ public final class Reference implements Comparable<Reference> {
 		 * @return this Builder object
 		 */
 		public Builder setBook(String bookName) {
+			//no bookname provided, set it to empty
 			if(bookName == null) {
 				bookName = "";
 			}
-			Book parsedBook = null;
 
-			//Bible is provided, try parse with it
-			if(bible != null) {
-				parsedBook = bible.parseBook(bookName);
-
-				//successful with provided Bible
-				if(parsedBook != null) {
-					unsetFlag(DEFAULT_BIBLE_FLAG);
-					unsetFlag(DEFAULT_BOOK_FLAG);
-
-					book = parsedBook;
-					return this;
-				}
-
-				//unsuccessful with provided Bible, try again with default bible
+			//no bible provided, assume default Bible and use that
+			if(bible == null) {
+				setFlag(DEFAULT_BIBLE_FLAG);
+				bible = new Bible();
 			}
 			else {
-				setFlag(DEFAULT_BIBLE_FLAG);
+				unsetFlag(DEFAULT_BIBLE_FLAG);
 			}
 
-			//either no Bible was provided, or the provided Bible failed to parse
-			parsedBook = new Bible().parseBook(bookName);
+			Book parsedBook = bible.parseBook(bookName);
 
-			//successful only with default Bible
 			if(parsedBook != null) {
-				setFlag(DEFAULT_BIBLE_FLAG);
 				unsetFlag(DEFAULT_BOOK_FLAG);
 
 				book = parsedBook;
 				return this;
 			}
-
-			//unsuccessful parse with default Bible, we can safely assume default
-			//book in the provided bible, whether it was default or not
+			//could not find this book in the given bible, just add the book as-is
 			else {
 				parsedBook = new Book();
 				parsedBook.setName(bookName);

@@ -105,19 +105,19 @@ public class BiblePicker extends LinearLayout {
 		if(workerThread.getState() == Thread.State.NEW)
 			workerThread.start();
 
+		post(new Runnable() {
+			@Override
+			public void run() {
+				progressText.setText("Retrieving Bible list");
+				progressText.setVisibility(View.VISIBLE);
+				bibleList.setVisibility(View.GONE);
+				progressBar.setVisibility(View.VISIBLE);
+			}
+		});
+
 		workerThread.post(new Runnable() {
 			@Override
 			public void run() {
-				post(new Runnable() {
-					@Override
-					public void run() {
-						progressText.setText("Retreiving Bible list");
-						progressText.setVisibility(View.VISIBLE);
-						bibleList.setVisibility(View.GONE);
-						progressBar.setVisibility(View.VISIBLE);
-					}
-				});
-
 				selectedBible = BiblePickerSettings.getSelectedBible(context);
 
 				try {
@@ -162,73 +162,23 @@ public class BiblePicker extends LinearLayout {
 		});
 	}
 
-
-//	private class LoadBiblesThread extends AsyncTask<Void, Void, Void> {
-//
-//
-//		@Override
-//		protected void onPreExecute() {
-//			super.onPreExecute();
-//
-//			progressText.setText("Retreiving Bible list");
-//			progressText.setVisibility(View.VISIBLE);
-//			bibleList.setVisibility(View.GONE);
-//			progressBar.setVisibility(View.VISIBLE);
-//		}
-//
-//		@Override
-//		protected Void doInBackground(Void... params) {
-//			selectedBible = BiblePickerSettings.getSelectedBible(context);
-//
-//			try {
-//				bibles = ABSBible.parseAvailableVersions(
-//							ABSBible.availableVersionsDoc(
-//								context.getResources().getString(R.string.bibles_org_key)
-//								, null
-//							));
-//			}
-//			catch(IOException ioe) {
-//				//assuming we have previously selected a bible, only show that
-//				//one in the list if we can't connect to the server right now.
-//				//In the case that we haven't selected a Bible yet, the settings
-//				//will return a default Bible that we can use for the time being
-//				bibles = new HashMap<>();
-//				bibles.put(selectedBible.getAbbreviation(), selectedBible);
-//			}
-//
-//			return null;
-//		}
-//
-//		@Override
-//		protected void onPostExecute(Void aVoid) {
-//			super.onPostExecute(aVoid);
-//			adapter = new BibleListAdapter(context, bibles.values());
-//			adapter.filterBy(filter.getText().toString());
-//			bibleList.setAdapter(adapter);
-//			bibleList.setVisibility(View.VISIBLE);
-//			progressBar.setVisibility(View.GONE);
-//			progressText.setVisibility(View.GONE);
-//		}
-//	}
-
 	private void loadSelectedBibleInfo() {
 		if(workerThread.getState() == Thread.State.NEW)
 			workerThread.start();
 
+		post(new Runnable() {
+			@Override
+			public void run() {
+				progressText.setText("Downloading Bible Info");
+				progressText.setVisibility(View.VISIBLE);
+				bibleList.setVisibility(View.GONE);
+				progressBar.setVisibility(View.VISIBLE);
+			}
+		});
+
 		workerThread.post(new Runnable() {
 			@Override
 			public void run() {
-				post(new Runnable() {
-
-					@Override
-					public void run() {
-						progressText.setText("Caching selected Bible");
-						progressText.setVisibility(View.VISIBLE);
-						bibleList.setVisibility(View.GONE);
-						progressBar.setVisibility(View.VISIBLE);
-					}
-				});
-
 				if(selectedBible instanceof Downloadable) {
 					Downloadable downloadableBible = (Downloadable) selectedBible;
 
@@ -286,66 +236,6 @@ public class BiblePicker extends LinearLayout {
 			}
 		});
 	}
-
-//	private class LoadSelectedBibleInfoThread extends AsyncTask<Void, Void, Void> {
-//
-//		boolean success;
-//
-//		@Override
-//		protected void onPreExecute() {
-//			super.onPreExecute();
-//
-//			progressText.setText("Caching selected Bible");
-//			progressText.setVisibility(View.VISIBLE);
-//			bibleList.setVisibility(View.GONE);
-//			progressBar.setVisibility(View.VISIBLE);
-//		}
-//
-//		@Override
-//		protected Void doInBackground(Void... params) {
-//			if(selectedBible instanceof Downloadable) {
-//				Downloadable downloadableBible = (Downloadable) selectedBible;
-//
-//				try {
-//					Document doc = downloadableBible.getDocument();
-//
-//					if(doc != null) {
-//						ABTUtility.cacheDocument(context, doc, "selectedBible.xml");
-//						success = true;
-//					}
-//					else {
-//						publishProgress();
-//						success = false;
-//					}
-//				}
-//				catch(IOException ioe) {
-//					ioe.printStackTrace();
-//					publishProgress();
-//					success = false;
-//				}
-//			}
-//
-//			return null;
-//		}
-//
-//		@Override
-//		protected void onProgressUpdate(Void... values) {
-//			super.onProgressUpdate(values);
-//			Toast.makeText(context, "Could not cache bible, try again later", Toast.LENGTH_SHORT).show();
-//		}
-//
-//		@Override
-//		protected void onPostExecute(Void aVoid) {
-//			super.onPostExecute(aVoid);
-//			progressText.setVisibility(View.GONE);
-//			bibleList.setVisibility(View.VISIBLE);
-//			progressBar.setVisibility(View.GONE);
-//
-//			if(listener != null) {
-//				listener.onBibleDownloaded(success);
-//			}
-//		}
-//	}
 
 	private class BibleListAdapter extends BaseAdapter {
 		private Comparator<Bible> bibleComparator = new Comparator<Bible>() {

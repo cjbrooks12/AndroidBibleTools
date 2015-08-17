@@ -6,6 +6,8 @@ import com.caseybrooks.androidbibletools.basic.Reference;
 
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
+
 public class ReferenceTest extends TestCase {
 	Bible bible;
 
@@ -111,6 +113,38 @@ public class ReferenceTest extends TestCase {
 
 			assertEquals(ref1, ref3);
 		}
+
+		bible.setBooks(new ArrayList<Book>());
+		Reference ref1 = new Reference.Builder()
+				.setBible(bible)
+				.parseReference("1 Corinthians 6:14")
+				.create();
+		Reference ref2 = new Reference.Builder()
+				.setBible(bible)
+				.setBook("1 Corinthians")
+				.setChapter(6)
+				.setVerses(14)
+				.create();
+
+		//should never return null Reference, but rather throw exception. Check here just to be sure
+		assertNotNull(ref1);
+		assertNotNull(ref2);
+
+		//test for equality among parsed and entered References by all possible
+		// measures. Also test to make sure that a.equals(b) is no different from
+		// b.equals(a) for each comparison
+		assertEquals(ref1, ref2);
+		assertEquals(ref2, ref1);
+
+		assertTrue(ref1.equals(ref2));
+		assertTrue(ref2.equals(ref1));
+
+		assertEquals(0, ref1.compareTo(ref2));
+		assertEquals(0, ref2.compareTo(ref1));
+
+		assertEquals(ref1.hashCode(), ref2.hashCode());
+		assertEquals(ref2.hashCode(), ref1.hashCode());
+
 	}
 
 //	//this test shows that for any book except Judges, Jude, Philippians, and

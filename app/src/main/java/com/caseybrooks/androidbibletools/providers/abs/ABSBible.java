@@ -148,8 +148,8 @@ public class ABSBible extends Bible implements Downloadable {
 
 		Element parent = doc.select("parent").first();
 
-		name = parent.select("name").text();
-		abbreviation = parent.select("id").text().replaceAll(".*-", "");
+		name = (parent != null) ? parent.select("name").text() : DefaultBible.defaultBibleName;
+		abbreviation = (parent != null) ? parent.select("id").text().replaceAll(".*-", "") : DefaultBible.defaultBibleId;
 		copyright = doc.select("copyright").first().text();
 
 		doc.select("next").remove();

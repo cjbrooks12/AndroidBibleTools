@@ -111,6 +111,11 @@ public class BiblePickerSettings {
 							ABTUtility.cacheDocument(context, doc, "selectedBible.xml");
 							((Downloadable) bible).parseDocument(doc);
 
+							PreferenceManager.getDefaultSharedPreferences(context)
+									.edit()
+									.putInt("TIMES_BIBLE_REDOWNLOADED",
+											PreferenceManager.getDefaultSharedPreferences(context).getInt("TIMES_BIBLE_REDOWNLOADED", 0) + 1)
+									.commit();
 						}
 					}
 					catch(IOException ioe) {

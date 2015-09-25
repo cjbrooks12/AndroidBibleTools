@@ -17,7 +17,8 @@ public class ABTUtility {
 
 	public enum CacheTimeout {
 		TwoWeeks(14*24*60*60*1000),
-		OneDay(24*60*60*1000);
+		OneDay(24*60*60*1000),
+		Never(Long.MAX_VALUE);
 
 		public long millis;
 

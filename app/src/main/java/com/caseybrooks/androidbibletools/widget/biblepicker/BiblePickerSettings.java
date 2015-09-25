@@ -67,14 +67,15 @@ public class BiblePickerSettings {
 	}
 
 	public static Bible getCachedBible(Context context) {
-		Bible bible = getSelectedBible(context);
+        try {
+            Bible bible = getSelectedBible(context);
 
-		if(bible instanceof Downloadable) {
-			String filename = "selectedBible.xml";
-			Document doc = ABTUtility.getChachedDocument(context, filename, ABTUtility.CacheTimeout.Never.millis);
+            if (bible instanceof Downloadable) {
+                String filename = "selectedBible.xml";
+                Document doc = ABTUtility.getChachedDocument(context, filename, ABTUtility.CacheTimeout.Never.millis);
 
-			if(doc != null) {
-				((Downloadable) bible).parseDocument(doc);
+                if (doc != null) {
+                    ((Downloadable) bible).parseDocument(doc);
 
 //				//if the bible is more than 5 days old, its data is still valid so
 //				//we can return the Bible we just pulled from the cache. However,
@@ -88,9 +89,13 @@ public class BiblePickerSettings {
 //					redownloadBible(context);
 //				}
 
-				return bible;
-			}
-		}
+                    return bible;
+                }
+            }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
 
 		return new ABSBible(context.getResources().getString(R.string.bibles_org_key, ""), null);
 	}

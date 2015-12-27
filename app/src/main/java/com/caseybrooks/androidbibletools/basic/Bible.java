@@ -3,6 +3,7 @@ package com.caseybrooks.androidbibletools.basic;
 import com.caseybrooks.androidbibletools.defaults.DefaultBible;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * A base class to give a verse the Bible translation or version that it is. A
@@ -41,37 +42,20 @@ public class Bible {
 
 //Getters and Setters
 //------------------------------------------------------------------------------
-	public String getName() {
-		return name;
-	}
+	public void setName(String name) { this.name = name; }
+	public String getName() { return name; }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+	public void setAbbreviation(String abbreviation) { this.abbreviation = abbreviation; }
+	public String getAbbreviation() { return abbreviation; }
 
-	public String getAbbreviation() {
-		return abbreviation;
-	}
+	public void setLanguage(String language) { this.language = language; }
+	public String getLanguage() { return language; }
 
-	public void setAbbreviation(String abbreviation) {
-		this.abbreviation = abbreviation;
-	}
-
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
-	public ArrayList<Book> getBooks() {
-		return books;
-	}
-
-	public void setBooks(ArrayList<Book> books) {
-		this.books = books;
-	}
+	public void setBooks(Collection<Book> books) {
+        this.books = new ArrayList<>();
+        this.books.addAll(books);
+    }
+	public ArrayList<Book> getBooks() { return books; }
 
 	/**
 	 * Attemps to parse a given String and determine the name of the book.

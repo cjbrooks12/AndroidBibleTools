@@ -286,17 +286,15 @@ public class MetadataTest extends ApplicationTestCase<Application> {
 		}
 		assertEquals("1357902468", simpleSort3);
 
-//Reference tests won't pass because Reference comparison function does not work yet for single-verse objects
-
 		//start by sorting into position
-//		Collections.sort(verses, new Metadata.Comparator("POS"));
-//		//sort by reference
-//		Collections.sort(verses, new Metadata.Comparator(Metadata.Comparator.KEY_REFERENCE));
-//		String simpleSort4 = "";
-//		for(int i = 0; i < verses.size(); i++) {
-//			simpleSort4 += verses.get(i).getMetadata().getInt("POS");
-//		}
-//		assertEquals("9876543210", simpleSort4);
+		Collections.sort(verses, new Metadata.Comparator("POS"));
+		//sort by reference
+		Collections.sort(verses, new Metadata.Comparator(Metadata.Comparator.KEY_REFERENCE));
+		String simpleSort4 = "";
+		for(int i = 0; i < verses.size(); i++) {
+			simpleSort4 += verses.get(i).getMetadata().getInt("POS");
+		}
+		assertEquals("9876543210", simpleSort4);
 
 		//start by sorting into position
 		Collections.sort(verses, new Metadata.Comparator("POS"));

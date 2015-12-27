@@ -53,33 +53,43 @@ public class BiblePicker extends LinearLayout {
 
 	WorkerThread workerThread;
 
-	//Constructors and Initialization
+    String apiKey;
+    String preferenceKey;
+
+//Constructors and Initialization
 //------------------------------------------------------------------------------
 	public BiblePicker(Context context) {
 		super(context);
 		this.context = context;
 
-		initialize();
+		initialize(null);
 	}
 
-	public BiblePicker(Context context, AttributeSet attrs) {
+    public BiblePicker(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.context = context;
 
-		initialize();
+		initialize(attrs);
 	}
 
-	public void initialize() {
+	public void initialize(AttributeSet attrs) {
+        if (attrs != null) {
+            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.abt_biblepicker, 0, 0);
+            apiKey = a.getString(R.styleable.abt_biblepicker_bible_api_key);
+            preferenceKey = a.getString(R.styleable.abt_biblepicker_bible_preference_key);
+            a.recycle();
+        }
+
 		workerThread = new WorkerThread();
 
 		TypedArray a = context.getTheme().obtainStyledAttributes(new int[]{
 				android.R.attr.textColor,
-				R.attr.colorAccent,
-				R.attr.colorPrimaryDark
+				R.attr.colorPrimaryDark,
+				R.attr.colorAccent
 		});
 		textColor = a.getColor(0, Color.BLACK);
-		colorAccent = a.getColor(1, Color.LTGRAY);
-		colorPrimary = a.getColor(2, Color.DKGRAY);
+		colorPrimary = a.getColor(1, Color.DKGRAY);
+		colorAccent = a.getColor(2, Color.LTGRAY);
 		a.recycle();
 
 		LayoutInflater.from(context).inflate(R.layout.bible_picker, this);
@@ -94,14 +104,31 @@ public class BiblePicker extends LinearLayout {
 
 		progressText = (TextView) findViewById(R.id.progress_text);
 		progressBar = (ProgressBar) findViewById(R.id.progress);
-
-		loadBibleList();
 	}
+
+//Getters and Setters
+//------------------------------------------------------------------------------
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public String getPreferenceKey() {
+        return preferenceKey;
+    }
+
+    public void setPreferenceKey(String preferenceKey) {
+        this.preferenceKey = preferenceKey;
+    }
+
 
 //Data retrieval and manipulation
 //------------------------------------------------------------------------------
 
-	private void loadBibleList() {
+	public void loadBibleList() {
 		if(workerThread.getState() == Thread.State.NEW)
 			workerThread.start();
 
@@ -122,10 +149,8 @@ public class BiblePicker extends LinearLayout {
 
 				try {
 					final HashMap<String, Bible> bibles = ABSBible.parseAvailableVersions(
-							ABSBible.availableVersionsDoc(
-									context.getResources().getString(R.string.bibles_org_key)
-									, null
-							));
+							ABSBible.availableVersionsDoc(apiKey, null));
+
 					post(new Runnable() {
 						@Override
 						public void run() {

@@ -7,7 +7,8 @@ import com.caseybrooks.androidbibletools.defaults.DefaultFormatter;
 
 import java.util.TreeSet;
 
-/**An abstract implementation of a Verse in the Bible. A verse represents a location
+/**
+ * An abstract implementation of a Verse in the Bible. A verse represents a location
  * and its text, and is considered immutable in that the location the verse
  * points to is fixed. A verse contains several peripheral classes to give a
  * verse metadata, provide intelligent sorting, and create a consistent IO pattern.
@@ -108,7 +109,6 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	}
 
 //Tags
-//TODO: make Tags its own class
 //------------------------------------------------------------------------------
 	public AbstractVerse removeAllTags() {
         tags.clear();
@@ -161,9 +161,11 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	/**
 	 * Get the raw, unparsed text for this Verse. In most cases, this will be
 	 * the full verse text provided by the API, not what's left after stripping
-	 * out the HTML formatting.
+	 * out the HTML formatting. This is not the HTML response, that should be taken
+     * from the Document of a downloadable verse. This is simply the text that
+     * describes the markup of the verse without all that markup replaced.
 	 *
-	 * @return
+	 * @return {@link java.lang.String}
 	 */
 	public abstract String getRawText();
 

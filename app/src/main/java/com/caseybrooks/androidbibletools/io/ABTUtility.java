@@ -53,7 +53,7 @@ public class ABTUtility {
 		}
 	}
 
-	public static Document getChachedDocument(Context context, String filename, long timeout) {
+	public static Document getCachedDocument(Context context, String filename, long timeout) {
 		try {
 
 			long cachedTime =
@@ -86,7 +86,7 @@ public class ABTUtility {
 		return null;
 	}
 
-	public static Document getChachedDocument(Context context, String filename) {
-		return getChachedDocument(context, filename, CacheTimeout.TwoWeeks.millis);
+	public static Document getCachedDocument(Context context, String filename) {
+		return getCachedDocument(context, filename, CacheTimeout.TwoWeeks.millis);
 	}
 }

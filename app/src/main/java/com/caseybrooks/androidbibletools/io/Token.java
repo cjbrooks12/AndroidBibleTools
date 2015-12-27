@@ -14,7 +14,6 @@ public class Token {
 		WHITESPACE,
 	}
 
-
 	private Type type;
 	private String stringValue;
 	private int intValue;

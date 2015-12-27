@@ -3,39 +3,49 @@ package com.caseybrooks.androidbibletools.widget.biblepicker;
 import android.app.AlertDialog;
 import android.content.Context;
 
-public class BiblePickerDialog extends AlertDialog implements OnBibleSelectedListener {
-	OnBibleSelectedListener listener;
+public class BiblePickerDialog extends AlertDialog {
 	BiblePicker picker;
 
-	public static BiblePickerDialog create(Context context) {
-		return new BiblePickerDialog(context);
+	public static BiblePickerDialog create(Context context, String apiKey, String preferenceKey) {
+		BiblePickerDialog dialog = new BiblePickerDialog(context);
+        dialog.setApiKey(apiKey);
+        dialog.setPreferenceKey(preferenceKey);
+        dialog.loadBibleList();
+        return dialog;
 	}
 
 	protected BiblePickerDialog(Context context) {
 		super(context);
 
 		picker = new BiblePicker(context);
-		picker.setListener(this);
 		setView(picker);
 	}
 
-	@Override
-	public void onBibleSelected() {
-		if(listener != null)
-			listener.onBibleSelected();
-	}
-
-	@Override
-	public void onBibleDownloaded(boolean successfullyDownloaded) {
-		if(listener != null)
-			listener.onBibleDownloaded(successfullyDownloaded);
-	}
-
 	public OnBibleSelectedListener getListener() {
-		return listener;
+        return picker.getListener();
 	}
 
 	public void setListener(OnBibleSelectedListener listener) {
-		this.listener = listener;
+        picker.setListener(listener);
 	}
+
+    public String getApiKey() {
+        return picker.getApiKey();
+    }
+
+    public void setApiKey(String apiKey) {
+        picker.setApiKey(apiKey);
+    }
+
+    public String getPreferenceKey() {
+        return picker.getPreferenceKey();
+    }
+
+    public void setPreferenceKey(String preferenceKey) {
+        picker.setPreferenceKey(preferenceKey);
+    }
+
+    public void loadBibleList() {
+        picker.loadBibleList();
+    }
 }

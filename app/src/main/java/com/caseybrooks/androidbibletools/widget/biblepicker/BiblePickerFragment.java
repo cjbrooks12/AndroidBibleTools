@@ -6,13 +6,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class BiblePickerFragment extends Fragment implements OnBibleSelectedListener {
-	OnBibleSelectedListener listener;
+public class BiblePickerFragment extends Fragment {
 	BiblePicker picker;
 
-	public static Fragment newInstance() {
-		return new BiblePickerFragment();
-	}
+    public static BiblePickerFragment newInstance(String apiKey, String preferenceKey) {
+        BiblePickerFragment fragment = new BiblePickerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("apiKey", apiKey);
+        bundle.putString("preferenceKey", preferenceKey);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -20,29 +24,21 @@ public class BiblePickerFragment extends Fragment implements OnBibleSelectedList
 		setHasOptionsMenu(true);
 
 		picker = new BiblePicker(getActivity());
-		picker.setListener(this);
+        if(getArguments() != null) {
+            picker.setApiKey(getArguments().getString("apiKey"));
+            picker.setPreferenceKey(getArguments().getString("preferenceKey"));
+        }
+        picker.loadBibleList();
 
-		return picker;
-	}
-
-	@Override
-	public void onBibleSelected() {
-		if(listener != null)
-			listener.onBibleSelected();
-	}
-
-	@Override
-	public void onBibleDownloaded(boolean successfullyDownloaded) {
-		if(listener != null)
-			listener.onBibleDownloaded(successfullyDownloaded);
+        return picker;
 	}
 
 	public OnBibleSelectedListener getListener() {
-		return listener;
+		return picker.getListener();
 	}
 
 	public void setListener(OnBibleSelectedListener listener) {
-		this.listener = listener;
-	}
+	    picker.setListener(listener);
+    }
 }
 

@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * word ::= { [a..zA..Z] }
  * punctuation ::= [;:,.-\/]
  *
- * book ::= ([123]) word
+ * book ::= ([123]) word+
  * chapter ::= number
  * verse ::= number
  *

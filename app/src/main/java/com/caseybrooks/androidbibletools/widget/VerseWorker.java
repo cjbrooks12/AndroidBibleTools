@@ -46,7 +46,7 @@ public class VerseWorker implements IVerseView {
 
 	@Override
 	public boolean hasCachedText() {
-		return ABTUtility.getChachedDocument(context, verse.getId()) != null;
+		return ABTUtility.getCachedDocument(context, verse.getId()) != null;
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class VerseWorker implements IVerseView {
 		workerThread.post(new Runnable() {
 			@Override
 			public void run() {
-				Document doc = ABTUtility.getChachedDocument(context, verse.getId());
+				Document doc = ABTUtility.getCachedDocument(context, verse.getId());
 
 				if(doc != null) {
 					verse.parseDocument(doc);

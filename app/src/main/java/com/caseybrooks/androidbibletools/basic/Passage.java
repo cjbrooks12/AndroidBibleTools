@@ -19,12 +19,11 @@ import java.util.Collections;
 public class Passage extends AbstractVerse {
 //Data Members
 //------------------------------------------------------------------------------
-	//Data that makes up the Passage
 	protected ArrayList<Verse> verses;
 	protected String allText;
 	protected String rawText;
 
-	//Constructors
+//Constructors
 //------------------------------------------------------------------------------
     public Passage(Reference reference) {
         super(reference);
@@ -34,7 +33,9 @@ public class Passage extends AbstractVerse {
 		for(Integer verseNum : this.reference.verses) {
 			this.verses.add(new Verse(
 					new Reference.Builder()
-					.setBook(this.reference.book).setChapter(this.reference.chapter).setVerses(verseNum).create()));
+                        .setBook(this.reference.book)
+                        .setChapter(this.reference.chapter)
+                        .setVerses(verseNum).create()));
 		}
     }
 

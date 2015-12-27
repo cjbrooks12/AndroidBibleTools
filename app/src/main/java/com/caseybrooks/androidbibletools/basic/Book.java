@@ -6,46 +6,48 @@ public class Book {
 	private int location;
 	private int[] chapters;
 
+    public void setName(String name) { this.name = name; }
 	public String getName() { return name; }
+
+	public void setAbbreviation(String abbreviation) { this.abbreviation = abbreviation; }
 	public String getAbbreviation() { return abbreviation; }
+
+	public void setLocation(int location) { this.location = location; }
 	public int getLocation() { return location; }
 
-	public void setName(String name) { this.name = name; }
-	public void setAbbreviation(String abbreviation) { this.abbreviation = abbreviation; }
-	public void setLocation(int location) { this.location = location; }
-
-	public int[] getChapters() { return chapters; }
 	public void setChapters(int... chapters) { this.chapters = chapters; }
+	public int[] getChapters() { return chapters; }
 
 	/**
 	 * Get the number of chapters in this Book
 	 *
-	 * @return the number of chapters in this Book
+	 * @return the number of chapters in this Book, or -1 if chapters is null
 	 */
 	public int numChapters() {
-		return chapters.length;
+		return (chapters != null) ? chapters.length : -1;
 	}
 
 	/**
 	 * Get the number of verses in the specified chapter of this Book
 	 *
 	 * @param chapter the specified chapter
-	 * @return the number of verses in this chapter
+	 * @return the number of verses in this chapter, or -1 if something went wrong
 	 */
 	public int numVersesInChapter(int chapter) {
-		if(chapter <= chapters.length && chapter != 0) {
-			return chapters[chapter - 1];
-		}
-		else return -1;
+        if( (chapters != null) &&
+            (chapters.length != 0) &&
+            (chapter > 0) &&
+            (chapter <= chapters.length)) return chapters[chapter - 1];
+        else return -1;
 	}
 
 	/**
 	 * Get the last verse in this Book. Equivalent to numVersesinChapter(numChapters() - 1)
 	 *
-	 * @return the last verse in this book
+	 * @return the last verse in this book, or -1 if chapters is null or empty
 	 */
 	public int lastVerseInBook() {
-		return chapters[chapters.length - 1];
+		return (chapters != null && chapters.length > 0) ? chapters[chapters.length - 1] : -1;
 	}
 
 	/**

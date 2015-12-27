@@ -2,6 +2,7 @@ package com.caseybrooks.androidbibletools.ABSTest;
 
 import android.util.Log;
 
+import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.basic.Book;
 import com.caseybrooks.androidbibletools.basic.Reference;
 import com.caseybrooks.androidbibletools.io.PrivateKeys;
@@ -13,11 +14,13 @@ import junit.framework.TestCase;
 
 import org.jsoup.nodes.Document;
 
+import java.util.HashMap;
+
 public class DownloadingTest extends TestCase {
 	public void testDownloadingVerse() throws Throwable {
 		ABSBible baseBible = new ABSBible(PrivateKeys.API_KEY, "eng-ESV");
 		assertTrue(baseBible.isAvailable());
-//		baseBible.parseDocument(baseBible.getDocument());
+		baseBible.parseDocument(baseBible.getDocument());
 
 		for(Book book : baseBible.getBooks()) {
 			Log.e("", book.toString());
@@ -67,30 +70,30 @@ public class DownloadingTest extends TestCase {
 		assertEquals("Porque por medio de la ley yo he muerto a la ley, a fin de vivir para Dios. Con Cristo he sido crucificado, y ya no soy yo quien vive, sino que es Cristo quien vive en mí. Y la vida que ahora vivo en el cuerpo, la vivo por mi fe en el Hijo de Dios, que me amó y se entregó a la muerte por mí. No quiero rechazar la bondad de Dios; pues si se obtuviera la justicia por medio de la ley, Cristo habría muerto inútilmente.", brandNewPassage.getText());
 	}
 
-//	public void testGettingVersionsList() throws Throwable {
-//		Document availableVersions = ABSBible.availableVersionsDoc(PrivateKeys.API_KEY, null);
-//		HashMap<String, String> availableLanguages = ABSBible.getAvailableLanguages(availableVersions);
-//
-//		assertNotNull(availableLanguages);
-//		Log.i("No. Available Langs", availableLanguages.size() + " languages");
-//
-//		String langKey = "English (US)";
-//		if(availableLanguages.containsKey(langKey)) {
-//			HashMap<String, Bible> versionsList = ABSBible.parseAvailableVersions(availableVersions);
-//
-//			assertNotNull(versionsList);
-//			Log.i("No. Versions", versionsList.size() + " versions in " + availableLanguages.get(langKey));
-//
-//			ABSBible esv = (ABSBible) versionsList.get("ESV");
-//			assertNotNull(esv);
-//
-//			esv.parseDocument(esv.getDocument());
-//
-//			Book galatians = esv.parseBook("Galatians");
-//			assertNotNull(galatians);
-//			assertEquals("Galatians", galatians.getName());
-//			assertEquals("Gal", galatians.getAbbreviation());
-//			assertEquals(48, galatians.getLocation());
-//		}
-//	}
+	public void testGettingVersionsList() throws Throwable {
+		Document availableVersions = ABSBible.availableVersionsDoc(PrivateKeys.API_KEY, null);
+		HashMap<String, String> availableLanguages = ABSBible.getAvailableLanguages(availableVersions);
+
+		assertNotNull(availableLanguages);
+		Log.i("No. Available Langs", availableLanguages.size() + " languages");
+
+		String langKey = "English (US)";
+		if(availableLanguages.containsKey(langKey)) {
+			HashMap<String, Bible> versionsList = ABSBible.parseAvailableVersions(availableVersions);
+
+			assertNotNull(versionsList);
+			Log.i("No. Versions", versionsList.size() + " versions in " + availableLanguages.get(langKey));
+
+			ABSBible esv = (ABSBible) versionsList.get("ESV");
+			assertNotNull(esv);
+
+			esv.parseDocument(esv.getDocument());
+
+			Book galatians = esv.parseBook("Galatians");
+			assertNotNull(galatians);
+			assertEquals("Galatians", galatians.getName());
+			assertEquals("Gal", galatians.getAbbreviation());
+			assertEquals(48, galatians.getLocation());
+		}
+	}
 }

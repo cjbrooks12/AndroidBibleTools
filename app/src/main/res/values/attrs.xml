@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="abt_verseview">
+        <attr name="verse_api_key" format="string" />
+        <attr name="reference_picker" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="abt_biblepicker">
+        <attr name="bible_api_key" format="string" />
+        <attr name="bible_provider_class" format="string" />
+        <attr name="bible_preference_key" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="abt_referencepicker">
+    </declare-styleable>
+</resources>

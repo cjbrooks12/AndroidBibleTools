@@ -9,11 +9,11 @@ public class TokenStream {
 
 	public TokenStream(String expression) {
 		String toParse = expression.replaceAll("\\s+", "~");
-		chars = new LinkedList<Character>();
+		chars = new LinkedList<>();
 		for(int i = 0; i < toParse.length(); i++) {
 			chars.add(toParse.charAt(i));
 		}
-		ungetTokens = new Stack<Token>();
+		ungetTokens = new Stack<>();
 	}
 
 	public Token get() {
@@ -71,18 +71,7 @@ public class TokenStream {
 					// nonword characters that may have gotten through the above lexing cases
 					s = s.replaceAll("\\W", "");
 
-//					if (s.equalsIgnoreCase("through")) {
-//						return new Token(Token.Type.DASH, s);
-//					}
-//					else if (s.equalsIgnoreCase("to")) {
-//						return new Token(Token.Type.DASH, s);
-//					}
-//					else if (s.equalsIgnoreCase("and")) {
-//						return new Token(Token.Type.COMMA, s);
-//					}
-//					else {
-						return new Token(Token.Type.WORD, s);
-//					}
+                    return new Token(Token.Type.WORD, s);
 				}
 			} else {
 				return null;

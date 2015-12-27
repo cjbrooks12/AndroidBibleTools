@@ -72,7 +72,7 @@ public class BiblePickerSettings {
 
             if (bible instanceof Downloadable) {
                 String filename = "selectedBible.xml";
-                Document doc = ABTUtility.getChachedDocument(context, filename, ABTUtility.CacheTimeout.Never.millis);
+                Document doc = ABTUtility.getCachedDocument(context, filename, ABTUtility.CacheTimeout.Never.millis);
 
                 if (doc != null) {
                     ((Downloadable) bible).parseDocument(doc);

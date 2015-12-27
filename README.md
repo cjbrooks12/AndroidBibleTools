@@ -18,6 +18,11 @@ This library solves that problem. By making it dead-simple to share verses to ot
 
 ...
 
+## Current Status
+This library is still very-much unfinished. Many of the low-level APIs are finished, but they are a bit clunky to use at a higher level, and the higher-level APIs are either non-existant, or will undergo significant refactoring before release. Use with caution.
+
+That being said, many of the desired aspects work quite well. The low-level infrastructure works just as I like, there are numerous UI widgets that make working with Bible verses quite easy. Through these widgets, references can be parsed easily and powerfully, the text for verses can be downloaded, and the downloads can be cached automatically. It really works quite well, but just know that you will have to deal with breaking API changes as progress continues. 
+
 ## Include in your project 
 #### Gradle
 This library uses Jitpack to distribute the release sources. To use, you must add the Jitpack repository to your top-level build.gradle file.
@@ -31,13 +36,13 @@ repositories {
 Add the following to your module's build.gradle file:
 ```groovy
 dependencies {
-    compile 'com.github.cjbrooks12:AndroidBibleTools:0.1.0@aar'
+    compile 'com.github.cjbrooks12:AndroidBibleTools:0.2.25@aar'
 }
 ```
 
 And that's it!  You can see it's usage in my other apps [Scripture Now!](https://github.com/cjbrooks12/scripturememory) and [OpenBible.info for Android](https://github.com/cjbrooks12/openbible), or in the project included here abttestapp. The code in Scripture Now will likely be the most recent of the three, but the code in the test app will probably be the most accessible.
 
-[Learn more about Jitpack](https://jitpack.io/#cjbrooks12/AndroidBibleTools/0.1.0)
+[Learn more about Jitpack](https://jitpack.io/#cjbrooks12/AndroidBibleTools/0.2.25)
 
 ###Eclipse
 You will have to manually download the repository as a zip and include it yourself.

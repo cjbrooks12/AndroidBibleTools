@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.caseybrooks.androidbibletools.basic.AbstractVerse;
 import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.basic.Reference;
+import com.caseybrooks.androidbibletools.io.PrivateKeys;
 import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
 import com.caseybrooks.androidbibletools.widget.IReferencePickerListener;
 import com.caseybrooks.androidbibletools.widget.IVerseViewListener;
@@ -85,7 +86,7 @@ public class FragmentTwo extends Fragment implements IReferencePickerListener, I
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if(item.getItemId() == R.id.action_show_bibles) {
-			BiblePickerDialog.create(context).show();
+			BiblePickerDialog.create(context, PrivateKeys.API_KEY, "KEYYYY").show();
 			return true;
 		}
 		if(item.getItemId() == R.id.action_refresh) {

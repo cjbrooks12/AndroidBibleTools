@@ -43,6 +43,7 @@ public class BiblePickerPreference extends DialogPreference implements OnBibleSe
         builder.setPositiveButton(null, null);
 	}
 
+
 	@Override
 	protected View onCreateDialogView() {
 		picker = new BiblePicker(getContext());

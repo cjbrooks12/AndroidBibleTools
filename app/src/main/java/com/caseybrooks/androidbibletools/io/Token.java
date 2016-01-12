@@ -33,6 +33,8 @@ public class Token {
 	}
 
 	public String getStringValue() { return stringValue; }
+
 	public int getIntValue() { return intValue; }
+
 	public boolean equals(Type type) { return this.type == type; }
 }

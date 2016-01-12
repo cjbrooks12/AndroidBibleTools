@@ -1,90 +1,95 @@
 package com.androidbibletools.abttestapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
+import com.caseybrooks.androidbibletools.ABT;
 
-public class MainActivity extends ActionBarActivity
-		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-
-	/**
-	 * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-	 */
-	private NavigationDrawerFragment mNavigationDrawerFragment;
-
-	/**
-	 * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-	 */
-	private CharSequence mTitle;
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 
-		mNavigationDrawerFragment = (NavigationDrawerFragment)
-				getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-		mTitle = getTitle();
+		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+				this,
+				drawer,
+				toolbar,
+				R.string.navigation_drawer_open,
+				R.string.navigation_drawer_close
+		);
+		drawer.setDrawerListener(toggle);
+		toggle.syncState();
 
-		// Set up the drawer.
-		mNavigationDrawerFragment.setUp(
-				R.id.navigation_drawer,
-				(DrawerLayout) findViewById(R.id.drawer_layout));
+		ABT.getInstance(this)
+		   .getMetadata().putString("ABS_ApiKey", "mDaM8REZFo6itplNpcv1ls8J5PkwEz1wbhJ7p9po");
+
+		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+		navigationView.setNavigationItemSelectedListener(this);
+
+		navigationView.setCheckedItem(R.id.nav_bibles);
+		getSupportFragmentManager()
+				.beginTransaction()
+				.replace(R.id.container, FragmentOne.newInstance())
+				.addToBackStack(null)
+				.commit();
 	}
 
 	@Override
-	public void onNavigationDrawerItemSelected(int position) {
-		// update the main content by replacing fragments
-		FragmentManager fragmentManager = getSupportFragmentManager();
+	public void onBackPressed() {
+		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		if(drawer.isDrawerOpen(GravityCompat.START)) {
+			drawer.closeDrawer(GravityCompat.START);
+		}
+		else {
+			super.onBackPressed();
+		}
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(MenuItem item) {
+		int id = item.getItemId();
 
 		Fragment fragment;
 
-		switch(position) {
-		case 0:
+		if(id == R.id.nav_bibles) {
 			fragment = FragmentOne.newInstance();
-			break;
-		case 1:
+		}
+		else if(id == R.id.nav_verses) {
 			fragment = FragmentTwo.newInstance();
-			break;
-		case 2:
+		}
+		else if(id == R.id.nav_verseview) {
 			fragment = FragmentThree.newInstance();
-			break;
-		default:
-			fragment = FragmentOne.newInstance();
-			break;
+		}
+		else if(id == R.id.nav_settings) {
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+			return true;
+		}
+		else {
+			return false;
 		}
 
-		fragmentManager.beginTransaction()
+		getSupportFragmentManager()
+				.beginTransaction()
 				.replace(R.id.container, fragment)
+				.addToBackStack(null)
 				.commit();
-		onSectionAttached(position);
-	}
 
-	public void onSectionAttached(int number) {
-		switch(number) {
-		case 0:
-			mTitle = "Section 1";
-			break;
-		case 1:
-			mTitle = "Bible";
-			break;
-		case 2:
-			mTitle = "Section 3";
-			break;
-		default:
-			mTitle = "Default";
-			break;
-		}
-	}
-
-	public void restoreActionBar() {
-		ActionBar actionBar = getSupportActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		actionBar.setDisplayShowTitleEnabled(true);
-		actionBar.setTitle(mTitle);
+		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		drawer.closeDrawer(GravityCompat.START);
+		return true;
 	}
 }

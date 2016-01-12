@@ -2,9 +2,8 @@ package com.caseybrooks.androidbibletools.providers.abs;
 
 import android.util.Base64;
 
-import com.caseybrooks.androidbibletools.basic.Verse;
-import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.basic.Reference;
+import com.caseybrooks.androidbibletools.basic.Verse;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,7 +11,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
-public class ABSVerse extends Verse implements Downloadable {
+public class ABSVerse extends Verse {
 	protected final String id;
 	protected final String APIKey;
 
@@ -33,16 +32,22 @@ public class ABSVerse extends Verse implements Downloadable {
 		return id;
 	}
 
+	public String getData() throws IOException {
+		return null;
+	}
+
+	public boolean parseData(String data) {
+		return false;
+	}
+
 	public String getAPIKey() {
 		return APIKey;
 	}
 
-	@Override
 	public boolean isAvailable() {
 		return APIKey != null && id != null;
 	}
 
-	@Override
 	public Document getDocument() throws IOException {
 		String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/chapters/" +
 				id + "/verses.xml?include_marginalia=false";
@@ -53,7 +58,6 @@ public class ABSVerse extends Verse implements Downloadable {
 		return Jsoup.connect(url).header("Authorization", "Basic " + encodedHeader).get();
 	}
 
-	@Override
 	public boolean parseDocument(Document doc) {
 		String id_base = doc.select("verse").attr("id");
 		String[] id_split = id_base.split("\\.");
@@ -63,7 +67,9 @@ public class ABSVerse extends Verse implements Downloadable {
 		}
 		else {
 			String s = "";
-			for(String ss : id_split) s += ss + " ";
+			for(String ss : id_split) {
+				s += ss + " ";
+			}
 			setText("split not correct " + s);
 			return false;
 		}

@@ -1,7 +1,6 @@
 package com.caseybrooks.androidbibletools.providers.openbible;
 
 import com.caseybrooks.androidbibletools.basic.Passage;
-import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.basic.Reference;
 
 import org.jsoup.Jsoup;
@@ -12,7 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TopicalSearch implements Downloadable {
+public class TopicalSearch {
 	private String topic;
 	private ArrayList<Passage> verses;
 
@@ -21,23 +20,23 @@ public class TopicalSearch implements Downloadable {
 		verses = new ArrayList<>();
 	}
 
-	@Override
 	public boolean isAvailable() {
 		return true;
 	}
 
-	@Override
-	public String getId() {
-		return "";
+	public String getData() throws IOException {
+		return null;
 	}
 
-	@Override
+	public boolean parseData(String data) {
+		return false;
+	}
+
 	public Document getDocument() throws IOException {
 		String query = "http://www.openbible.info/topics/" + topic.trim().replaceAll(" ", "_");
 		return Jsoup.connect(query).get();
 	}
 
-	@Override
 	public boolean parseDocument(Document doc) {
 		Elements passages = doc.select(".verse");
 
@@ -50,7 +49,8 @@ public class TopicalSearch implements Downloadable {
 			passage.setText(element.select("p").text());
 
 			String notesString = element.select(".note").first().ownText();
-			passage.getMetadata().putInt("UPVOTES", Integer.parseInt(notesString.replaceAll("\\D", "")));
+			passage.getMetadata()
+			       .putInt("UPVOTES", Integer.parseInt(notesString.replaceAll("\\D", "")));
 			passage.getMetadata().putString("SEARCH_TERM", topic.trim());
 
 			verses.add(passage);

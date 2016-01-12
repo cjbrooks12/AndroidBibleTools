@@ -4,21 +4,17 @@ import com.caseybrooks.androidbibletools.basic.Reference;
 
 import java.util.ArrayList;
 
-/** The class used to parse a String into Reference objects. Uses the following grammar
- *
- * Passage ::= book (punctuation) chapter ((punctuation) verseList)
- * Verse ::= book (punctuation) chapter (punctuation) verse
- *
- * number ::= { [0..9] }
- * word ::= { [a..zA..Z] }
- * punctuation ::= [;:,.-\/]
- *
- * book ::= ([123]) word+
- * chapter ::= number
- * verse ::= number
- *
- * verseSequence ::= verse punctuation verse
- * verseList ::= { [verse | verseSequence] punctuation }
+/**
+ * The class used to parse a String into Reference objects. Uses the following grammar
+ * <p/>
+ * Passage ::= book (punctuation) chapter ((punctuation) verseList) Verse ::= book (punctuation)
+ * chapter (punctuation) verse
+ * <p/>
+ * number ::= { [0..9] } word ::= { [a..zA..Z] } punctuation ::= [;:,.-\/]
+ * <p/>
+ * book ::= ([123]) word+ chapter ::= number verse ::= number
+ * <p/>
+ * verseSequence ::= verse punctuation verse verseList ::= { [verse | verseSequence] punctuation }
  */
 
 public class ReferenceParser {
@@ -71,12 +67,12 @@ public class ReferenceParser {
 		//if actual token is punctuation
 		if(a != null && (
 				a.equals(Token.Type.COLON) ||
-				a.equals(Token.Type.SEMICOLON) ||
-				a.equals(Token.Type.COMMA) ||
-				a.equals(Token.Type.DOT) ||
-				a.equals(Token.Type.DASH) ||
-				a.equals(Token.Type.SLASH) ||
-				a.equals(Token.Type.BACKSLASH))) {
+						a.equals(Token.Type.SEMICOLON) ||
+						a.equals(Token.Type.COMMA) ||
+						a.equals(Token.Type.DOT) ||
+						a.equals(Token.Type.DASH) ||
+						a.equals(Token.Type.SLASH) ||
+						a.equals(Token.Type.BACKSLASH))) {
 
 			return true;
 		}
@@ -173,8 +169,11 @@ public class ReferenceParser {
 			Token dash = ts.get();
 			if(dash != null &&
 					(dash.equals(Token.Type.DASH) ||
-					(dash.equals(Token.Type.WORD) && dash.getStringValue().equalsIgnoreCase("through")) ||
-					(dash.equals(Token.Type.WORD) && dash.getStringValue().equalsIgnoreCase("to")))) {
+							(dash.equals(Token.Type.WORD) && dash.getStringValue().equalsIgnoreCase(
+									"through"
+							)) ||
+							(dash.equals(Token.Type.WORD) && dash.getStringValue()
+							                                     .equalsIgnoreCase("to")))) {
 
 				Token b = ts.get();
 				if(b != null && b.equals(Token.Type.NUMBER) && b.getIntValue() > 0) {
@@ -206,14 +205,14 @@ public class ReferenceParser {
 
 	//verseList ::= { [verse | verseSequence] comma }
 	private void verseList() {
-		while (true) {
-			if (!verseSequence()) {
+		while(true) {
+			if(!verseSequence()) {
 				if(!verse()) {
 					return;
 				}
 			}
 
-			if (!punctuation()) {
+			if(!punctuation()) {
 				return;
 			}
 		}

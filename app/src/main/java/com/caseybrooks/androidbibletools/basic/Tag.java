@@ -14,14 +14,18 @@ public class Tag implements Comparable<Tag> {
 	}
 
 	public Tag(String name) {
-		if(name != null && name.length() > 0) this.name = name;
+		if(name != null && name.length() > 0) {
+			this.name = name;
+		}
 		this.id = 0;
 		this.color = 0;
 		this.count = 0;
 	}
 
 	public Tag(String name, int id, int color, int count) {
-		if(name != null && name.length() > 0) this.name = name;
+		if(name != null && name.length() > 0) {
+			this.name = name;
+		}
 		this.id = id;
 		this.color = color;
 		this.count = count;

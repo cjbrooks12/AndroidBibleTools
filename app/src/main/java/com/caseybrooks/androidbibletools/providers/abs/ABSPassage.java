@@ -3,9 +3,8 @@ package com.caseybrooks.androidbibletools.providers.abs;
 import android.util.Base64;
 
 import com.caseybrooks.androidbibletools.basic.Passage;
-import com.caseybrooks.androidbibletools.basic.Verse;
-import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.basic.Reference;
+import com.caseybrooks.androidbibletools.basic.Verse;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,13 +12,22 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
-public class ABSPassage extends Passage implements Downloadable {
+public class ABSPassage extends Passage {
 	protected final String APIKey;
 	protected final String id;
 
 	public String getId() {
 		return id;
 	}
+
+	public String getData() throws IOException {
+		return null;
+	}
+
+	public boolean parseData(String data) {
+		return false;
+	}
+
 	public String getAPIKey() {
 		return APIKey;
 	}
@@ -37,12 +45,10 @@ public class ABSPassage extends Passage implements Downloadable {
 		}
 	}
 
-	@Override
 	public boolean isAvailable() {
 		return (APIKey != null) && (id != null);
 	}
 
-	@Override
 	public Document getDocument() throws IOException {
 		if(reference != null) {
 			String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/chapters/" +
@@ -58,7 +64,6 @@ public class ABSPassage extends Passage implements Downloadable {
 		}
 	}
 
-	@Override
 	public boolean parseDocument(Document doc) {
 		String id_base = doc.select("verse").attr("id");
 		String[] id_split = id_base.split("\\.");
@@ -75,7 +80,9 @@ public class ABSPassage extends Passage implements Downloadable {
 		for(int i = 0; i < verses.size(); i++) {
 			Verse verse = verses.get(i);
 
-			Elements scripture = doc.select("verse[id=" + id_base + "." + verse.getReference().verses.get(0) + "]");
+			Elements scripture = doc.select(
+					"verse[id=" + id_base + "." + verse.getReference().verses.get(0) + "]"
+			);
 
 			String verseRawText = scripture.select("text").text();
 			verse.setRawText(verseRawText);

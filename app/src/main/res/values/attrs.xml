@@ -6,9 +6,8 @@
     </declare-styleable>
 
     <declare-styleable name="abt_biblepicker">
-        <attr name="bible_api_key" format="string" />
-        <attr name="bible_provider_class" format="string" />
-        <attr name="bible_preference_key" format="string" />
+        <attr name="bibleList" format="string" />
+        <attr name="tag" format="string" />
     </declare-styleable>
 
     <declare-styleable name="abt_referencepicker">

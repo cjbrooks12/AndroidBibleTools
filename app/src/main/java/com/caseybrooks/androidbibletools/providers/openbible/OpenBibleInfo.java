@@ -12,15 +12,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class OpenBibleInfo {
-    public static ArrayList<Passage> getVersesFromTopic(String topic) throws IOException {
-        ArrayList<Passage> verses = new ArrayList<Passage>();
+	public static ArrayList<Passage> getVersesFromTopic(String topic) throws IOException {
+		ArrayList<Passage> verses = new ArrayList<Passage>();
 
-        String query = "http://www.openbible.info/topics/" + topic.trim().replaceAll(" ", "_");
+		String query = "http://www.openbible.info/topics/" + topic.trim().replaceAll(" ", "_");
 
-        Document doc = Jsoup.connect(query).get();
-        Elements passages = doc.select(".verse");
+		Document doc = Jsoup.connect(query).get();
+		Elements passages = doc.select(".verse");
 
-        for(Element element : passages) {
+		for(Element element : passages) {
 			Reference ref = new Reference.Builder()
 					.parseReference(element.select(".bibleref").first().ownText())
 					.create();
@@ -29,27 +29,28 @@ public class OpenBibleInfo {
 			passage.setText(element.select("p").text());
 
 			String notesString = element.select(".note").first().ownText();
-			passage.getMetadata().putInt("UPVOTES", Integer.parseInt(notesString.replaceAll("\\D", "")));
+			passage.getMetadata()
+			       .putInt("UPVOTES", Integer.parseInt(notesString.replaceAll("\\D", "")));
 			passage.getMetadata().putString("SEARCH_TERM", topic.trim());
 
 			verses.add(passage);
-        }
+		}
 
-        return verses;
-    }
+		return verses;
+	}
 
-    public static  ArrayList<String> getSuggestions(char letter) throws IOException {
-        ArrayList<String> verses = new ArrayList<String>();
+	public static ArrayList<String> getSuggestions(char letter) throws IOException {
+		ArrayList<String> verses = new ArrayList<String>();
 
-        String query = "http://www.openbible.info/topics/" + letter;
+		String query = "http://www.openbible.info/topics/" + letter;
 
-        Document doc = Jsoup.connect(query).get();
-        Elements passages = doc.select("li");
+		Document doc = Jsoup.connect(query).get();
+		Elements passages = doc.select("li");
 
-        for (Element element : passages) {
-            verses.add(element.text());
-        }
+		for(Element element : passages) {
+			verses.add(element.text());
+		}
 
-        return verses;
-    }
+		return verses;
+	}
 }

@@ -13,7 +13,7 @@ import java.util.Collections;
 
 public class MetadataTest extends ApplicationTestCase<Application> {
 //Dummy classes to ensure only Comparable types are allowed in the
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 	private class ComparableClass implements Comparable<ComparableClass> {
 		public int value;
 

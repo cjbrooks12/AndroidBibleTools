@@ -1,0 +1,9 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.caseybrooks.androidbibletools.widget.BiblePickerPreference
+        android:key="ABSBibleList"
+        app:bibleList="com.caseybrooks.androidbibletools.providers.abs.ABSBibleList"
+        android:title="Bible Picker Preference"/>
+
+</PreferenceScreen>

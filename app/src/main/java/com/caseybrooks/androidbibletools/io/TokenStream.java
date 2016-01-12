@@ -18,14 +18,14 @@ public class TokenStream {
 
 	public Token get() {
 		try {
-			if (ungetTokens.size() > 0) {
+			if(ungetTokens.size() > 0) {
 				return ungetTokens.pop();
 			}
-			else if (chars.size() > 0) {
+			else if(chars.size() > 0) {
 				char ch = chars.removeFirst();
 				String s;
 
-				switch (ch) {
+				switch(ch) {
 				case '~':
 					return get();
 				case ':':
@@ -54,16 +54,16 @@ public class TokenStream {
 				case '9':
 					s = "";
 					s += ch;
-					while (chars.size() > 0 && chars.getFirst() != null &&
-								   Character.isDigit(chars.getFirst())) {
+					while(chars.size() > 0 && chars.getFirst() != null &&
+							Character.isDigit(chars.getFirst())) {
 						s += chars.removeFirst();
 					}
 					return new Token(Token.Type.NUMBER, Integer.parseInt(s));
 				default:
 					s = "";
 					s += ch;
-					while (chars.size() > 0 && chars.getFirst() != null &&
-								   Character.isLetter(chars.getFirst())) {
+					while(chars.size() > 0 && chars.getFirst() != null &&
+							Character.isLetter(chars.getFirst())) {
 						s += chars.removeFirst();
 					}
 
@@ -71,9 +71,10 @@ public class TokenStream {
 					// nonword characters that may have gotten through the above lexing cases
 					s = s.replaceAll("\\W", "");
 
-                    return new Token(Token.Type.WORD, s);
+					return new Token(Token.Type.WORD, s);
 				}
-			} else {
+			}
+			else {
 				return null;
 			}
 		}

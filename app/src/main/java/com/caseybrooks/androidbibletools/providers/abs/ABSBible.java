@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.caseybrooks.androidbibletools.ABT;
 import com.caseybrooks.androidbibletools.basic.Bible;
+import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.defaults.DefaultBible;
 import com.caseybrooks.androidbibletools.io.CachingStringRequest;
@@ -25,7 +26,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ABSBible extends Bible<ABSBook> implements Response.Listener<String>, Response.ErrorListener {
+public class ABSBible extends Bible<ABSBook> implements Downloadable, Response.Listener<String>, Response.ErrorListener {
 //Data Members
 //--------------------------------------------------------------------------------------------------
 	protected String APIKey;
@@ -85,6 +86,7 @@ public class ABSBible extends Bible<ABSBook> implements Response.Listener<String
 		return APIKey != null && id != null;
 	}
 
+	@Override
 	public void download(OnResponseListener listener) {
 		APIKey = ABT.getInstance().getMetadata().getString("ABS_ApiKey", null);
 

@@ -3,6 +3,7 @@ package com.caseybrooks.androidbibletools;
 import android.test.AndroidTestCase;
 
 import com.caseybrooks.androidbibletools.basic.Bible;
+import com.caseybrooks.androidbibletools.basic.Book;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBibleList;
@@ -61,6 +62,11 @@ public class BiblesTest extends AndroidTestCase {
 			public void responseFinished() {
 				assertTrue(bible.getName().equals("New American Standard Bible"));
 				assertEquals(bible.getBooks().size(), 66);
+				Book matthew = bible.getBooks().get(39);
+
+				assertEquals(matthew.getName(), "Matthew");
+				assertEquals(matthew.numChapters(), 28);
+				assertEquals(matthew.numVersesInChapter(28), 20);
 
 				signal.countDown();
 			}

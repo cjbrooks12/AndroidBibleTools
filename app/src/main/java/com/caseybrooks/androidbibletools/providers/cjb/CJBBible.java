@@ -7,6 +7,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.caseybrooks.androidbibletools.ABT;
 import com.caseybrooks.androidbibletools.basic.Bible;
+import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.defaults.DefaultBible;
 import com.caseybrooks.androidbibletools.io.CachingStringRequest;
@@ -18,7 +19,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 
-public class CJBBible extends Bible<CJBBook> implements Response.Listener<String>, Response.ErrorListener {
+public class CJBBible extends Bible<CJBBook> implements Downloadable, Response.Listener<String>, Response.ErrorListener {
 //Data Members
 //--------------------------------------------------------------------------------------------------
 	protected String service;
@@ -148,6 +149,7 @@ public class CJBBible extends Bible<CJBBook> implements Response.Listener<String
 		return service != null && id != null;
 	}
 
+	@Override
 	public void download(OnResponseListener listener) {
 		this.listener = listener;
 

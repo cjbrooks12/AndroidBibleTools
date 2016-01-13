@@ -99,7 +99,7 @@ public class Verse extends AbstractVerse {
 		String text = "";
 
 		text += formatter.onPreFormat(reference);
-		text += formatter.onFormatVerseStart(reference.verses.get(0));
+		text += formatter.onFormatVerseStart(reference.getVerses().get(0));
 		text += formatter.onFormatText(verseText);
 		text += formatter.onPostFormat();
 

@@ -1,42 +1,37 @@
-<ScrollView
+<LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:layout_marginLeft="8dp"
-	android:layout_marginRight="8dp"
-	android:layout_marginBottom="8dp"
-	android:layout_marginTop="8dp">
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:weightSum="2">
+        <Button
+            android:id="@+id/biblepickerButtonDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="Bible Picker Dialog"/>
+        <Button
+            android:id="@+id/biblepickerButtonFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="Bible Picker Fragment"/>
+    </LinearLayout>
+    <com.caseybrooks.androidbibletools.widget.BiblePicker
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:bp_bibleList="com.caseybrooks.androidbibletools.providers.abs.ABSBibleList"
+        app:bp_tag="ABSBibleList"/>
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical">
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:weightSum="2">
-			<Button
-				android:id="@+id/biblepickerButtonDialog"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:gravity="center"
-				android:layout_weight="1"
-				android:text="Bible Picker Dialog"/>
-			<Button
-				android:id="@+id/biblepickerButtonFragment"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:gravity="center"
-				android:layout_weight="1"
-				android:text="Bible Picker Fragment"/>
-		</LinearLayout>
-		<com.caseybrooks.androidbibletools.widget.BiblePicker
-			android:layout_width="match_parent"
-			android:layout_height="480dp"
-			app:bibleList="com.caseybrooks.androidbibletools.providers.abs.ABSBibleList"
-            app:tag="ABSBibleList"/>
-	</LinearLayout>
-
-</ScrollView>
+</LinearLayout>

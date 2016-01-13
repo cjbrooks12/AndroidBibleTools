@@ -18,9 +18,9 @@ import java.util.Collections;
  * always take first verse in a Passage reference.
  */
 public final class Reference implements Comparable<Reference> {
-	public final Book book;
-	public final int chapter;
-	public final ArrayList<Integer> verses;
+	private final Book book;
+	private final int chapter;
+	private final ArrayList<Integer> verses;
 
 //Make constructors private. Force caller to use of the static initializer methods
 //--------------------------------------------------------------------------------------------------
@@ -45,6 +45,20 @@ public final class Reference implements Comparable<Reference> {
 
 //static initializer methods
 //--------------------------------------------------------------------------------------------------
+	public Book getBook() {
+		return book;
+	}
+
+	public int getChapter() {
+		return chapter;
+	}
+
+	public ArrayList<Integer> getVerses() {
+		return verses;
+	}
+
+//static initializer methods
+//--------------------------------------------------------------------------------------------------
 
 	/**
 	 * Builder class to aid in creating a reference, especially when working with user input. The
@@ -61,6 +75,7 @@ public final class Reference implements Comparable<Reference> {
 		public static int DEFAULT_BOOK_FLAG = 0x2;
 		public static int DEFAULT_CHAPTER_FLAG = 0x4;
 		public static int DEFAULT_VERSES_FLAG = 0x8;
+		public static int PREVENT_AUTO_ADD_VERSES_FLAG = 0x10;
 
 		private int flags = 0;
 
@@ -72,6 +87,18 @@ public final class Reference implements Comparable<Reference> {
 
 		public Builder() {
 			verses = new ArrayList<>();
+		}
+
+		public Book getBook() {
+			return book;
+		}
+
+		public int getChapter() {
+			return chapter;
+		}
+
+		public ArrayList<Integer> getVerses() {
+			return verses;
 		}
 
 		/**
@@ -296,30 +323,32 @@ public final class Reference implements Comparable<Reference> {
 			if(verses == null || verses.size() == 0) {
 				setFlag(DEFAULT_VERSES_FLAG);
 
-				//no verses, but chapter was given.
-				if(chapter != 0) {
-					//book has a count of the chapters, so add all verses in that chapter
-					if(book.getChapters() != null && book.getChapters().length > 0) {
-						int verseCount = book.numVersesInChapter(chapter);
+				if(!checkFlag(PREVENT_AUTO_ADD_VERSES_FLAG)) {
+					//no verses, but chapter was given.
+					if(chapter != 0) {
+						//book has a count of the chapters, so add all verses in that chapter
+						if(book.getChapters() != null && book.getChapters().length > 0) {
+							int verseCount = book.numVersesInChapter(chapter);
 
-						this.verses = new ArrayList<>();
-						for(int i = 1; i <= verseCount; i++) {
-							this.verses.add(i);
+							this.verses = new ArrayList<>();
+							for(int i = 1; i <= verseCount; i++) {
+								this.verses.add(i);
+							}
+						}
+						//book does not have a list of the chapters, so just use use the first verse
+						else {
+							verses = new ArrayList<>();
+							verses.add(1);
 						}
 					}
-					//book does not have a list of the chapters, so just use use the first verse
+					//no verses or chapter given. Set to the first verse of the first chapter
 					else {
+						setFlag(DEFAULT_CHAPTER_FLAG);
+
+						chapter = 1;
 						verses = new ArrayList<>();
 						verses.add(1);
 					}
-				}
-				//no verses or chapter given. Set to the first verse of the first chapter
-				else {
-					setFlag(DEFAULT_CHAPTER_FLAG);
-
-					chapter = 1;
-					verses = new ArrayList<>();
-					verses.add(1);
 				}
 			}
 
@@ -353,6 +382,10 @@ public final class Reference implements Comparable<Reference> {
 	public String toString() {
 		String refString = book.getName();
 		refString += " " + chapter;
+
+		if(verses == null || verses.size() == 0)
+			return refString;
+
 		refString += ":";
 
 		refString += verses.get(0);

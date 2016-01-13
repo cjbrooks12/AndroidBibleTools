@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,15 +77,13 @@ public class BiblePicker extends LinearLayout {
 					0
 			);
 			try {
-				bibleListClass = (Class<? extends BibleList>) Class.forName(a.getString(R.styleable.abt_biblepicker_bibleList));
+				bibleListClass = (Class<? extends BibleList>) Class.forName(a.getString(R.styleable.abt_biblepicker_bp_bibleList));
 			}
 			catch(ClassNotFoundException e) {
 				bibleListClass = null;
 			}
 
-			this.tag = (!TextUtils.isEmpty(a.getString(R.styleable.abt_biblepicker_tag)))
-			           ? a.getString(R.styleable.abt_biblepicker_tag)
-			           : bibleListClass.getSimpleName();
+			this.tag = a.getString(R.styleable.abt_biblepicker_bp_tag);
 
 			a.recycle();
 		}
@@ -138,14 +137,16 @@ public class BiblePicker extends LinearLayout {
 
 	public void setBibleListClass(Class<? extends BibleList> bibleListClass, String tag) {
 		this.bibleListClass = bibleListClass;
-
-		this.tag = (!TextUtils.isEmpty(tag)) ? tag : bibleListClass.getSimpleName();
+		this.tag = tag;
 	}
 
 //Data retrieval and manipulation
 //--------------------------------------------------------------------------------------------------
 	public void loadBibleList() {
 		selectedBible = ABT.getInstance(context).getSelectedBible(tag);
+
+		if(selectedBible != null)
+			Log.i("BiblePicker", "tag=[" + tag + "] bible=[" + selectedBible.getClass().getName() + ", " + selectedBible.getId() + "]");
 
 		progressText.setText("Retrieving Bible list");
 		progressText.setVisibility(View.VISIBLE);

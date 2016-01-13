@@ -1,74 +1,53 @@
 package com.androidbibletools.abttestapp;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
-import com.caseybrooks.androidbibletools.widget.ReferencePicker;
-import com.caseybrooks.androidbibletools.widget.VerseView;
+import com.caseybrooks.androidbibletools.widget.VersePickerFragment;
 
 public class FragmentTwo extends Fragment {
-	Context context;
-
-	ReferencePicker referencePicker;
-	VerseView verseView;
-
-	private static final String settings_file = "my_settings";
-	private static final String PREFIX = "BIBLE_";
-
-	private static final String PROGRESS = "PROGRESS";
-
 	public static Fragment newInstance() {
 		Fragment fragment = new FragmentTwo();
-		Bundle extras = new Bundle();
-		fragment.setArguments(extras);
+		Bundle args = new Bundle();
+		fragment.setArguments(args);
 		return fragment;
 	}
 
-//Lifecycle and Initialization
-//--------------------------------------------------------------------------------------------------
+	Button showDialogButton, showFragmentButton;
+
+	VersePickerFragment versePickerFragment;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		super.onCreateView(inflater, container, savedInstanceState);
-		View view = inflater.inflate(R.layout.fragment_bible_reader, container, false);
+		View view = inflater.inflate(R.layout.fragment_fragment_two, container, false);
 
-		this.context = getActivity();
-		setHasOptionsMenu(true);
+		versePickerFragment = new VersePickerFragment();
+		versePickerFragment.setSelectedBibleTag(null);
 
-		referencePicker = (ReferencePicker) view.findViewById(R.id.reference_picker);
-		verseView = (VerseView) view.findViewById(R.id.verse_view);
+		showDialogButton = (Button) view.findViewById(R.id.versepickerButtonDialog);
+		showDialogButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				versePickerFragment.show(getActivity().getSupportFragmentManager(), "Sample Fragment");
+			}
+		});
+
+		showFragmentButton = (Button) view.findViewById(R.id.versepickerButtonFragment);
+		showFragmentButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getActivity().getSupportFragmentManager()
+						.beginTransaction()
+						.replace(R.id.container, versePickerFragment)
+						.addToBackStack(null)
+						.commit();
+			}
+		});
 
 		return view;
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		restoreProgress();
-	}
-
-//Preferences
-//--------------------------------------------------------------------------------------------------
-	public void saveProgress(String progress) {
-		context.getSharedPreferences(settings_file, 0)
-		       .edit()
-		       .putString(PREFIX + PROGRESS, progress)
-		       .commit();
-	}
-
-	public void restoreProgress() {
-		String progress = context.getSharedPreferences(settings_file, 0)
-		                         .getString(PREFIX + PROGRESS, "Matthew 1:1");
-
-		referencePicker.setText(progress);
 	}
 }

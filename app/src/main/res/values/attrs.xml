@@ -5,11 +5,12 @@
         <attr name="reference_picker" format="reference" />
     </declare-styleable>
 
-    <declare-styleable name="abt_biblepicker">
-        <attr name="bibleList" format="string" />
-        <attr name="tag" format="string" />
+    <declare-styleable name="abt_biblepicker" parent="abt_view">
+        <attr name="bp_tag" format="string" />
+        <attr name="bp_bibleList" format="string" />
     </declare-styleable>
 
-    <declare-styleable name="abt_referencepicker">
+    <declare-styleable name="abt_versepicker" parent="abt_view">
+        <attr name="vp_tag" format="string" />
     </declare-styleable>
 </resources>

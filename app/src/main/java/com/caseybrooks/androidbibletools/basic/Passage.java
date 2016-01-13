@@ -28,14 +28,14 @@ public class Passage extends AbstractVerse {
 	public Passage(Reference reference) {
 		super(reference);
 
-		Collections.sort(this.reference.verses);
+		Collections.sort(this.reference.getVerses());
 		this.verses = new ArrayList<>();
-		for(Integer verseNum : this.reference.verses) {
+		for(Integer verseNum : this.reference.getVerses()) {
 			this.verses.add(
 					new Verse(
 							new Reference.Builder()
-									.setBook(this.reference.book)
-									.setChapter(this.reference.chapter)
+									.setBook(this.reference.getBook())
+									.setChapter(this.reference.getChapter())
 									.setVerses(verseNum).create()
 					)
 			);
@@ -81,7 +81,7 @@ public class Passage extends AbstractVerse {
 			for(int i = 0; i < verses.size(); i++) {
 				Verse verse = verses.get(i);
 
-				text += formatter.onFormatVerseStart(verse.reference.verses.get(0));
+				text += formatter.onFormatVerseStart(verse.reference.getVerses().get(0));
 				text += formatter.onFormatText(verse.verseText);
 
 				if(i < verses.size() - 1) {

@@ -39,11 +39,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
 
-		navigationView.setCheckedItem(R.id.nav_bibles);
+		navigationView.setCheckedItem(R.id.nav_verses);
 		getSupportFragmentManager()
 				.beginTransaction()
-				.replace(R.id.container, FragmentOne.newInstance())
-				.addToBackStack(null)
+				.add(R.id.container, FragmentTwo.newInstance())
 				.commit();
 	}
 

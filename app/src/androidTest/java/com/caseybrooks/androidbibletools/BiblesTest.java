@@ -77,8 +77,7 @@ public class BiblesTest extends AndroidTestCase {
 
 	public void testABSBible() throws Throwable{
 		final CountDownLatch signal = new CountDownLatch(1);
-		ABT
-				.getInstance(getContext())
+		ABT.getInstance(getContext())
 				.getMetadata().putString("ABS_ApiKey", "mDaM8REZFo6itplNpcv1ls8J5PkwEz1wbhJ7p9po");
 
 		//verify that a Bible and required components will all extend the correct classes

@@ -1,10 +1,11 @@
-package com.caseybrooks.androidbibletools.providers.abs;
+package com.caseybrooks.androidbibletools.providers.cjb;
 
 import com.caseybrooks.androidbibletools.basic.Reference;
 import com.caseybrooks.androidbibletools.basic.Verse;
+import com.caseybrooks.androidbibletools.providers.abs.ABSBook;
 
-public class ABSVerse extends Verse {
-	public ABSVerse(Reference reference) {
+public class CJBVerse extends Verse {
+	public CJBVerse(Reference reference) {
 		super(reference);
 
 		if(reference.getBook() instanceof ABSBook) {

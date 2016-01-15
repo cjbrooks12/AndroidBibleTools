@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.caseybrooks.androidbibletools.providers.cjb.CJBBibleList;
+import com.caseybrooks.androidbibletools.widget.BiblePickerDialog;
 import com.caseybrooks.androidbibletools.widget.BiblePickerFragment;
 
 public class FragmentOne extends Fragment {
@@ -20,11 +21,15 @@ public class FragmentOne extends Fragment {
 
 	Button showDialogButton, showFragmentButton;
 
+	BiblePickerDialog biblePickerDialog;
 	BiblePickerFragment biblePickerFragment;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_fragment_one, container, false);
+
+		biblePickerDialog = new BiblePickerDialog();
+		biblePickerDialog.setBibleListClass(CJBBibleList.class, null);
 
 		biblePickerFragment = new BiblePickerFragment();
 		biblePickerFragment.setBibleListClass(CJBBibleList.class, null);
@@ -33,7 +38,7 @@ public class FragmentOne extends Fragment {
 		showDialogButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				biblePickerFragment.show(getActivity().getSupportFragmentManager(), "Sample Fragment");
+				biblePickerDialog.show(getActivity().getSupportFragmentManager(), "Sample Fragment");
 			}
 		});
 

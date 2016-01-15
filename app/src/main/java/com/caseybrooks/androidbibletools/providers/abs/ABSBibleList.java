@@ -43,12 +43,7 @@ public class ABSBibleList extends BibleList<ABSBible> implements Response.Listen
 		String tag = "ABSBibleList";
 		String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/versions.js";
 
-		CachingStringRequest jsonObjReq = new CachingStringRequest(
-				Request.Method.GET,
-				url,
-				this,
-				this
-		) {
+		CachingStringRequest jsonObjReq = new CachingStringRequest(Request.Method.GET, url, this, this) {
 			@Override
 			public Map<String, String> getHeaders() throws AuthFailureError {
 				HashMap<String, String> headers = new HashMap<String, String>();

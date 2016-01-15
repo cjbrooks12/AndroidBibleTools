@@ -8,7 +8,7 @@ import java.util.Collection;
  * have a full name, an abbreviation, which can be derived from the full name, and a list of Books
  * from which we can determine exactly where in the Bible a verse exists.
  */
-public abstract class Bible<T extends Book> {
+public abstract class Bible<T extends Book> implements Comparable<Bible> {
 //Data Members
 //--------------------------------------------------------------------------------------------------
 	protected String id;
@@ -126,5 +126,10 @@ public abstract class Bible<T extends Book> {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public int compareTo(Bible another) {
+		return this.getName().compareTo(another.getName());
 	}
 }

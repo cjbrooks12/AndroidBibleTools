@@ -148,18 +148,15 @@ public class ABSBible extends Bible<ABSBook> implements Downloadable, Response.L
 				JSONObject bookJSON = booksJSON.getJSONObject(i);
 
 				if(abbreviation == null) {
-					this.abbreviation = bookJSON.getJSONObject("parent")
-					                            .getJSONObject("version")
-					                            .getString("id")
-					                            .replaceAll(".*-", "");
+					this.abbreviation = bookJSON
+							.getJSONObject("parent")
+							.getJSONObject("version")
+							.getString("id")
+							.replaceAll(".*-", "");
 				}
 				if(name == null) {
-					this.name = bookJSON.getJSONObject("parent")
-					                    .getJSONObject("version")
-					                    .getString("name");
-					this.nameEnglish = bookJSON.getJSONObject("parent")
-					                           .getJSONObject("version")
-					                           .getString("name");
+					this.name = bookJSON.getJSONObject("parent").getJSONObject("version").getString("name");
+					this.nameEnglish = bookJSON.getJSONObject("parent").getJSONObject("version").getString("name");
 				}
 				if(copyright == null) {
 					this.copyright = bookJSON.getString("copyright");
@@ -173,18 +170,29 @@ public class ABSBible extends Bible<ABSBook> implements Downloadable, Response.L
 				book.setLocation(Integer.parseInt(bookJSON.getString("ord")));
 
 				JSONArray chapters = bookJSON.getJSONArray("chapters");
-				int[] chapterVerseCounts = new int[chapters.length()];
+				ArrayList<Integer> chapterVerseCounts = new ArrayList<>();
 				for(int j = 0; j < chapters.length(); j++) {
 					JSONObject chapterJSON = chapters.getJSONObject(j);
+					try {
+						String osis_end = chapterJSON.getString("osis_end");
+						Matcher m = Pattern.compile(".*\\.\\d+\\.(\\d+)").matcher(osis_end);
 
-					String osis_end = chapterJSON.getString("osis_end");
-					Matcher m = Pattern.compile(".*\\.\\d+\\.(\\d+)").matcher(osis_end);
-
-					if(m.find()) {
-						chapterVerseCounts[j] = Integer.parseInt(m.group(1));
+						if(m.find()) {
+							chapterVerseCounts.add(Integer.parseInt(m.group(1)));
+						}
+					}
+					catch(Exception e) {
+						e.printStackTrace();
 					}
 				}
-				book.setChapters(chapterVerseCounts);
+
+				int[] chaptersArray = new int[chapterVerseCounts.size()];
+
+				for(int j = 0; j < chapterVerseCounts.size(); j++) {
+					chaptersArray[j] = chapterVerseCounts.get(j);
+				}
+
+				book.setChapters(chaptersArray);
 
 				this.books.add(book);
 			}
@@ -206,6 +214,8 @@ public class ABSBible extends Bible<ABSBook> implements Downloadable, Response.L
 			listener.responseFinished();
 		}
 	}
+
+
 
 	@Override
 	public boolean equals(Object o) {

@@ -1,17 +1,23 @@
 package com.caseybrooks.androidbibletools.widget;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,13 +32,31 @@ import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.io.DividerItemDecoration;
 
 public class VersePicker extends LinearLayout {
+	public enum SelectionMode {
+		OneVerse("One Verse"),
+		ManyVerses("Many Verses"),
+		Chapter("Whole Chapter");
+
+		private String title;
+
+		SelectionMode(String title) {
+			this.title = title;
+		}
+
+		@Override
+		public String toString() {
+			return title;
+		}
+	}
 //Data Members
 //--------------------------------------------------------------------------------------------------
 	Context context;
 
 	Bible bible;
 	String tag;
+	TextView selectedBibleName;
 	EditText editReference;
+	Button verseSelectionModeButton;
 
 	ViewPager viewPager;
 	TabLayout tabLayout;
@@ -41,9 +65,10 @@ public class VersePicker extends LinearLayout {
 	RecyclerView bookList;
 	RecyclerView chapterList;
 	RecyclerView verseList;
-	LinearLayout verseListLayout;
 
 	Reference.Builder builder;
+
+	SelectionMode selectionMode = SelectionMode.ManyVerses;
 
 //Constructors and Initialization
 //--------------------------------------------------------------------------------------------------
@@ -74,6 +99,7 @@ public class VersePicker extends LinearLayout {
 
 		LayoutInflater.from(context).inflate(R.layout.verse_picker, this);
 
+		selectedBibleName = (TextView) findViewById(R.id.selected_bible_name);
 		editReference = (EditText) findViewById(R.id.editReference);
 
 		viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -82,7 +108,6 @@ public class VersePicker extends LinearLayout {
 		bookList = (RecyclerView) findViewById(R.id.book_list);
 		chapterList = (RecyclerView) findViewById(R.id.chapter_list);
 		verseList = (RecyclerView) findViewById(R.id.verse_list);
-		verseListLayout = (LinearLayout) findViewById(R.id.verse_list_layout);
 
 		bookList.setHasFixedSize(true);
 		chapterList.setHasFixedSize(true);
@@ -100,6 +125,44 @@ public class VersePicker extends LinearLayout {
 		chapterList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.GRID_STROKE));
 		verseList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.GRID_STROKE));
 
+		verseSelectionModeButton = (Button) findViewById(R.id.selection_mode_button);
+		verseSelectionModeButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				ArrayAdapter<SelectionMode> itemsAdapter =
+						new ArrayAdapter<SelectionMode>(
+								getContext(),
+								android.R.layout.simple_list_item_single_choice,
+								SelectionMode.values()) {
+							@Override
+							public View getView(int position, View convertView, ViewGroup parent) {
+								CheckedTextView view = (CheckedTextView) super.getView(position, convertView, parent);
+
+								if(position == selectionMode.ordinal())
+									view.setChecked(true);
+								else
+									view.setChecked(false);
+
+								return view;
+							}
+						};
+
+				new AlertDialog.Builder(getContext())
+						.setTitle("Select...")
+						.setAdapter(itemsAdapter,
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+									setSelectionMode(SelectionMode.values()[which]);
+								}
+							})
+						.create()
+						.show();
+
+			}
+		});
+
 		if(bible != null) {
 			loadBible();
 		}
@@ -113,6 +176,22 @@ public class VersePicker extends LinearLayout {
 		this.tag = tag;
 	}
 
+	public void setSelectionMode(SelectionMode selectionMode) {
+		this.selectionMode = selectionMode;
+
+		if(adapter != null) {
+			adapter.notifyDataSetChanged();
+			tabLayout.setupWithViewPager(viewPager);
+			tabLayout.getTabAt(0).select();
+		}
+
+		builder.getVerses().clear();
+		verseList.getAdapter().notifyDataSetChanged();
+		editReference.setText(builder.create().toString());
+
+		Log.i("VersePicker", "SelectionMode=[" + selectionMode.toString() + "]");
+	}
+
 	public void loadBible() {
 		bible = ABT.getInstance(context).getSelectedBible(tag);
 
@@ -124,6 +203,8 @@ public class VersePicker extends LinearLayout {
 				new OnResponseListener() {
 					@Override
 					public void responseFinished() {
+						selectedBibleName.setText("From " + bible.getName());
+
 						adapter = new VersePickerPagerAdapter();
 						viewPager.setAdapter(adapter);
 						tabLayout.setupWithViewPager(viewPager);
@@ -137,19 +218,20 @@ public class VersePicker extends LinearLayout {
 		}
 	}
 
-///TabLayout and ViewPagerAdapter
+	public Reference.Builder getReferenceBuilder() {
+		return builder;
+	}
+
+	///TabLayout and ViewPagerAdapter
 //--------------------------------------------------------------------------------------------------
 
 	class VersePickerPagerAdapter extends PagerAdapter {
 		boolean[] isRemoved = {true, true, true};
-		View[] views = {bookList, chapterList, verseListLayout};
+		View[] views = {bookList, chapterList, verseList};
 		String[] titles = {"Books", "Chapters", "Verses"};
 
 		public VersePickerPagerAdapter() {
-			ViewGroup parent = (ViewGroup) views[0].getParent();
-			parent.removeView(views[0]);
-			parent.removeView(views[1]);
-			parent.removeView(views[2]);
+			((ViewGroup) views[0].getParent()).removeAllViews();
 		}
 
 		public Object instantiateItem(ViewGroup collection, int position) {
@@ -163,7 +245,7 @@ public class VersePicker extends LinearLayout {
 
 		@Override
 		public int getCount() {
-			return 3;
+			return (selectionMode == SelectionMode.Chapter) ? 2 : 3;
 		}
 
 		@Override
@@ -212,6 +294,8 @@ public class VersePicker extends LinearLayout {
 				@Override
 				public void onClick(View v) {
 					builder.setBook(book);
+					builder.clearChapter();
+					builder.clearVerses();
 					editReference.setText(book.getName());
 
 					bookList.getAdapter().notifyDataSetChanged();
@@ -269,11 +353,18 @@ public class VersePicker extends LinearLayout {
 				public void onClick(View v) {
 					builder.setChapter(chapter);
 
-					editReference.setText(builder.getBook().getName() + " " + (chapter));
+					if(selectionMode == SelectionMode.Chapter) {
+						builder.addAllVersesInChapter();
+						editReference.setText(builder.create().toString());
+					}
+					else {
+						builder.clearVerses();
+						tabLayout.getTabAt(2).select();
+						editReference.setText(builder.create().toString());
+					}
 
 					chapterList.getAdapter().notifyDataSetChanged();
 					verseList.getAdapter().notifyDataSetChanged();
-					tabLayout.getTabAt(2).select();
 				}
 			});
 		}
@@ -325,11 +416,16 @@ public class VersePicker extends LinearLayout {
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-
-						if(!builder.getVerses().contains(Integer.valueOf(verse)))
+						if(selectionMode == SelectionMode.OneVerse) {
+							builder.getVerses().clear();
 							builder.getVerses().add(Integer.valueOf(verse));
-						else
-							builder.getVerses().remove(Integer.valueOf(verse));
+						}
+						if(selectionMode == SelectionMode.ManyVerses) {
+							if(!builder.getVerses().contains(Integer.valueOf(verse)))
+								builder.getVerses().add(Integer.valueOf(verse));
+							else
+								builder.getVerses().remove(Integer.valueOf(verse));
+						}
 
 						editReference.setText(builder.create().toString());
 						verseList.getAdapter().notifyDataSetChanged();

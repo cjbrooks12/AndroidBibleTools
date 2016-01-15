@@ -158,13 +158,7 @@ public class CJBBible extends Bible<CJBBook> implements Downloadable, Response.L
 		url += "service=" + service;
 		url += "&id=" + id;
 
-		CachingStringRequest jsonObjReq = new CachingStringRequest(
-				Request.Method.GET,
-				url,
-				this,
-				this
-		);
-
+		CachingStringRequest jsonObjReq = new CachingStringRequest(Request.Method.GET, url, this, this);
 		ABT.getInstance().addToRequestQueue(jsonObjReq, tag);
 	}
 
@@ -177,6 +171,7 @@ public class CJBBible extends Bible<CJBBook> implements Downloadable, Response.L
 		try {
 			JSONObject jsonObject = new JSONObject(response);
 			this.name = jsonObject.getString("name");
+			this.abbreviation = jsonObject.getString("abbreviation");
 			this.nameEnglish = jsonObject.getString("nameEnglish");
 			this.language = jsonObject.getString("language");
 			this.languageEnglish = jsonObject.getString("languageEnglish");

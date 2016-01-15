@@ -17,10 +17,11 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 //Data Members
 //--------------------------------------------------------------------------------------------------
 	protected Bible bible;
-	protected final Reference reference; //always points to one location in the Bible
+	protected final Reference reference;
 	protected Formatter formatter;
 	protected Metadata metadata;
 	protected TreeSet<Tag> tags;
+	protected String id;
 
 	/**
 	 * Constructor for AbstractVerse that takes a Reference object as initialization
@@ -30,7 +31,6 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	 * @see Reference
 	 */
 	public AbstractVerse(Reference reference) {
-		//		this.bible = new Bible();
 		this.reference = reference;
 		this.formatter = new DefaultFormatter();
 		this.metadata = new Metadata();
@@ -112,7 +112,15 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 		this.metadata = metadata;
 	}
 
-//Tags
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	//Tags
 //--------------------------------------------------------------------------------------------------
 	public AbstractVerse removeAllTags() {
 		tags.clear();
@@ -154,46 +162,31 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 //--------------------------------------------------------------------------------------------------
 
 	/**
-	 * Get a human-readable text representation of this verse using the set {@link
-	 * com.caseybrooks.androidbibletools.data.Formatter}. Default formatters can display the text in
-	 * various ways designed for memorization, but custom Formatters can be configured for any kind
-	 * of output, including HTML, XML, or JSON
+	 * Get a the text of this verse
 	 *
-	 * @return {@link java.lang.String}
+	 * @return {@link java.lang.String} unformatted text of the verse
 	 *
 	 * @see #setFormatter(com.caseybrooks.androidbibletools.data.Formatter)
 	 */
 	public abstract String getText();
 
 	/**
-	 * Get the raw, unparsed text for this Verse. In most cases, this will be the full verse text
-	 * provided by the API, not what's left after stripping out the HTML formatting. This is not the
-	 * HTML response, that should be taken from the Document of a downloadable verse. This is simply
-	 * the text that describes the markup of the verse without all that markup replaced.
+	 * Get a the formatted text of this verse
 	 *
-	 * @return {@link java.lang.String}
+	 * @return {@link java.lang.String} formatted text of the verse
+	 *
+	 * @see #setFormatter(com.caseybrooks.androidbibletools.data.Formatter)
 	 */
-	public abstract String getRawText();
+	public abstract String getFormattedText();
 
 //Comparison methods
 //--------------------------------------------------------------------------------------------------
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param verse the verse to compare this to
-	 *
-	 * @return the int result of comparison
-	 */
 	public abstract int compareTo(@NonNull AbstractVerse verse);
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param o the verse to compare this to
-	 *
-	 * @return the boolean result of checking for equality
-	 */
 	@Override
 	public abstract boolean equals(Object o);
+
+	@Override
+	public abstract int hashCode();
 }

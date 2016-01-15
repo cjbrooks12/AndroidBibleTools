@@ -55,7 +55,8 @@ public class CachingStringRequest extends StringRequest {
 	protected Response<String> parseNetworkResponse(NetworkResponse response) {
 		String parsed;
 		try {
-			parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+			//TODO: don't forcibly read all responses as UTF-8, but choose charset from headers
+			parsed = new String(response.data, "UTF-8");
 		}
 		catch(UnsupportedEncodingException e) {
 			parsed = new String(response.data);

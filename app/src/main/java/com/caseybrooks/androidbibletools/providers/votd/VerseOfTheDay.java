@@ -1,11 +1,9 @@
 package com.caseybrooks.androidbibletools.providers.votd;
 
 import com.caseybrooks.androidbibletools.basic.Passage;
-import com.caseybrooks.androidbibletools.basic.Tag;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
@@ -43,8 +41,8 @@ public class VerseOfTheDay {
 	}
 
 	public boolean parseDocument(Document doc) {
-		Elements scripture = doc.select(".scripture");
-		Elements verseReference = scripture.select("a");
+//		Elements scripture = doc.select(".scripture");
+//		Elements verseReference = scripture.select("a");
 
 		//		passage = new Passage(
 		//				new Reference.Builder()
@@ -53,10 +51,10 @@ public class VerseOfTheDay {
 		//				.create()
 		//		);
 
-		scripture.select(".reference").remove();
+//		scripture.select(".reference").remove();
 
-		passage.setText(scripture.text());
-		passage.setTags(new Tag("VOTD"));
+//		passage.setText(scripture.text());
+//		passage.setTags(new Tag("VOTD"));
 
 		return true;
 	}

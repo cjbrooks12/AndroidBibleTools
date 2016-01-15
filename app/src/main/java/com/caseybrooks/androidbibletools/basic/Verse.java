@@ -17,11 +17,10 @@ import android.support.annotation.NonNull;
  * not the getText of the verse. In this way, it makes sense that a Verse can be displayed in
  * multiple versions and in different formats.
  */
-public class Verse extends AbstractVerse {
+public abstract class Verse extends AbstractVerse {
 //Data Members
 //--------------------------------------------------------------------------------------------------
-	protected String verseText;
-	protected String rawText;
+	protected String text;
 
 //Constructors
 //--------------------------------------------------------------------------------------------------
@@ -31,106 +30,58 @@ public class Verse extends AbstractVerse {
 
 //Getters and Setters
 //--------------------------------------------------------------------------------------------------
-	//Verse Text is mutable, should be set when a user manually inputs a verse,
-	//or when downloading the verse in a new Bible.
 	public Verse setText(String verseText) {
-		this.verseText = verseText;
+		this.text = verseText;
 		return this;
 	}
-
-	public Verse setRawText(String rawText) {
-		this.rawText = rawText;
-		return this;
-	}
-
-	//	public Verse next() {
-	//		if(reference.verses.get(0) != reference.book.numVersesInChapter(reference.chapter)) {
-	//            Reference nextRef = new Reference(reference.book, reference.chapter, reference.verses.get(0) + 1);
-	//			return new Verse(nextRef);
-	//		}
-	//		else {
-	//			if(reference.chapter != reference.book.numChapters()) {
-	//                Reference nextRef = new Reference(reference.book, reference.chapter + 1, reference.verses.get(0));
-	//                return new Verse(nextRef);
-	//			}
-	//			else {
-	//				for(int i = 0; i < BookEnum.values().length; i++) {
-	//					if((reference.book == BookEnum.values()[i]) && (i != BookEnum.values().length - 1)) {
-	//                        Reference nextRef = new Reference(BookEnum.values()[i+1], 1, 1);
-	//						return new Verse(nextRef);
-	//					}
-	//				}
-	//                Reference nextRef = new Reference(BookEnum.values()[0], 1, 1);
-	//				return new Verse(nextRef);
-	//			}
-	//		}
-	//	}
-
-	//	public Verse previous() {
-	//		if(reference.verses.get(0) != 1) {
-	//            Reference previousRef = new Reference(reference.book, reference.chapter, reference.verses.get(0) - 1);
-	//            return new Verse(previousRef);
-	//		}
-	//		else {
-	//			if(reference.chapter != 1) {
-	//                Reference previousRef = new Reference(reference.book, reference.chapter - 1, reference.book.numVersesInChapter(reference.chapter - 1));
-	//                return new Verse(previousRef);
-	//			}
-	//			else {
-	//				BookEnum newBook;
-	//				for(int i = 0; i < BookEnum.values().length; i++) {
-	//					if((reference.book == BookEnum.values()[i]) && (i != 0)) {
-	//						newBook = BookEnum.values()[i-1];
-	//                        Reference previousRef = new Reference(newBook, newBook.numChapters(), newBook.lastVerseInBook());
-	//                        return new Verse(previousRef);
-	//					}
-	//				}
-	//				newBook = BookEnum.values()[BookEnum.values().length - 1];
-	//                Reference previousRef = new Reference(newBook, newBook.numChapters(), newBook.lastVerseInBook());
-	//                return new Verse(previousRef);
-	//			}
-	//		}
-	//	}
 
 //Print the formatted String
 //--------------------------------------------------------------------------------------------------
 	@Override
 	public String getText() {
+		return text;
+	}
+
+	@Override
+	public String getFormattedText() {
 		String text = "";
 
 		text += formatter.onPreFormat(reference);
 		text += formatter.onFormatVerseStart(reference.getVerses().get(0));
-		text += formatter.onFormatText(verseText);
+		text += formatter.onFormatText(text);
 		text += formatter.onPostFormat();
 
 		return text.trim();
 	}
 
-	@Override
-	public String getRawText() {
-		return rawText;
+	public int getVerseNumber() {
+		return reference.getVerses().get(0);
 	}
 
-//Comparison methods for sorting
+//Comparison methods
 //--------------------------------------------------------------------------------------------------
+
 	@Override
 	public int compareTo(@NonNull AbstractVerse verse) {
-		Verse lhs = this;
-		Verse rhs = (Verse) verse;
-
-		return lhs.reference.compareTo(rhs.getReference());
+		return this.getReference().compareTo(verse.getReference());
 	}
 
 	@Override
-	public boolean equals(Object verse) {
-		if(verse instanceof Verse) {
-			Verse lhs = this;
-			Verse rhs = (Verse) verse;
-
-			return lhs.reference.equals(rhs.reference);
+	public boolean equals(Object o) {
+		if(this == o) {
+			return true;
 		}
-		else {
+		if(o == null || this.getClass() != o.getClass()) {
 			return false;
 		}
+
+		Verse verse = (Verse) o;
+
+		return this.getReference().equals(verse.getReference());
+	}
+
+	@Override
+	public int hashCode() {
+		return this.reference != null ? this.reference.hashCode() : 0;
 	}
 }

@@ -227,6 +227,24 @@ public final class Reference implements Comparable<Reference> {
 			return this;
 		}
 
+		public Builder clearBook() {
+			this.book = null;
+
+			return this;
+		}
+
+		public Builder clearChapter() {
+			this.chapter = 0;
+
+			return this;
+		}
+
+		public Builder clearVerses() {
+			this.verses.clear();
+
+			return this;
+		}
+
 		/**
 		 * Sets the Bible of this Builder to the given Bible object
 		 *
@@ -311,6 +329,57 @@ public final class Reference implements Comparable<Reference> {
 		}
 
 		/**
+		 * Sets the chapter of this Builder, then adds all verses in that chapter if that data is available
+		 *
+		 * @param chapter the chapter to add all verses from
+		 *
+		 * @return this Builder object
+		 */
+		public Builder addAllVersesInChapter(int chapter) {
+			setChapter(chapter);
+			unsetFlag(DEFAULT_VERSES_FLAG);
+
+			if(
+				book != null
+				&& book.getChapters() != null
+				&& book.getChapters().length > 0
+				&& chapter >= 0
+				&& chapter < book.getChapters().length) {
+
+				this.verses = new ArrayList<>();
+				for(int i = 1; i <= book.numVersesInChapter(chapter); i++) {
+					this.verses.add(i);
+				}
+			}
+
+			return this;
+		}
+
+		/**
+		 * Using the currently set chapter of this Builder, add all verses in that chapter if that data is available
+		 *
+		 * @return this Builder object
+		 */
+		public Builder addAllVersesInChapter() {
+			unsetFlag(DEFAULT_VERSES_FLAG);
+
+			if(
+					book != null
+							&& book.getChapters() != null
+							&& book.getChapters().length > 0
+							&& chapter >= 0
+							&& chapter < book.getChapters().length) {
+
+				this.verses = new ArrayList<>();
+				for(int i = 1; i <= book.numVersesInChapter(chapter); i++) {
+					this.verses.add(i);
+				}
+			}
+
+			return this;
+		}
+
+		/**
 		 * Given the current state of this Builder, create a Reference. It will always produce a
 		 * non-null reference, but that reference may have default values if you were not careful
 		 * and did not create it well enough. Ideally, some reference is better than none, because
@@ -358,7 +427,6 @@ public final class Reference implements Comparable<Reference> {
 				setBook("Matthew");
 				setFlag(DEFAULT_BOOK_FLAG);
 			}
-
 
 			return new Reference(book, chapter, verses);
 		}

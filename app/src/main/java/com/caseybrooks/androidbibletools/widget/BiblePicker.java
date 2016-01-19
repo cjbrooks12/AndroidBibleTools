@@ -9,7 +9,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +50,9 @@ public class BiblePicker extends LinearLayout {
 	String tag;
 
 	Bible selectedBible;
+	OnBibleSelectedListener listener;
+
+	int connectedViewId;
 
 //Constructors and Initialization
 //--------------------------------------------------------------------------------------------------
@@ -68,22 +70,23 @@ public class BiblePicker extends LinearLayout {
 		initialize(attrs);
 	}
 
+
+
 	public void initialize(AttributeSet attrs) {
+		LayoutInflater.from(context).inflate(R.layout.bible_picker, this);
+
 		if(attrs != null) {
-			TypedArray a = getContext().obtainStyledAttributes(
-					attrs,
-					R.styleable.abt_biblepicker,
-					0,
-					0
-			);
+			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.abt_biblepicker, 0, 0);
 			try {
-				bibleListClass = (Class<? extends BibleList>) Class.forName(a.getString(R.styleable.abt_biblepicker_bp_bibleList));
+				setBibleListClass(
+						(Class<? extends BibleList>) Class.forName(a.getString(R.styleable.abt_biblepicker_bibleListClass)),
+						a.getString(R.styleable.abt_biblepicker_tag));
+
+				connectedViewId = a.getResourceId(R.styleable.abt_biblepicker_connectTo, 0);
 			}
 			catch(ClassNotFoundException e) {
-				bibleListClass = null;
+				e.printStackTrace();
 			}
-
-			this.tag = a.getString(R.styleable.abt_biblepicker_bp_tag);
 
 			a.recycle();
 		}
@@ -101,8 +104,6 @@ public class BiblePicker extends LinearLayout {
 		colorPrimary = a.getColor(1, Color.DKGRAY);
 		colorAccent = a.getColor(2, Color.LTGRAY);
 		a.recycle();
-
-		LayoutInflater.from(context).inflate(R.layout.bible_picker, this);
 
 		filter = (EditText) findViewById(R.id.bible_list_filter);
 		filter.addTextChangedListener(filterTextChanged);
@@ -129,7 +130,20 @@ public class BiblePicker extends LinearLayout {
 		}
 	}
 
-//Getters and Setters
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+
+		if(connectedViewId != 0 && getRootView() != null) {
+			View connectedView = getRootView().findViewById(connectedViewId);
+
+			if(connectedView != null && connectedView instanceof OnBibleSelectedListener) {
+				setOnBibleSelectedListener((OnBibleSelectedListener) connectedView);
+			}
+		}
+	}
+
+	//Getters and Setters
 //--------------------------------------------------------------------------------------------------
 	public Class<? extends BibleList> getBibleListClass() {
 		return bibleListClass;
@@ -140,13 +154,14 @@ public class BiblePicker extends LinearLayout {
 		this.tag = tag;
 	}
 
+	public void setOnBibleSelectedListener(OnBibleSelectedListener listener) {
+		this.listener = listener;
+	}
+
 //Data retrieval and manipulation
 //--------------------------------------------------------------------------------------------------
 	public void loadBibleList() {
 		selectedBible = ABT.getInstance(context).getSelectedBible(tag);
-
-		if(selectedBible != null)
-			Log.i("BiblePicker", "tag=[" + tag + "] bible=[" + selectedBible.getClass().getName() + ", " + selectedBible.getId() + "]");
 
 		progressText.setText("Retrieving Bible list");
 		progressText.setVisibility(View.VISIBLE);
@@ -160,10 +175,7 @@ public class BiblePicker extends LinearLayout {
 				((Downloadable) bibleList).download(new OnResponseListener() {
 					@Override
 					public void responseFinished() {
-						adapter = new BibleListAdapter(
-								context,
-								bibleList.getBibles().values()
-						);
+						adapter = new BibleListAdapter(context, bibleList.getBibles().values());
 
 						adapter.filterBy(filter.getText().toString());
 						bibleListView.setAdapter(adapter);
@@ -221,16 +233,17 @@ public class BiblePicker extends LinearLayout {
 				abbreviation.setTextColor(colorPrimary);
 			}
 
-			root.setOnClickListener(
-					new OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							ABT.getInstance(context).setSelectedBible(bible, tag);
-							selectedBible = bible;
-							adapter.resort();
-						}
-					}
-			);
+			root.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					ABT.getInstance(context).setSelectedBible(bible, tag);
+					selectedBible = bible;
+					adapter.resort();
+
+					if(listener != null)
+						listener.onBibleSelected(bible);
+				}
+			});
 		}
 	}
 
@@ -317,13 +330,7 @@ public class BiblePicker extends LinearLayout {
 
 		@Override
 		public BibleListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-			View itemView = LayoutInflater.
-					                              from(context).
-					                              inflate(
-							                              R.layout.bible_picker_item,
-							                              parent,
-							                              false
-					                              );
+			View itemView = LayoutInflater.from(context).inflate(R.layout.bible_picker_item, parent, false);
 
 			return new BibleListViewHolder(itemView);
 		}

@@ -31,23 +31,13 @@ import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.io.DividerItemDecoration;
 
-public class VersePicker extends LinearLayout {
-	public enum SelectionMode {
-		OneVerse("One Verse"),
-		ManyVerses("Many Verses"),
-		Chapter("Whole Chapter");
+//TODO: Make an EditReference that does the actual input parsing logic, and connect it here instead of a simple EditText
+//TODO: Make manually updating the reference text automatically update the selection within the picker body
+public class VersePicker extends LinearLayout implements OnBibleSelectedListener {
+	public static int SELECTION_ONE_VERSE = 0;
+	public static int SELECTION_MANY_VERSES = 1;
+	public static int SELECTION_WHOLE_CHAPTER = 2;
 
-		private String title;
-
-		SelectionMode(String title) {
-			this.title = title;
-		}
-
-		@Override
-		public String toString() {
-			return title;
-		}
-	}
 //Data Members
 //--------------------------------------------------------------------------------------------------
 	Context context;
@@ -68,9 +58,12 @@ public class VersePicker extends LinearLayout {
 
 	Reference.Builder builder;
 
-	SelectionMode selectionMode = SelectionMode.ManyVerses;
+	OnReferenceCreatedListener listener;
+	int connectedViewId;
+	int selectionMode;
 
-//Constructors and Initialization
+
+	//Constructors and Initialization
 //--------------------------------------------------------------------------------------------------
 	public VersePicker(Context context) {
 		super(context);
@@ -87,17 +80,23 @@ public class VersePicker extends LinearLayout {
 	}
 
 	public void initialize(AttributeSet attrs) {
+		LayoutInflater.from(context).inflate(R.layout.verse_picker, this);
+
+		int attrSelectionMode = SELECTION_MANY_VERSES;
+
 		if(attrs != null) {
 			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.abt_versepicker, 0, 0);
-			this.tag = a.getString(R.styleable.abt_versepicker_vp_tag);
+			attrSelectionMode = a.getInt(R.styleable.abt_versepicker_selectionMode, SELECTION_MANY_VERSES);
+			setSelectedBibleTag(a.getString(R.styleable.abt_versepicker_tag));
+			connectedViewId = a.getResourceId(R.styleable.abt_biblepicker_connectTo, 0);
 			a.recycle();
 		}
+
+		Log.i("VersePicker", "selectionMode=[" + attrSelectionMode + "]");
 
 		bible = ABT.getInstance(context).getSelectedBible(tag);
 		builder = new Reference.Builder();
 		builder.setFlag(Reference.Builder.PREVENT_AUTO_ADD_VERSES_FLAG);
-
-		LayoutInflater.from(context).inflate(R.layout.verse_picker, this);
 
 		selectedBibleName = (TextView) findViewById(R.id.selected_bible_name);
 		editReference = (EditText) findViewById(R.id.editReference);
@@ -129,16 +128,15 @@ public class VersePicker extends LinearLayout {
 		verseSelectionModeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				ArrayAdapter<SelectionMode> itemsAdapter =
-						new ArrayAdapter<SelectionMode>(
-								getContext(),
-								android.R.layout.simple_list_item_single_choice,
-								SelectionMode.values()) {
+				ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(
+						getContext(),
+						android.R.layout.simple_list_item_single_choice,
+						getResources().getStringArray(R.array.versepicker_selection_titles)) {
 							@Override
 							public View getView(int position, View convertView, ViewGroup parent) {
 								CheckedTextView view = (CheckedTextView) super.getView(position, convertView, parent);
 
-								if(position == selectionMode.ordinal())
+								if(position == selectionMode)
 									view.setChecked(true);
 								else
 									view.setChecked(false);
@@ -154,7 +152,7 @@ public class VersePicker extends LinearLayout {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									dialog.dismiss();
-									setSelectionMode(SelectionMode.values()[which]);
+									setSelectionMode(which);
 								}
 							})
 						.create()
@@ -163,8 +161,23 @@ public class VersePicker extends LinearLayout {
 			}
 		});
 
+		setSelectionMode(attrSelectionMode);
+
 		if(bible != null) {
 			loadBible();
+		}
+	}
+
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+
+		if(connectedViewId != 0 && getRootView() != null) {
+			View connectedView = getRootView().findViewById(connectedViewId);
+
+			if(connectedView != null && connectedView instanceof OnReferenceCreatedListener) {
+				setOnReferenceCreatedListener((OnReferenceCreatedListener) connectedView);
+			}
 		}
 	}
 
@@ -176,7 +189,7 @@ public class VersePicker extends LinearLayout {
 		this.tag = tag;
 	}
 
-	public void setSelectionMode(SelectionMode selectionMode) {
+	public void setSelectionMode(int selectionMode) {
 		this.selectionMode = selectionMode;
 
 		if(adapter != null) {
@@ -188,8 +201,6 @@ public class VersePicker extends LinearLayout {
 		builder.getVerses().clear();
 		verseList.getAdapter().notifyDataSetChanged();
 		editReference.setText(builder.create().toString());
-
-		Log.i("VersePicker", "SelectionMode=[" + selectionMode.toString() + "]");
 	}
 
 	public void loadBible() {
@@ -198,28 +209,39 @@ public class VersePicker extends LinearLayout {
 		if(bible == null)
 			return;
 
+		builder.setBible(bible);
+
 		if(bible instanceof Downloadable) {
-			((Downloadable) bible).download(
-				new OnResponseListener() {
-					@Override
-					public void responseFinished() {
-						selectedBibleName.setText("From " + bible.getName());
+			((Downloadable) bible).download(new OnResponseListener() {
+				@Override
+				public void responseFinished() {
+					selectedBibleName.setText("From " + bible.getName());
 
-						adapter = new VersePickerPagerAdapter();
-						viewPager.setAdapter(adapter);
-						tabLayout.setupWithViewPager(viewPager);
+					adapter = new VersePickerPagerAdapter();
+					viewPager.setAdapter(adapter);
+					tabLayout.setupWithViewPager(viewPager);
 
-						bookList.getAdapter().notifyDataSetChanged();
-						chapterList.getAdapter().notifyDataSetChanged();
-						verseList.getAdapter().notifyDataSetChanged();
-					}
+					bookList.getAdapter().notifyDataSetChanged();
+					chapterList.getAdapter().notifyDataSetChanged();
+					verseList.getAdapter().notifyDataSetChanged();
 				}
-			);
+			});
 		}
 	}
 
 	public Reference.Builder getReferenceBuilder() {
 		return builder;
+	}
+
+	@Override
+	public void onBibleSelected(Bible bible) {
+		this.bible = bible;
+
+		loadBible();
+	}
+
+	public void setOnReferenceCreatedListener(OnReferenceCreatedListener listener) {
+		this.listener = listener;
 	}
 
 	///TabLayout and ViewPagerAdapter
@@ -245,7 +267,7 @@ public class VersePicker extends LinearLayout {
 
 		@Override
 		public int getCount() {
-			return (selectionMode == SelectionMode.Chapter) ? 2 : 3;
+			return (selectionMode == SELECTION_WHOLE_CHAPTER) ? 2 : 3;
 		}
 
 		@Override
@@ -296,7 +318,7 @@ public class VersePicker extends LinearLayout {
 					builder.setBook(book);
 					builder.clearChapter();
 					builder.clearVerses();
-					editReference.setText(book.getName());
+					editReference.setText(builder.create().toString());
 
 					bookList.getAdapter().notifyDataSetChanged();
 					chapterList.getAdapter().notifyDataSetChanged();
@@ -353,9 +375,11 @@ public class VersePicker extends LinearLayout {
 				public void onClick(View v) {
 					builder.setChapter(chapter);
 
-					if(selectionMode == SelectionMode.Chapter) {
+					if(selectionMode == SELECTION_WHOLE_CHAPTER) {
 						builder.addAllVersesInChapter();
 						editReference.setText(builder.create().toString());
+						if(listener != null)
+							listener.onReferenceCreated(builder);
 					}
 					else {
 						builder.clearVerses();
@@ -416,15 +440,20 @@ public class VersePicker extends LinearLayout {
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						if(selectionMode == SelectionMode.OneVerse) {
+						if(selectionMode == SELECTION_ONE_VERSE) {
 							builder.getVerses().clear();
 							builder.getVerses().add(Integer.valueOf(verse));
+							if(listener != null)
+								listener.onReferenceCreated(builder);
 						}
-						if(selectionMode == SelectionMode.ManyVerses) {
+						if(selectionMode == SELECTION_MANY_VERSES) {
 							if(!builder.getVerses().contains(Integer.valueOf(verse)))
 								builder.getVerses().add(Integer.valueOf(verse));
 							else
 								builder.getVerses().remove(Integer.valueOf(verse));
+
+							if(listener != null)
+								listener.onReferenceCreated(builder);
 						}
 
 						editReference.setText(builder.create().toString());

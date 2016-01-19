@@ -34,15 +34,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		toggle.syncState();
 
 		ABT.getInstance(this)
-		   .getMetadata().putString("ABS_ApiKey", "mDaM8REZFo6itplNpcv1ls8J5PkwEz1wbhJ7p9po");
+			.getMetadata().putString("ABS_ApiKey", "mDaM8REZFo6itplNpcv1ls8J5PkwEz1wbhJ7p9po");
 
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
 
-		navigationView.setCheckedItem(R.id.nav_verses);
+		navigationView.setCheckedItem(R.id.nav_verseview_views);
 		getSupportFragmentManager()
 				.beginTransaction()
-				.add(R.id.container, FragmentTwo.newInstance())
+				.add(R.id.container, Fragment4.newInstance())
 				.commit();
 	}
 
@@ -64,13 +64,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		Fragment fragment;
 
 		if(id == R.id.nav_bibles) {
-			fragment = FragmentOne.newInstance();
+			fragment = Fragment1.newInstance();
 		}
 		else if(id == R.id.nav_verses) {
-			fragment = FragmentTwo.newInstance();
+			fragment = Fragment2.newInstance();
 		}
-		else if(id == R.id.nav_verseview) {
-			fragment = FragmentThree.newInstance();
+		else if(id == R.id.nav_verseview_pickers) {
+			fragment = Fragment3.newInstance();
+		}
+		else if(id == R.id.nav_verseview_views) {
+			fragment = Fragment4.newInstance();
 		}
 		else if(id == R.id.nav_settings) {
 			Intent intent = new Intent(this, SettingsActivity.class);

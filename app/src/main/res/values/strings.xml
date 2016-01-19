@@ -1,4 +1,10 @@
 <resources>
 	<string name="app_name">AndroidBibleTools</string>
 	<string name="bibles_org_key"></string>
+
+	<string-array name="versepicker_selection_titles">
+		<item>One Verse</item>
+		<item>Many Verses</item>
+		<item>Whole Chapter</item>
+	</string-array>
 </resources>

@@ -2,6 +2,8 @@ package com.caseybrooks.androidbibletools.basic;
 
 import com.caseybrooks.androidbibletools.data.Optional;
 import com.caseybrooks.androidbibletools.io.ReferenceParser;
+import com.caseybrooks.androidbibletools.providers.basic.SimpleBible;
+import com.caseybrooks.androidbibletools.providers.basic.SimpleBook;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -143,15 +145,10 @@ public final class Reference implements Comparable<Reference> {
 		 * @return this Builder object
 		 */
 		public Builder setBook(String bookName) {
-			//no bookname provided, set it to empty
-			if(bookName == null) {
-				bookName = "";
-			}
-
 			//no bible provided, assume default Bible and use that
 			if(bible == null) {
 				setFlag(DEFAULT_BIBLE_FLAG);
-				//				bible = new Bible();
+				bible = new SimpleBible();
 			}
 			else {
 				unsetFlag(DEFAULT_BIBLE_FLAG);
@@ -167,7 +164,7 @@ public final class Reference implements Comparable<Reference> {
 			}
 			//could not find this book in the given bible, just add the book as-is
 			else {
-				parsedBook = new Book();
+				parsedBook = new SimpleBook();
 				parsedBook.setName(bookName);
 				setFlag(DEFAULT_BOOK_FLAG);
 
@@ -424,8 +421,8 @@ public final class Reference implements Comparable<Reference> {
 			//the book was not specified, so use the first book of the New Testament
 			// since many translations only have the New Testament.
 			if(book == null) {
-				setBook("Matthew");
 				setFlag(DEFAULT_BOOK_FLAG);
+				setBook("Matthew");
 			}
 
 			return new Reference(book, chapter, verses);
@@ -449,6 +446,10 @@ public final class Reference implements Comparable<Reference> {
 	@Override
 	public String toString() {
 		String refString = book.getName();
+
+		if(chapter == 0)
+			return refString;
+
 		refString += " " + chapter;
 
 		if(verses == null || verses.size() == 0)

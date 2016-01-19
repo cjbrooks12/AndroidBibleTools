@@ -10,7 +10,11 @@
             android:icon="@android:drawable/ic_menu_gallery"
             android:title="Verse Picker" />
         <item
-            android:id="@+id/nav_verseview"
+            android:id="@+id/nav_verseview_pickers"
+            android:icon="@android:drawable/ic_menu_slideshow"
+            android:title="Verse View" />
+        <item
+            android:id="@+id/nav_verseview_views"
             android:icon="@android:drawable/ic_menu_slideshow"
             android:title="Verse View" />
         <item

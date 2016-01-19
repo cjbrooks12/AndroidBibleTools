@@ -11,9 +11,9 @@ import com.caseybrooks.androidbibletools.providers.cjb.CJBBibleList;
 import com.caseybrooks.androidbibletools.widget.BiblePickerDialog;
 import com.caseybrooks.androidbibletools.widget.BiblePickerFragment;
 
-public class FragmentOne extends Fragment {
+public class Fragment1 extends Fragment {
 	public static Fragment newInstance() {
-		Fragment fragment = new FragmentOne();
+		Fragment fragment = new Fragment1();
 		Bundle args = new Bundle();
 		fragment.setArguments(args);
 		return fragment;
@@ -26,13 +26,12 @@ public class FragmentOne extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_fragment_one, container, false);
+		View view = inflater.inflate(R.layout.fragment_fragment_1, container, false);
 
 		biblePickerDialog = new BiblePickerDialog();
 		biblePickerDialog.setBibleListClass(CJBBibleList.class, null);
 
-		biblePickerFragment = new BiblePickerFragment();
-		biblePickerFragment.setBibleListClass(CJBBibleList.class, null);
+		biblePickerFragment = BiblePickerFragment.newInstance(CJBBibleList.class, null);
 
 		showDialogButton = (Button) view.findViewById(R.id.biblepickerButtonDialog);
 		showDialogButton.setOnClickListener(new View.OnClickListener() {

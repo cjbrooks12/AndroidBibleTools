@@ -1,16 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="abt_verseview">
-        <attr name="verse_api_key" format="string" />
-        <attr name="reference_picker" format="reference" />
-    </declare-styleable>
+    <attr name="tag" format="string" />
+    <attr name="connectTo" format="reference" />
 
     <declare-styleable name="abt_biblepicker" parent="abt_view">
-        <attr name="bp_tag" format="string" />
-        <attr name="bp_bibleList" format="string" />
+        <attr name="tag" />
+        <attr name="bibleListClass" format="string" />
+        <attr name="connectTo" />
     </declare-styleable>
 
     <declare-styleable name="abt_versepicker" parent="abt_view">
-        <attr name="vp_tag" format="string" />
+        <attr name="tag" />
+        <attr name="connectTo" />
+        <attr name="selectionMode" format="enum">
+            <enum name="oneverse" value="0"/>
+            <enum name="manyverses" value="1"/>
+            <enum name="wholechapter" value="2"/>
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="abt_verseview">
+        <attr name="verseClass" format="string" />
+        <attr name="verseDisplay" >
+            <flag name="formatted" value="0x1"/>
+            <flag name="html" value="0x2"/>
+        </attr>
     </declare-styleable>
 </resources>

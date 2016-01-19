@@ -3,7 +3,7 @@
 
     <com.caseybrooks.androidbibletools.widget.BiblePickerPreference
         android:key="ABSBibleList"
-        app:bp_bibleList="com.caseybrooks.androidbibletools.providers.abs.ABSBibleList"
+        app:bibleListClass="com.caseybrooks.androidbibletools.providers.abs.ABSBibleList"
         android:title="Bible Picker Preference"/>
 
 </PreferenceScreen>

@@ -31,7 +31,7 @@
     <com.caseybrooks.androidbibletools.widget.BiblePicker
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:bp_bibleList="com.caseybrooks.androidbibletools.providers.abs.ABSBibleList"
-        app:bp_tag="ABSBibleList"/>
+        app:bibleListClass="com.caseybrooks.androidbibletools.providers.abs.ABSBibleList"
+        app:tag="ABSBibleList"/>
 
 </LinearLayout>

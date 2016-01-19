@@ -13,6 +13,7 @@ public class BiblePickerDialog extends AppCompatDialogFragment {
 	BiblePicker picker;
 	Class<? extends BibleList> bibleListClass;
 	String tag;
+	OnBibleSelectedListener listener;
 
 	@Override
 	public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -26,6 +27,7 @@ public class BiblePickerDialog extends AppCompatDialogFragment {
 
 		picker = new BiblePicker(getActivity());
 		builder.setView(picker);
+		picker.setOnBibleSelectedListener(listener);
 		picker.setBibleListClass(bibleListClass, tag);
 		picker.loadBibleList();
 
@@ -35,5 +37,9 @@ public class BiblePickerDialog extends AppCompatDialogFragment {
 	public void setBibleListClass(Class<? extends BibleList> bibleListClass, String tag) {
 		this.bibleListClass = bibleListClass;
 		this.tag = tag;
+	}
+
+	public void setOnBibleSelectedListener(OnBibleSelectedListener listener) {
+		this.listener = listener;
 	}
 }

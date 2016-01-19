@@ -16,7 +16,7 @@ import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
 import com.caseybrooks.androidbibletools.widget.BiblePickerDialog;
 import com.caseybrooks.androidbibletools.widget.VersePickerDialog;
 
-public class FragmentThree extends Fragment {
+public class Fragment3 extends Fragment {
 	Button biblePickerButton, versePickerButton, downloadButton;
 	TextView verseView;
 
@@ -24,7 +24,7 @@ public class FragmentThree extends Fragment {
 	VersePickerDialog versePickerDialog;
 
 	public static Fragment newInstance() {
-		Fragment fragment = new FragmentThree();
+		Fragment fragment = new Fragment3();
 		Bundle extras = new Bundle();
 		fragment.setArguments(extras);
 		return fragment;
@@ -35,7 +35,7 @@ public class FragmentThree extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
-		View view = inflater.inflate(R.layout.fragment_fragment_three, container, false);
+		View view = inflater.inflate(R.layout.fragment_fragment_3, container, false);
 
 		biblePickerButton = (Button) view.findViewById(R.id.biblePickerButton);
 		versePickerButton = (Button) view.findViewById(R.id.versePickerButton);

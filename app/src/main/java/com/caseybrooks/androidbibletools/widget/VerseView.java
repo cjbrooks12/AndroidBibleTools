@@ -1,77 +1,115 @@
 package com.caseybrooks.androidbibletools.widget;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-/**
- * An extension of the Android TextView which makes displaying Verses in this library incredibly
- * simple. It allows for simple yet rich display formatting, because it displays text from the
- * Verses as HTML (using 'Html.fromHtml()'). It also supports automatic verse downloading and
- * caching for downloadable passages, plugging directly into the BiblePicker widget.
- * <p/>
- * By default, this VerseView assumes that the BiblePicker is used to select the user's preferred
- * Bible, and pulls the Bible to download from those classes, which is persisted automatically into
- * SharedPreferences.
- */
-public class VerseView extends TextView {
-//Data Members
-//--------------------------------------------------------------------------------------------------
-	Context context;
+import com.caseybrooks.androidbibletools.R;
+import com.caseybrooks.androidbibletools.basic.AbstractVerse;
+import com.caseybrooks.androidbibletools.basic.Reference;
+import com.caseybrooks.androidbibletools.data.Downloadable;
+import com.caseybrooks.androidbibletools.data.OnResponseListener;
 
-	boolean displayAsHtml;
-	boolean displayRawText;
+public class VerseView extends TextView implements OnReferenceCreatedListener {
+	public static int DISPLAY_DEFAULT = 0x0;
+	public static int DISPLAY_FORMATTED = 0x1;
+	public static int DISPLAY_HTML = 0x2;
+
+	Class<? extends AbstractVerse> verseClass;
+
+	AbstractVerse verse;
+	int displayFlags;
 
 //Constructors and Initialization
 //--------------------------------------------------------------------------------------------------
 	public VerseView(Context context) {
 		super(context);
-		this.context = context;
 
-		initialize();
+		initialize(null);
 	}
 
 	public VerseView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		this.context = context;
 
-		initialize();
+		initialize(attrs);
 	}
 
-	public void initialize() {
-		displayAsHtml = true;
-		displayRawText = false;
+	public void initialize(AttributeSet attrs) {
+		if(attrs != null) {
+			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.abt_verseview, 0, 0);
+			setDisplayFlags(a.getInt(R.styleable.abt_verseview_verseDisplay, DISPLAY_DEFAULT));
+
+			try {
+				setVerseClass((Class<? extends AbstractVerse>)Class.forName(a.getString(R.styleable.abt_verseview_verseClass)));
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+
+			a.recycle();
+		}
 	}
 
-//	public void showText() {
-//		post(new Runnable() {
-//			@Override
-//			public void run() {
-//				String textToShow = displayRawText ? worker.getVerse().getRawText() : worker.getVerse().getText();
-//
-//				if(displayAsHtml) {
-//					setText(Html.fromHtml(textToShow));
-//				}
-//				else {
-//					setText(textToShow);
-//				}
-//			}
-//		});
-//	}
-
-	public boolean isDisplayingAsHtml() {
-		return displayAsHtml;
+	@Override
+	public void onReferenceCreated(Reference.Builder reference) {
+		if(verseClass != null) {
+			try {
+				setVerse(verseClass.getConstructor(Reference.class).newInstance(reference.create()));
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
-	public void setDisplayingAsHtml(boolean displayAsHtml) {
-		this.displayAsHtml = displayAsHtml;
+	public void setVerseClass(Class<? extends AbstractVerse> verseClass) {
+		this.verseClass = verseClass;
 	}
 
-	public boolean isDisplayingRawText() {
-		return displayRawText;
+	public AbstractVerse getVerse() {
+		return verse;
 	}
 
-	public void setDisplayingRawText(boolean displayRawText) {
-		this.displayRawText = displayRawText;
+	public void setVerse(final AbstractVerse verse) {
+		this.verseClass = verse.getClass();
+		this.verse = verse;
+
+		if(verse instanceof Downloadable) {
+			((Downloadable) verse).download(new OnResponseListener() {
+				@Override
+				public void responseFinished() {
+					displayText();
+				}
+			});
+		}
+		else {
+			displayText();
+		}
+	}
+
+	private void displayText() {
+		String text;
+		if(checkFlag(DISPLAY_FORMATTED)) {
+			text = verse.getFormattedText();
+		}
+		else {
+			text = verse.getText();
+		}
+
+		if(checkFlag(DISPLAY_HTML)) {
+			setText(Html.fromHtml(text));
+		}
+		else {
+			setText(text);
+		}
+	}
+
+	public void setDisplayFlags(int flags) {
+		displayFlags = flags;
+	}
+
+	private boolean checkFlag(int flag) {
+		return ((displayFlags & flag) == flag);
 	}
 }

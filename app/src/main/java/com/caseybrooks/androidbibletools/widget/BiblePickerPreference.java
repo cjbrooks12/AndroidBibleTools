@@ -32,7 +32,7 @@ public class BiblePickerPreference extends DialogPreference {
 				0
 		);
 		try {
-			bibleListClass = (Class<? extends BibleList>) Class.forName(a.getString(R.styleable.abt_biblepicker_bp_bibleList));
+			bibleListClass = (Class<? extends BibleList>) Class.forName(a.getString(R.styleable.abt_biblepicker_bibleListClass));
 		}
 		catch(ClassNotFoundException e) {
 			bibleListClass = null;

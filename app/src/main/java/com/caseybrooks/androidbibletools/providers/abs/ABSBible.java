@@ -82,10 +82,6 @@ public class ABSBible extends Bible<ABSBook> implements Downloadable, Response.L
 
 //Downloadable Interface Implementation
 //--------------------------------------------------------------------------------------------------
-	public boolean isAvailable() {
-		return APIKey != null && id != null;
-	}
-
 	@Override
 	public void download(OnResponseListener listener) {
 		APIKey = ABT.getInstance().getMetadata().getString("ABS_ApiKey", null);
@@ -214,8 +210,6 @@ public class ABSBible extends Bible<ABSBook> implements Downloadable, Response.L
 			listener.responseFinished();
 		}
 	}
-
-
 
 	@Override
 	public boolean equals(Object o) {

@@ -6,6 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collections;
 
+//TODO: fix reflection stuff so that any Passage class can be extended
 public abstract class Passage<T extends Verse> extends AbstractVerse {
 //Data Members
 //--------------------------------------------------------------------------------------------------

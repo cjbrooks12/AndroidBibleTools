@@ -1,63 +1,94 @@
 package com.caseybrooks.androidbibletools.providers.openbible;
 
+import android.text.TextUtils;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.caseybrooks.androidbibletools.ABT;
+import com.caseybrooks.androidbibletools.data.Downloadable;
+import com.caseybrooks.androidbibletools.data.OnResponseListener;
+import com.caseybrooks.androidbibletools.io.CachingStringRequest;
+
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.util.TreeSet;
+import java.util.ArrayList;
 
-//TODO: Fix this class
-public class Topics {
-	private TreeSet<String> topics;
-	private char c;
+public class Topics implements Downloadable, Response.Listener<String>, Response.ErrorListener {
+//Data Members
+//--------------------------------------------------------------------------------------------------
+	private ArrayList<String> topics;
+	private char searchCharacter;
+	private OnResponseListener listener;
 
+//Constructors
+//--------------------------------------------------------------------------------------------------
 	public Topics() {
-		topics = new TreeSet<>();
-		c = ' ';
+		topics = new ArrayList<>();
+		searchCharacter = ' ';
 	}
 
-	//set a specific letter to get topics from. If character is not a letter, then
-	//get everything
-	public Topics(char c) {
-		topics = new TreeSet<>();
-		this.c = c;
+//Getters and Setters
+//--------------------------------------------------------------------------------------------------
+
+
+	public ArrayList<String> getTopics() {
+		return topics;
 	}
 
-	public boolean isAvailable() {
-		return Character.isLetter(c);
+	public char getSearchCharacter() {
+		return searchCharacter;
 	}
 
-	public String getData() throws IOException {
-		return null;
+	public void setSearchCharacter(char searchCharacter) {
+		if(Character.isLetter(searchCharacter))
+			this.searchCharacter = searchCharacter;
 	}
 
-	public boolean parseData(String data) {
-		return false;
+//Interface Implementations
+//--------------------------------------------------------------------------------------------------
+	@Override
+	public void download(OnResponseListener listener) {
+		this.listener = listener;
+		String tag = "Topics";
+		String url = "http://www.openbible.info/topics/" + searchCharacter;
+
+		CachingStringRequest htmlObjReq = new CachingStringRequest(Request.Method.GET, url, this, this);
+
+		ABT.getInstance().addToRequestQueue(htmlObjReq, tag);
 	}
 
-	public Document getDocument() throws IOException {
-		String query = "http://www.openbible.info/topics/" + c;
+	@Override
+	public void onResponse(String response) {
+		if(TextUtils.isEmpty(response)) {
+			onErrorResponse(new VolleyError("Empty response"));
+			return;
+		}
 
-		return Jsoup.connect(query).get();
-	}
+		Elements passages = Jsoup.parse(response).select("li");
 
-	public boolean parseDocument(Document doc) {
-		Elements passages = doc.select("li");
+		if(passages == null) {
+			onErrorResponse(new VolleyError("No valid data available in response"));
+			return;
+		}
 
+		topics.clear();
 		for(Element element : passages) {
 			topics.add(element.text());
 		}
 
-		return true;
+		if(listener != null) {
+			listener.responseFinished();
+		}
 	}
 
-	public TreeSet<String> getTopics() {
-		return topics;
-	}
-
-	public void setC(char c) {
-		this.c = c;
+	@Override
+	public void onErrorResponse(VolleyError error) {
+		error.printStackTrace();
+		if(listener != null) {
+			listener.responseFinished();
+		}
 	}
 }

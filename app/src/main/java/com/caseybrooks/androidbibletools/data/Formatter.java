@@ -10,25 +10,25 @@ import com.caseybrooks.androidbibletools.basic.Reference;
 public interface Formatter {
 	//called before we begin formatting the actual verses.
 	//i.e. to print the reference before all its text
-	public String onPreFormat(Reference reference);
+	String onPreFormat(Reference reference);
 
 	//called when about to format a new ver
 	//i.e. change how the numbers will be shown
-	public String onFormatVerseStart(int verseNumber);
+	String onFormatVerseStart(int verseNumber);
 
 	//called when formatting the main text of a verse
 	//i.e. print only first letters of words, random words, etc.
-	public String onFormatText(String verseText);
+	String onFormatText(String verseText);
 
 	//called when we encounter a word that we want to handle differently
 	//i.e. ensure 'Lord' is always 'LORD'
-	public String onFormatSpecial(String special);
+	String onFormatSpecial(String special);
 
 	//called when we have finished formatting one verse and are moving to the next
 	//i.e. to insert a newline between all verses
-	public String onFormatVerseEnd();
+	String onFormatVerseEnd();
 
 	//called when we have finished all other formatting
 	//i.e. to print the reference at the end of all text, or a URL, or copyright info
-	public String onPostFormat();
+	String onPostFormat();
 }

@@ -11,7 +11,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,8 +61,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 	int connectedViewId;
 	int selectionMode;
 
-
-	//Constructors and Initialization
+//Constructors and Initialization
 //--------------------------------------------------------------------------------------------------
 	public VersePicker(Context context) {
 		super(context);
@@ -91,8 +89,6 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 			connectedViewId = a.getResourceId(R.styleable.abt_biblepicker_connectTo, 0);
 			a.recycle();
 		}
-
-		Log.i("VersePicker", "selectionMode=[" + attrSelectionMode + "]");
 
 		bible = ABT.getInstance(context).getSelectedBible(tag);
 		builder = new Reference.Builder();
@@ -316,8 +312,8 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 				@Override
 				public void onClick(View v) {
 					builder.setBook(book);
-					builder.clearChapter();
-					builder.clearVerses();
+					builder.setDefaultChapter();
+					builder.setDefaultVerses();
 					editReference.setText(builder.create().toString());
 
 					bookList.getAdapter().notifyDataSetChanged();
@@ -382,7 +378,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 							listener.onReferenceCreated(builder);
 					}
 					else {
-						builder.clearVerses();
+						builder.setDefaultVerses();
 						tabLayout.getTabAt(2).select();
 						editReference.setText(builder.create().toString());
 					}

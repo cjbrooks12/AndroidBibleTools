@@ -1,7 +1,6 @@
 package com.caseybrooks.androidbibletools.providers.cjb;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -32,10 +31,10 @@ public class CJBPassage extends Passage<CJBVerse> implements Downloadable, Respo
 
 		String tag = "CJBBible";
 		String url = "https://heroku-website-cjbrooks12.c9.io/verse_api/verses?";
-		url += "service=" + ((CJBBible)getBible()).getService();
-		url += "&bibleId=" + getBible().getId();
-		url += "&bookId=" + ((CJBBook) getReference().getBook()).getBookId();
-		url += "&chapterId=" + getReference().getChapter();
+		url += "service=" + ((CJBBible) reference.getBible()).getService();
+		url += "&bibleId=" + reference.getBible().getId();
+		url += "&bookId=" + ((CJBBook) reference.getBook()).getBookId();
+		url += "&chapterId=" + reference.getChapter();
 
 		CachingStringRequest jsonObjReq = new CachingStringRequest(Request.Method.GET, url, this, this);
 		ABT.getInstance().addToRequestQueue(jsonObjReq, tag);
@@ -57,13 +56,12 @@ public class CJBPassage extends Passage<CJBVerse> implements Downloadable, Respo
 
 		try {
 			JSONArray versesJSON = new JSONArray(response);
-			Log.i("CJBPassage", "length=[" + versesJSON.length() + "]");
 
 			//add all verses to a map from which we can pick the individual verses we want
 			HashMap<Integer, CJBVerse> verseMap = new HashMap<>();
 			for(int i = 0; i < versesJSON.length(); i++) {
 				Reference verseReference = new Reference.Builder()
-						.setBible(bible)
+						.setBible(reference.getBible())
 						.setBook(reference.getBook())
 						.setChapter(reference.getChapter())
 						.setVerses(i)
@@ -72,11 +70,6 @@ public class CJBPassage extends Passage<CJBVerse> implements Downloadable, Respo
 
 				JSONObject verseJSON = versesJSON.getJSONObject(i);
 				String text = verseJSON.getString("text");
-
-//				Document doc = Jsoup.parse(text);
-//				doc.select("h3").remove();
-//				doc.select("sup").remove();
-//				verse.setText(doc.text());
 
 				verse.setText(text);
 

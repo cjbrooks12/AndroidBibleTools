@@ -16,7 +16,7 @@ import java.util.TreeSet;
 public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 //Data Members
 //--------------------------------------------------------------------------------------------------
-	protected Bible bible;
+//	protected Bible bible;
 	protected final Reference reference;
 	protected Formatter formatter;
 	protected Metadata metadata;
@@ -39,26 +39,6 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 
 //Defined methods
 //--------------------------------------------------------------------------------------------------
-
-	/**
-	 * Get the currently set Bible of this verse
-	 *
-	 * @return {@link Bible}
-	 */
-	public Bible getBible() {
-		return bible;
-	}
-
-	/**
-	 * Set the Bible of this verse
-	 *
-	 * @param bible the desired Bible translation
-	 *
-	 * @see Bible
-	 */
-	public void setBible(Bible bible) {
-		this.bible = bible;
-	}
 
 	/**
 	 * Get the Reference this verse points to

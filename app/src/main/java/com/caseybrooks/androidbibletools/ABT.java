@@ -2,6 +2,7 @@ package com.caseybrooks.androidbibletools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -9,7 +10,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.basic.Metadata;
-import com.caseybrooks.androidbibletools.data.Optional;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -154,7 +154,7 @@ public class ABT {
 	 * @return Generic Bible object representing the Bible that was stored. It maintains the same
 	 * Type of the object that was saved
 	 */
-	public Bible getSelectedBible(@Optional String tag) {
+	public Bible getSelectedBible(@Nullable String tag) {
 		Bible bible;
 		String prefKey = (!TextUtils.isEmpty(tag))
 		                 ? PREF_SELECTED_BIBLE + tag
@@ -203,7 +203,7 @@ public class ABT {
 	 *
 	 * @return Class object representing the type of Bible that was stored
 	 */
-	public Class<? extends Bible> getSelectedBibleType(@Optional String tag) {
+	public Class<? extends Bible> getSelectedBibleType(@Nullable String tag) {
 		String prefKey = (!TextUtils.isEmpty(tag))
 		                 ? PREF_SELECTED_BIBLE + tag
 		                 : PREF_SELECTED_BIBLE;
@@ -241,7 +241,7 @@ public class ABT {
 	 *
 	 * @param tag unique tag that identified this instance of a Bible to persist
 	 */
-	public void setSelectedBible(Bible bible, @Optional String tag) {
+	public void setSelectedBible(Bible bible, @Nullable String tag) {
 		String prefKey = (!TextUtils.isEmpty(tag))
 		                 ? PREF_SELECTED_BIBLE + tag
 		                 : PREF_SELECTED_BIBLE;

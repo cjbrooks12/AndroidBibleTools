@@ -1,6 +1,6 @@
 package com.caseybrooks.androidbibletools.basic;
 
-public class Book {
+public abstract class Book {
 	private String name;
 	private String abbreviation;
 	private int location;

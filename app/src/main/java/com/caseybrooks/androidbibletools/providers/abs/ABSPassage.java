@@ -2,7 +2,6 @@ package com.caseybrooks.androidbibletools.providers.abs;
 
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -90,13 +89,12 @@ public class ABSPassage extends Passage<ABSVerse> implements Downloadable, Respo
 
 		try {
 			JSONArray versesJSON = new JSONObject(response).getJSONObject("response").getJSONArray("verses");
-			Log.i("ABSPassage", "length=[" + versesJSON.length() + "]");
 
 			//add all verses to a map from which we can pick the individual verses we want
 			HashMap<Integer, ABSVerse> verseMap = new HashMap<>();
 			for(int i = 0; i < versesJSON.length(); i++) {
 				Reference verseReference = new Reference.Builder()
-						.setBible(bible)
+						.setBible(reference.getBible())
 						.setBook(reference.getBook())
 						.setChapter(reference.getChapter())
 						.setVerses(i)
@@ -105,11 +103,6 @@ public class ABSPassage extends Passage<ABSVerse> implements Downloadable, Respo
 
 				JSONObject verseJSON = versesJSON.getJSONObject(i);
 				String text = verseJSON.getString("text");
-
-//				Document doc = Jsoup.parse(text);
-//				doc.select("h3").remove();
-//				doc.select("sup").remove();
-//				verse.setText(doc.text());
 
 				verse.setText(text);
 

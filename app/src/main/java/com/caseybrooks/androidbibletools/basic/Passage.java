@@ -1,7 +1,6 @@
 package com.caseybrooks.androidbibletools.basic;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ public abstract class Passage<T extends Verse> extends AbstractVerse {
 		super(reference);
 
 		Class<? extends Verse> verseClass = getTypeParamemeterClass();
-		Log.i("Passage", "Verse Passage<" + verseClass.getName() + "> created");
 
 		Collections.sort(this.reference.getVerses());
 		this.verses = new ArrayList<>();
@@ -53,14 +51,6 @@ public abstract class Passage<T extends Verse> extends AbstractVerse {
 
 //Setters and Getters
 //--------------------------------------------------------------------------------------------------
-	@Override
-	public void setBible(Bible bible) {
-		super.setBible(bible);
-		for(T verse : verses) {
-			verse.setBible(this.bible);
-		}
-	}
-
 	@Override
 	public String getFormattedText() {
 		if(verses.size() > 0) {

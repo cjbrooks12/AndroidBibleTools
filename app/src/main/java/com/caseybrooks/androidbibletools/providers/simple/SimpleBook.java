@@ -1,4 +1,4 @@
-package com.caseybrooks.androidbibletools.providers.basic;
+package com.caseybrooks.androidbibletools.providers.simple;
 
 import com.caseybrooks.androidbibletools.basic.Book;
 

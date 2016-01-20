@@ -1,9 +1,11 @@
 package com.caseybrooks.androidbibletools.basic;
 
-import com.caseybrooks.androidbibletools.data.Optional;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
 import com.caseybrooks.androidbibletools.io.ReferenceParser;
-import com.caseybrooks.androidbibletools.providers.basic.SimpleBible;
-import com.caseybrooks.androidbibletools.providers.basic.SimpleBook;
+import com.caseybrooks.androidbibletools.providers.simple.SimpleBible;
+import com.caseybrooks.androidbibletools.providers.simple.SimpleBook;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,33 +22,27 @@ import java.util.Collections;
  * always take first verse in a Passage reference.
  */
 public final class Reference implements Comparable<Reference> {
+	private final Bible bible;
 	private final Book book;
 	private final int chapter;
 	private final ArrayList<Integer> verses;
 
-//Make constructors private. Force caller to use of the static initializer methods
+//All constructors private. Force caller to use of the static initializer methods
 //--------------------------------------------------------------------------------------------------
-	private Reference(Book book, int chapter, int... verses) {
-		this.book = book;
-		this.chapter = chapter;
-		this.verses = new ArrayList<>();
-
-		for(int i : verses) {
-			this.verses.add(i);
-		}
-
-		Collections.sort(this.verses);
-	}
-
-	private Reference(Book book, int chapter, ArrayList<Integer> verses) {
+	private Reference(Bible bible, Book book, int chapter, ArrayList<Integer> verses) {
+		this.bible = bible;
 		this.book = book;
 		this.chapter = chapter;
 		this.verses = verses;
 		Collections.sort(this.verses);
 	}
 
-//static initializer methods
+//Getters
 //--------------------------------------------------------------------------------------------------
+	public Bible getBible() {
+		return bible;
+	}
+
 	public Book getBook() {
 		return book;
 	}
@@ -59,9 +55,6 @@ public final class Reference implements Comparable<Reference> {
 		return verses;
 	}
 
-//static initializer methods
-//--------------------------------------------------------------------------------------------------
-
 	/**
 	 * Builder class to aid in creating a reference, especially when working with user input. The
 	 * Builder offers much flexibility is the data that is used to construct a Reference, and will
@@ -73,6 +66,8 @@ public final class Reference implements Comparable<Reference> {
 	 * with it.
 	 */
 	public static class Builder {
+//Bitflags for state
+//--------------------------------------------------------------------------------------------------
 		public static int DEFAULT_BIBLE_FLAG = 0x1;
 		public static int DEFAULT_BOOK_FLAG = 0x2;
 		public static int DEFAULT_CHAPTER_FLAG = 0x4;
@@ -81,36 +76,65 @@ public final class Reference implements Comparable<Reference> {
 
 		private int flags = 0;
 
+		public void setFlag(int flag) { flags = flags | flag; }
+		public void unsetFlag(int flag) { flags = (flags & ~flag); }
+		public boolean checkFlag(int flag) { return ((flags & flag) == flag); }
+
+//Data Members, used to ultimately create a Reference
+//--------------------------------------------------------------------------------------------------
 		private Bible bible;
 		private Book book;
-
 		private int chapter;
 		private ArrayList<Integer> verses;
 
+//Constructor
+//--------------------------------------------------------------------------------------------------
 		public Builder() {
-			verses = new ArrayList<>();
+			setDefaultBible();
+			setDefaultBook();
+			setDefaultChapter();
+			setDefaultVerses();
 		}
 
-		public Book getBook() {
-			return book;
+//Set default properties
+//--------------------------------------------------------------------------------------------------
+		public Builder setDefaultBible() {
+			this.bible = new SimpleBible();
+
+			setFlag(DEFAULT_BIBLE_FLAG);
+			return this;
 		}
 
-		public int getChapter() {
-			return chapter;
+		public Builder setDefaultBook() {
+			this.book = new SimpleBook();
+
+			setFlag(DEFAULT_BOOK_FLAG);
+			return this;
 		}
 
-		public ArrayList<Integer> getVerses() {
-			return verses;
+		public Builder setDefaultChapter() {
+			this.chapter = 0;
+
+			setFlag(DEFAULT_CHAPTER_FLAG);
+			return this;
 		}
 
-		/**
-		 * Attempts to parse the full String into this Builder, extracting the book, chapter, and
-		 * all verses and populating this Builder with the extracted information.
-		 *
-		 * @param reference the String reference to be parsed
-		 *
-		 * @return this Builder object
-		 */
+		public Builder setDefaultVerses() {
+			this.verses = new ArrayList<>();
+
+			setFlag(DEFAULT_VERSES_FLAG);
+			return this;
+		}
+
+//Getters
+//--------------------------------------------------------------------------------------------------
+		public Bible getBible() { return bible; }
+		public Book getBook() { return book; }
+		public int getChapter() { return chapter; }
+		public ArrayList<Integer> getVerses() { return verses; }
+
+//Parse raw input into this Builder
+//--------------------------------------------------------------------------------------------------
 		public Builder parseReference(String reference) {
 			ReferenceParser parser = new ReferenceParser(this);
 			parser.getPassageReference(reference);
@@ -118,261 +142,115 @@ public final class Reference implements Comparable<Reference> {
 			return this;
 		}
 
-		/**
-		 * Set the book of this Builder
-		 *
-		 * @param book the Book to be set
-		 *
-		 * @return this Builder object
-		 */
+		public Builder setBible(String versionName, @Nullable String versionAbbr) {
+			this.bible = new SimpleBible();
+			this.bible.setName(versionName);
+
+			if(!TextUtils.isEmpty(versionAbbr)) {
+				this.bible.setAbbreviation(versionAbbr);
+			}
+
+			unsetFlag(DEFAULT_BIBLE_FLAG);
+			return this;
+		}
+
+		public Builder setBook(String bookName) {
+			if(bible == null)
+				setDefaultBible();
+
+			book = bible.parseBook(bookName);
+
+			if(book == null) {
+				book = new SimpleBook();
+				book.setName(bookName);
+			}
+
+			unsetFlag(DEFAULT_BOOK_FLAG);
+			return this;
+		}
+
+		public Builder setBook(String bookName, @Nullable String bookAbbr, @Nullable int location, @Nullable int[] chapters) {
+			book = new SimpleBook();
+			book.setName(bookName);
+
+			if(bookAbbr != null)
+				book.setAbbreviation(bookAbbr);
+
+			if(chapters != null)
+				book.setChapters(chapters);
+
+			if(location != 0)
+				book.setLocation(location);
+			else
+				book.setLocation(Integer.MAX_VALUE);
+
+			unsetFlag(DEFAULT_BOOK_FLAG);
+			return this;
+		}
+
+//Set concrete values for properties
+//--------------------------------------------------------------------------------------------------
+		public Builder setBible(Bible bible) {
+			this.bible = bible;
+
+			unsetFlag(DEFAULT_BIBLE_FLAG);
+			return this;
+		}
+
 		public Builder setBook(Book book) {
 			this.book = book;
 
-			//since we are having the Book provided, assume that it is not defaulted
 			unsetFlag(DEFAULT_BOOK_FLAG);
-
 			return this;
 		}
 
-		/**
-		 * Attempts to parse the bookName according to the bible that was set. If that fails, it
-		 * tries to parse against the default ESV. Failing both, it simply creates a Book with the
-		 * given bookName, but this book cannot be downloaded because we can't quite say which verse
-		 * it is in the Bible.
-		 *
-		 * @param bookName the bookname to be parsed
-		 *
-		 * @return this Builder object
-		 */
-		public Builder setBook(String bookName) {
-			//no bible provided, assume default Bible and use that
-			if(bible == null) {
-				setFlag(DEFAULT_BIBLE_FLAG);
-				bible = new SimpleBible();
-			}
-			else {
-				unsetFlag(DEFAULT_BIBLE_FLAG);
-			}
-
-			Book parsedBook = bible.parseBook(bookName);
-
-			if(parsedBook != null) {
-				unsetFlag(DEFAULT_BOOK_FLAG);
-
-				book = parsedBook;
-				return this;
-			}
-			//could not find this book in the given bible, just add the book as-is
-			else {
-				parsedBook = new SimpleBook();
-				parsedBook.setName(bookName);
-				setFlag(DEFAULT_BOOK_FLAG);
-
-				book = parsedBook;
-				return this;
-			}
-		}
-
-		/**
-		 * Makes no attempt to parse the bookName, but instead just creates a Book with the given
-		 * parameters.
-		 *
-		 * @param bookName the name of the book
-		 * @param bookAbbr (optional) the book's abbreviated name. If not specified, the first three
-		 * letters of the name will be used
-		 * @param chapters (optional) the list of chapters in this Book
-		 *
-		 * @return this Builder object
-		 */
-		public Builder setBook(
-				String bookName,
-				@Optional String bookAbbr,
-				@Optional int location,
-				@Optional int[] chapters) {
-
-			Book parsedBook = new Book();
-			parsedBook.setName(bookName);
-
-			if(bookAbbr != null) {
-				parsedBook.setAbbreviation(bookAbbr);
-			}
-			else {
-				parsedBook.setAbbreviation(bookName.substring(0, 3));
-			}
-
-			if(chapters != null) {
-				parsedBook.setChapters(chapters);
-			}
-
-			if(location != 0) {
-				parsedBook.setLocation(location);
-			}
-			else {
-				//choose highest order to ensure it will always be
-				//sorted to the end of a list of verses
-				parsedBook.setLocation(Integer.MAX_VALUE);
-			}
-
-			book = parsedBook;
-
-			//we assume that the book is not default, since it is being created now
-			//we also assume that the Bible is not default, since it was not involved
-			//in creating the Book, so we had no way to default it
-			unsetFlag(DEFAULT_BOOK_FLAG);
-			unsetFlag(DEFAULT_BIBLE_FLAG);
-
-			return this;
-		}
-
-		public Builder clearBook() {
-			this.book = null;
-
-			return this;
-		}
-
-		public Builder clearChapter() {
-			this.chapter = 0;
-
-			return this;
-		}
-
-		public Builder clearVerses() {
-			this.verses.clear();
-
-			return this;
-		}
-
-		/**
-		 * Sets the Bible of this Builder to the given Bible object
-		 *
-		 * @param bible the Bible to be set
-		 *
-		 * @return this Builder object
-		 */
-		public Builder setBible(Bible bible) {
-			this.bible = bible;
-			unsetFlag(DEFAULT_BIBLE_FLAG);
-
-			return this;
-		}
-
-		/**
-		 * Creates a new Bible with the given name. This Bible cannot be used to download verses,
-		 * but just provides a convenient way to accept arbitrary versions from user input as valid
-		 * versions. If no abbreviation is given, one will be created from the first letter of each
-		 * word in the version name, or if it is only one word, it will be copied over.
-		 *
-		 * @param versionName the name of this Bible
-		 * @param versionAbbr (optional) the abbreviation of this Bible
-		 *
-		 * @return this Builder object
-		 */
-		public Builder setBible(String versionName, @Optional String versionAbbr) {
-			//			this.bible = new Bible();
-			this.bible.name = versionName;
-			if(versionAbbr != null) {
-				this.bible.abbreviation = versionAbbr;
-			}
-
-			unsetFlag(DEFAULT_BIBLE_FLAG);
-
-			return this;
-		}
-
-		/**
-		 * A reference can point to a single chapter, so set that chapter.
-		 *
-		 * @param chapter the chapter to set
-		 *
-		 * @return this Builder object
-		 */
 		public Builder setChapter(int chapter) {
 			this.chapter = chapter;
-			unsetFlag(DEFAULT_CHAPTER_FLAG);
 
+			unsetFlag(DEFAULT_CHAPTER_FLAG);
 			return this;
 		}
 
-		/**
-		 * Set the list of verses in the specified chapter for the reference. Any previously set
-		 * verses will be removed
-		 *
-		 * @param verses an array of verses to be set
-		 */
 		public Builder setVerses(int... verses) {
 			this.verses = new ArrayList<>();
 			for(int verse : verses) {
 				this.verses.add(verse);
 			}
-			unsetFlag(DEFAULT_VERSES_FLAG);
 
+			unsetFlag(DEFAULT_VERSES_FLAG);
 			return this;
 		}
 
-		/**
-		 * Add a verse to the current list of verses if it has not already been added
-		 *
-		 * @param verse the verse to add
-		 *
-		 * @return this Builder object
-		 */
+		public Builder setVerses(ArrayList<Integer> verses) {
+			this.verses = verses;
+
+			unsetFlag(DEFAULT_VERSES_FLAG);
+			return this;
+		}
+
 		public Builder addVerse(int verse) {
 			if(!verses.contains(verse)) {
 				this.verses.add(verse);
 			}
-			unsetFlag(DEFAULT_VERSES_FLAG);
 
+			unsetFlag(DEFAULT_VERSES_FLAG);
 			return this;
 		}
 
-		/**
-		 * Sets the chapter of this Builder, then adds all verses in that chapter if that data is available
-		 *
-		 * @param chapter the chapter to add all verses from
-		 *
-		 * @return this Builder object
-		 */
-		public Builder addAllVersesInChapter(int chapter) {
-			setChapter(chapter);
-			unsetFlag(DEFAULT_VERSES_FLAG);
-
-			if(
-				book != null
-				&& book.getChapters() != null
-				&& book.getChapters().length > 0
-				&& chapter >= 0
-				&& chapter < book.getChapters().length) {
-
-				this.verses = new ArrayList<>();
-				for(int i = 1; i <= book.numVersesInChapter(chapter); i++) {
-					this.verses.add(i);
-				}
-			}
-
-			return this;
-		}
-
-		/**
-		 * Using the currently set chapter of this Builder, add all verses in that chapter if that data is available
-		 *
-		 * @return this Builder object
-		 */
 		public Builder addAllVersesInChapter() {
-			unsetFlag(DEFAULT_VERSES_FLAG);
-
-			if(
-					book != null
-							&& book.getChapters() != null
-							&& book.getChapters().length > 0
-							&& chapter >= 0
-							&& chapter < book.getChapters().length) {
-
+			if(book != null
+					&& book.getChapters() != null
+					&& book.getChapters().length > 0
+					&& chapter >= 0
+					&& chapter < book.getChapters().length)
+			{
 				this.verses = new ArrayList<>();
 				for(int i = 1; i <= book.numVersesInChapter(chapter); i++) {
 					this.verses.add(i);
 				}
 			}
 
+			unsetFlag(DEFAULT_VERSES_FLAG);
 			return this;
 		}
 
@@ -386,28 +264,14 @@ public final class Reference implements Comparable<Reference> {
 		 * @return the reference that was incrementally built by this Builder
 		 */
 		public Reference create() {
+			if(bible == null)
+				setDefaultBible();
+
 			if(verses == null || verses.size() == 0) {
-				setFlag(DEFAULT_VERSES_FLAG);
-
 				if(!checkFlag(PREVENT_AUTO_ADD_VERSES_FLAG)) {
-					//no verses, but chapter was given.
 					if(chapter != 0) {
-						//book has a count of the chapters, so add all verses in that chapter
-						if(book.getChapters() != null && book.getChapters().length > 0) {
-							int verseCount = book.numVersesInChapter(chapter);
-
-							this.verses = new ArrayList<>();
-							for(int i = 1; i <= verseCount; i++) {
-								this.verses.add(i);
-							}
-						}
-						//book does not have a list of the chapters, so just use use the first verse
-						else {
-							verses = new ArrayList<>();
-							verses.add(1);
-						}
+						addAllVersesInChapter();
 					}
-					//no verses or chapter given. Set to the first verse of the first chapter
 					else {
 						setFlag(DEFAULT_CHAPTER_FLAG);
 
@@ -415,31 +279,16 @@ public final class Reference implements Comparable<Reference> {
 						verses = new ArrayList<>();
 						verses.add(1);
 					}
+
+					setFlag(DEFAULT_VERSES_FLAG);
 				}
 			}
 
-			//the book was not specified, so use the first book of the New Testament
-			// since many translations only have the New Testament.
 			if(book == null) {
-				setFlag(DEFAULT_BOOK_FLAG);
-				setBook("Matthew");
+				setDefaultBook();
 			}
 
-			return new Reference(book, chapter, verses);
-		}
-
-		//bitflags for defaults during creation
-
-		public void setFlag(int flag) {
-			flags = flags | flag;
-		}
-
-		public void unsetFlag(int flag) {
-			flags = (flags & ~flag);
-		}
-
-		public boolean checkFlag(int flag) {
-			return ((flags & flag) == flag);
+			return new Reference(bible, book, chapter, verses);
 		}
 	}
 

@@ -82,12 +82,16 @@ public abstract class Bible<T extends Book> implements Comparable<Bible> {
 	 *
 	 * @return serialized String representation
 	 */
-	public abstract String serialize();
+	public String serialize() {
+		return "";
+	}
 
 	/**
 	 * deserialize this Bible from String
 	 */
-	public abstract void deserialize(String string);
+	public void deserialize(String string) {
+
+	}
 
 	/**
 	 * Attemps to parse a given String and determine the name of the book. Failing to find it within

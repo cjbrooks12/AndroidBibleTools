@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.util.ArrayList;
 
+//TODO: Fix this class
 public class TopicalSearch {
 	private String topic;
 	private ArrayList<Passage> verses;

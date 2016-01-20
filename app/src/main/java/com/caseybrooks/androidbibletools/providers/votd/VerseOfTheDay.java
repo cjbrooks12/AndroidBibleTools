@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 
+//TODO: fix this, make it an extension of Passage
 public class VerseOfTheDay {
 	private Passage passage;
 	private long date;

@@ -10,6 +10,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
+//TODO: Fix this class
 public class OpenBibleInfo {
 	public static ArrayList<Passage> getVersesFromTopic(String topic) throws IOException {
 //		ArrayList<Passage> verses = new ArrayList<Passage>();

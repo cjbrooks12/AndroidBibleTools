@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.TreeSet;
 
+//TODO: Fix this class
 public class Topics {
 	private TreeSet<String> topics;
 	private char c;

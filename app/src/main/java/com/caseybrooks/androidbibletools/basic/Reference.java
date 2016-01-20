@@ -10,17 +10,6 @@ import com.caseybrooks.androidbibletools.providers.simple.SimpleBook;
 import java.util.ArrayList;
 import java.util.Collections;
 
-/**
- * A generic Reference for a Bible verse. A Reference simply refers to a location in the Bible, as
- * denoted by a book, a chapter, and a list of verses contained within this chapter. The chapter and
- * verses are represented as integers, and the Book, while represented as a String as the name, is
- * supplemented by an integer as its position in the Bible. This class is final, because any type of
- * Bible verse should always be able to reference another by use of the same Reference, entirely
- * independent of the Bible version, language, or service providing the verse text. A reference for
- * a Verse should be compatible with any other implementation of a Verse, and a reference for a
- * Passage should be compatible with any other implementation of a Passage, a Verse reference will
- * always take first verse in a Passage reference.
- */
 public final class Reference implements Comparable<Reference> {
 	private final Bible bible;
 	private final Book book;
@@ -55,6 +44,8 @@ public final class Reference implements Comparable<Reference> {
 		return verses;
 	}
 
+//Builder class
+//--------------------------------------------------------------------------------------------------
 	/**
 	 * Builder class to aid in creating a reference, especially when working with user input. The
 	 * Builder offers much flexibility is the data that is used to construct a Reference, and will
@@ -254,15 +245,6 @@ public final class Reference implements Comparable<Reference> {
 			return this;
 		}
 
-		/**
-		 * Given the current state of this Builder, create a Reference. It will always produce a
-		 * non-null reference, but that reference may have default values if you were not careful
-		 * and did not create it well enough. Ideally, some reference is better than none, because
-		 * the reference returned should at least contain most of the information you put in, which
-		 * makes it easier to determine what was not valid and fix it.
-		 *
-		 * @return the reference that was incrementally built by this Builder
-		 */
 		public Reference create() {
 			if(bible == null)
 				setDefaultBible();

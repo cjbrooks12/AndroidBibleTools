@@ -2,7 +2,7 @@ package com.caseybrooks.androidbibletools.basic;
 
 import java.util.HashMap;
 
-public class BibleList<T extends Bible> {
+public abstract class BibleList<T extends Bible> {
 	protected HashMap<String, T> bibles;
 
 	public BibleList() {

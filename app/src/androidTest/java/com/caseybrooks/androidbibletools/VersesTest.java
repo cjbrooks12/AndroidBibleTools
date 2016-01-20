@@ -11,6 +11,7 @@ import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
 import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
 import com.caseybrooks.androidbibletools.providers.cjb.CJBBible;
 import com.caseybrooks.androidbibletools.providers.cjb.CJBPassage;
+import com.caseybrooks.androidbibletools.providers.simple.SimpleBook;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +35,7 @@ public class VersesTest extends AndroidTestCase {
 //Actual Tests
 //--------------------------------------------------------------------------------------------------
 	public void testPassageGenerics() throws Throwable {
-		Book book = new Book();
+		Book book = new SimpleBook();
 		book.setName("Matthew");
 
 		TestPassage passage = new TestPassage(
@@ -79,7 +80,6 @@ public class VersesTest extends AndroidTestCase {
 						assertEquals(reference.toString(), "Genesis 1:1-4, 6");
 
 						final ABSPassage passage = new ABSPassage(reference);
-						passage.setBible(bible);
 						passage.download(
 								new OnResponseListener() {
 									@Override
@@ -133,7 +133,6 @@ public class VersesTest extends AndroidTestCase {
 				assertEquals(reference.toString(), "Genesis 1:1-4, 6");
 
 				final CJBPassage passage = new CJBPassage(reference);
-				passage.setBible(bible);
 				passage.download(new OnResponseListener() {
 					@Override
 					public void responseFinished() {

@@ -1,7 +1,13 @@
 # Menu navigation links
 
-- title: Theme Setup
-  url: /theme-setup/
+- title: About 
+  url: /about/
 
-- title: External Link
-  url: http://mademistakes.com
+- title: Installation
+  url: /installation/
+
+- title: Usage
+  url: /usage/
+
+- title: Code Samples
+  url: /samples/

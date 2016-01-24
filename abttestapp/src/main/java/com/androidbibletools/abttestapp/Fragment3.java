@@ -2,23 +2,21 @@ package com.androidbibletools.abttestapp;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
-import com.caseybrooks.androidbibletools.basic.Reference;
-import com.caseybrooks.androidbibletools.data.OnResponseListener;
+import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBibleList;
-import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
 import com.caseybrooks.androidbibletools.widget.BiblePickerDialog;
+import com.caseybrooks.androidbibletools.widget.OnBibleSelectedListener;
 import com.caseybrooks.androidbibletools.widget.VersePickerDialog;
+import com.caseybrooks.androidbibletools.widget.VerseView;
 
 public class Fragment3 extends Fragment {
-	Button biblePickerButton, versePickerButton, downloadButton;
-	TextView verseView;
+	Button biblePickerButton, versePickerButton;
+	VerseView verseView;
 
 	BiblePickerDialog biblePickerDialog;
 	VersePickerDialog versePickerDialog;
@@ -39,15 +37,16 @@ public class Fragment3 extends Fragment {
 
 		biblePickerButton = (Button) view.findViewById(R.id.biblePickerButton);
 		versePickerButton = (Button) view.findViewById(R.id.versePickerButton);
-		downloadButton = (Button) view.findViewById(R.id.downloadButton);
 
-		verseView = (TextView) view.findViewById(R.id.verseView);
+		verseView = (VerseView) view.findViewById(R.id.verseView);
 
 		biblePickerDialog = new BiblePickerDialog();
 		biblePickerDialog.setBibleListClass(ABSBibleList.class, "frag3");
+
 		versePickerDialog = new VersePickerDialog();
 		versePickerDialog.setSelectedBibleTag("frag3");
 
+		//hit button to show Bible picker
 		biblePickerButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -55,6 +54,16 @@ public class Fragment3 extends Fragment {
 			}
 		});
 
+		//Selecting a Bible automatically opens the verse picker dialog
+		biblePickerDialog.setOnBibleSelectedListener(new OnBibleSelectedListener() {
+			@Override
+			public void onBibleSelected(Bible bible) {
+				biblePickerDialog.dismiss();
+				versePickerDialog.show(getActivity().getSupportFragmentManager(), "Sample Fragment");
+			}
+		});
+
+		//can also manually open versepicker
 		versePickerButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -62,20 +71,8 @@ public class Fragment3 extends Fragment {
 			}
 		});
 
-		downloadButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Reference reference = versePickerDialog.getVersePicker().getReferenceBuilder().create();
-
-				final ABSPassage passage = new ABSPassage(reference);
-				passage.download(new OnResponseListener() {
-					@Override
-					public void responseFinished() {
-						verseView.setText(Html.fromHtml(passage.getFormattedText()));
-					}
-				});
-			}
-		});
+		//selecting verses automatically downloads them into the verseview
+		versePickerDialog.setOnReferenceCreatedListener(verseView);
 
 		return view;
 	}

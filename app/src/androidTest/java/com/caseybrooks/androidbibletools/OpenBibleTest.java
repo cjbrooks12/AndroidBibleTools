@@ -63,7 +63,7 @@ public class OpenBibleTest extends AndroidTestCase {
 				assertEquals(topics.getPassages().size(), 90);
 				OpenBiblePassage passage = topics.getPassages().get(0);
 				final int upvotes_initial = passage.getMetadata().getInt("UPVOTES");
-				assertEquals(upvotes_initial, 364);
+				assertEquals(upvotes_initial, 365);
 
 				passage.upvote(new OnResponseListener() {
 					@Override

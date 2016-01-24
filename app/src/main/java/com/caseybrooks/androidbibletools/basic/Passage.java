@@ -4,22 +4,39 @@ import android.support.annotation.NonNull;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
 //TODO: fix reflection stuff so that any Passage class can be extended
-public abstract class Passage<T extends Verse> extends AbstractVerse {
-//Data Members
-//--------------------------------------------------------------------------------------------------
-	protected ArrayList<T> verses;
+//TODO: make verses an unmodifiable list
 
-//Constructors
-//--------------------------------------------------------------------------------------------------
+/**
+ * A base class for a list of Verses of a particular type. As with all implementations of
+ * {@link AbstractVerse}, the {@link Reference} is immutable, and so this passage will always refer
+ * to the same set of verses within one chapter of the Bible. In most cases, you will want to primarily
+ * use some implementation of Passage as opposed to Verse, because it is more powerful, but when set
+ * with just a single verse, acts very similar to the Verse class.
+ *
+ * @param <T>  the type of Verse that is contained in this Passage's list of verses
+ *
+ * @see Verse
+ */
+public abstract class Passage<T extends Verse> extends AbstractVerse {
+	protected List<T> verses;
+
+	/**
+	 * Create this Passage with the given Reference. Upon creation, an unmodifiable list of Verses
+	 * will be created of the type specified by the type parameter T. As of now, this feature is buggy,
+	 * and does not work with any deeper subclasses of Passage. As such, only direct descendants of
+	 * Passage should be created, and those implementations should always be final classes.
+	 *
+	 * @param reference  the reference of this Passage
+	 */
 	public Passage(Reference reference) {
 		super(reference);
 
 		Class<? extends Verse> verseClass = getTypeParamemeterClass();
 
-		Collections.sort(this.reference.getVerses());
+//		Collections.sort(this.reference.getVerses());
 		this.verses = new ArrayList<>();
 		for(Integer verseNum : this.reference.getVerses()) {
 			try {
@@ -36,6 +53,8 @@ public abstract class Passage<T extends Verse> extends AbstractVerse {
 				e.printStackTrace();
 			}
 		}
+
+//		this.verses = Collections.unmodifiableList(this.verses);
 	}
 
 	private Class<? extends Verse> getTypeParamemeterClass() {
@@ -50,8 +69,14 @@ public abstract class Passage<T extends Verse> extends AbstractVerse {
 		}
 	}
 
-//Setters and Getters
-//--------------------------------------------------------------------------------------------------
+	/**
+	 * Get the list of Verses associated with this Passage
+	 * @return
+	 */
+	public List<T> getVerses() {
+		return verses;
+	}
+
 	@Override
 	public String getFormattedText() {
 		if(verses.size() > 0) {
@@ -94,11 +119,6 @@ public abstract class Passage<T extends Verse> extends AbstractVerse {
 			return "";
 		}
 	}
-
-	public ArrayList<T> getVerses() {
-		return verses;
-	}
-
 
 	@Override
 	public int compareTo(@NonNull AbstractVerse verse) {

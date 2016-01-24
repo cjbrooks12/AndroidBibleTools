@@ -284,7 +284,7 @@ public class MetadataTest extends AndroidTestCase {
 		//start by sorting into position
 		Collections.sort(verses, new Metadata.Comparator("POS"));
 		//sort by reference
-		Collections.sort(verses, new Metadata.Comparator(Metadata.Comparator.KEY_REFERENCE));
+		Collections.sort(verses, new Metadata.Comparator(Metadata.Comparator.KEY_REFERENCE_CANONICAL));
 		String simpleSort4 = "";
 		for(int i = 0; i < verses.size(); i++) {
 			simpleSort4 += verses.get(i).getMetadata().getInt("POS");

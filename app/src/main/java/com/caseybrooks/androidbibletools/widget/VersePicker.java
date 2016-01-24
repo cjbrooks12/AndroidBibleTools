@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -44,7 +43,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 	Bible bible;
 	String tag;
 	TextView selectedBibleName;
-	EditText editReference;
+	TextView editReference;
 	Button verseSelectionModeButton;
 
 	ViewPager viewPager;
@@ -95,7 +94,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 		builder.setFlag(Reference.Builder.PREVENT_AUTO_ADD_VERSES_FLAG);
 
 		selectedBibleName = (TextView) findViewById(R.id.selected_bible_name);
-		editReference = (EditText) findViewById(R.id.editReference);
+		editReference = (TextView) findViewById(R.id.editReference);
 
 		viewPager = (ViewPager) findViewById(R.id.viewpager);
 		tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
@@ -240,7 +239,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 		this.listener = listener;
 	}
 
-	///TabLayout and ViewPagerAdapter
+//TabLayout and ViewPagerAdapter
 //--------------------------------------------------------------------------------------------------
 
 	class VersePickerPagerAdapter extends PagerAdapter {
@@ -249,7 +248,12 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 		String[] titles = {"Books", "Chapters", "Verses"};
 
 		public VersePickerPagerAdapter() {
-			((ViewGroup) views[0].getParent()).removeAllViews();
+			for(int i = 0; i < views.length; i++) {
+				if(views[i].getParent() != null) {
+					((ViewGroup) views[i].getParent()).removeAllViews();
+					break;
+				}
+			}
 		}
 
 		public Object instantiateItem(ViewGroup collection, int position) {

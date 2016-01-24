@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 public class VersePickerDialog extends DialogFragment {
 	VersePicker picker;
 	String tag;
+	OnReferenceCreatedListener listener;
 
 	@Override
 	public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -23,6 +24,7 @@ public class VersePickerDialog extends DialogFragment {
 
 		picker = new VersePicker(getActivity());
 		builder.setView(picker);
+		picker.setOnReferenceCreatedListener(listener);
 		picker.setSelectedBibleTag(tag);
 		picker.loadBible();
 
@@ -35,5 +37,9 @@ public class VersePickerDialog extends DialogFragment {
 
 	public VersePicker getVersePicker() {
 		return picker;
+	}
+
+	public void setOnReferenceCreatedListener(OnReferenceCreatedListener listener) {
+		this.listener = listener;
 	}
 }

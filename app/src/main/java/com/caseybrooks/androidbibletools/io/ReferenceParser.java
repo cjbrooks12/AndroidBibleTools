@@ -6,17 +6,16 @@ import java.util.ArrayList;
 
 /**
  * The class used to parse a String into Reference objects. Uses the following grammar
- * <p/>
+ * <p>
  * Passage ::= book (punctuation) chapter ((punctuation) verseList) Verse ::= book (punctuation)
  * chapter (punctuation) verse
- * <p/>
+ * <p>
  * number ::= { [0..9] } word ::= { [a..zA..Z] } punctuation ::= [;:,.-\/]
- * <p/>
+ * <p>
  * book ::= ([123]) word+ chapter ::= number verse ::= number
- * <p/>
+ * <p>
  * verseSequence ::= verse punctuation verse verseList ::= { [verse | verseSequence] punctuation }
  */
-
 public class ReferenceParser {
 	Reference.Builder builder;
 	String reference;

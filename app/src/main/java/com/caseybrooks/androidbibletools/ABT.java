@@ -14,14 +14,23 @@ import com.caseybrooks.androidbibletools.basic.Metadata;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * A singleton class that provides the ABT library with much of the Android application logic necessary
+ * for more advanced uses. By default, all providers in this library use Volley for networking for
+ * its caching capabilities, but Volley is directly connected to an Application by requiring a
+ * Context, so a Context is something that is included here and consumed by the providers when they
+ * need it. This makes it so you only need to initialize this singleton once, and then forget about
+ * it. Likewise, API keys are set here so that they do not need to be specified every time a provider
+ * needs an API key for accessing its web service. This class also makes it easy to save a user's
+ * preferred Bible, and the widgets in the library are dependant upon the user's preference being
+ * set here as opposed to being stored elsewhere.
+ */
 public class ABT {
 	private static final String PREFERENCES = "ABT_preferences";
 	private static final String PREF_SELECTED_BIBLE = "ABT_selectedBible";
 	private static final String PREF_CLASS_NAME = "className";
 	private static final String PREF_BIBLE = "bible";
 
-//Singleton
-//--------------------------------------------------------------------------------------------------
 	private static ABT ourInstance;
 
 	/**
@@ -29,7 +38,10 @@ public class ABT {
 	 * persistence or networking. This is only used internally when there is no direct handle to
 	 * such a Context, at which point it can be assumed that the Context was already supplied to the
 	 * singleton via getInstance(Context context) or setContext(Context context).
+	 *
+	 * @return the singleton of ABT
 	 */
+	@Deprecated
 	public static ABT getInstance() {
 		if(ourInstance == null) {
 			ourInstance = new ABT(null);
@@ -39,14 +51,19 @@ public class ABT {
 	}
 
 	/**
-	 * Initialize this library with the application Context and get the singleton instance for ABT
+	 * Initialize this library with the application Context and get the singleton instance for ABT.
+	 * If no instance has been created yet, this will create a new instance. Otherwise, it will set
+	 * the instance's to this new Context.
+	 *
+	 * @param context  the application Context
+	 * @return the singleton of ABT
 	 */
 	public static ABT getInstance(Context context) {
 		if(ourInstance == null) {
 			ourInstance = new ABT(context);
 		}
 
-		if(ourInstance.getContext() == null) {
+		if(context != null) {
 			ourInstance.setContext(context);
 		}
 
@@ -54,7 +71,10 @@ public class ABT {
 	}
 
 	/**
-	 * Initialize this library with the application Context without getting an instance of ABT
+	 * Initialize this library with the application Context. If no instance has been created yet,
+	 * this will create a new instance. Otherwise, it will set the instance's to this new Context.
+	 *
+	 * @param context  the application Context
 	 */
 	public static void createInstance(Context context) {
 		if(ourInstance == null) {
@@ -66,10 +86,7 @@ public class ABT {
 		}
 	}
 
-//Data members
-//--------------------------------------------------------------------------------------------------
 	private Context mContext;
-
 	private Metadata mMetadata;
 	private RequestQueue mRequestQueue;
 
@@ -79,6 +96,9 @@ public class ABT {
 	}
 
 	/**
+	 * Providers should use Volley for all HTTP requests, and ABT has its own instance of
+	 * RequestQueue. This returns the instance of RequestQueue used by ABT
+	 *
 	 * @return an instance of a Volley RequestQueue
 	 */
 	public RequestQueue getRequestQueue() {
@@ -96,7 +116,7 @@ public class ABT {
 	}
 
 	/**
-	 * Add an Request to Volley's RequestQueue
+	 * Add a Request to Volley's RequestQueue
 	 */
 	public <T> void addToRequestQueue(Request<T> req, String tag) {
 		req.setTag(TextUtils.isEmpty(tag) ? "" : tag);
@@ -104,14 +124,14 @@ public class ABT {
 	}
 
 	/**
-	 * Add an Request to Volley's RequestQueue with default tag
+	 * Add a Request to Volley's RequestQueue with a default tag
 	 */
 	public <T> void addToRequestQueue(Request<T> req) {
 		addToRequestQueue(req, null);
 	}
 
 	/**
-	 * Cancel all Requests in Volley's RequestQueue with given tag
+	 * Cancel all Requests in Volley's RequestQueue with the given tag
 	 */
 	public void cancelPendingRequests(String tag) {
 		if(mRequestQueue != null) {
@@ -234,7 +254,7 @@ public class ABT {
 	 * An instance of a Bible is often required to download Verse data. The user-selected Bible can
 	 * be stored and loaded at a later time. Multiple Bibles can be saved at the same time by
 	 * specifying a tag. This method saves a Bible to be loaded later.
-	 * <p/>
+	 * <p>
 	 * The Bible's Type is saved along with the result of Bible.serialize() so that any generic
 	 * Bible subclass can fully save and load whatever data is necessary in whatever format. All
 	 * serialization and deserialization is left entirely up to the Bible class.

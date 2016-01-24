@@ -111,7 +111,7 @@ public class BiblesTest extends AndroidTestCase {
 		bibleList.download(new OnResponseListener() {
 			@Override
 			public void responseFinished() {
-				assertEquals(bibleList.getBibles().size(), 1392);
+				assertEquals(bibleList.getBibles().size(), 1406);
 
 				signal.countDown();
 			}

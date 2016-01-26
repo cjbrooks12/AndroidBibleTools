@@ -1,0 +1,11 @@
+com.caseybrooks.androidbibletools
+com.caseybrooks.androidbibletools.basic
+com.caseybrooks.androidbibletools.data
+com.caseybrooks.androidbibletools.defaults
+com.caseybrooks.androidbibletools.io
+com.caseybrooks.androidbibletools.providers.abs
+com.caseybrooks.androidbibletools.providers.cjb
+com.caseybrooks.androidbibletools.providers.openbible
+com.caseybrooks.androidbibletools.providers.simple
+com.caseybrooks.androidbibletools.providers.votd
+com.caseybrooks.androidbibletools.widget

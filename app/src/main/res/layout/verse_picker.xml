@@ -34,7 +34,8 @@
         android:paddingRight="16dp"
         android:background="@drawable/bg_oval_32"
         android:singleLine="true"
-        android:hint="Enter Reference (i.e. John 3:16)" />
+        android:gravity="center_vertical"
+        android:hint="No Reference Selected" />
 
     <Button
         android:id="@+id/selection_mode_button"

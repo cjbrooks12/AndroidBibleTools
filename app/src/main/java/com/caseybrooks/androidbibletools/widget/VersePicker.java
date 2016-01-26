@@ -2,9 +2,12 @@ package com.caseybrooks.androidbibletools.widget;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -29,8 +32,7 @@ import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.io.DividerItemDecoration;
 
-//TODO: Make an EditReference that does the actual input parsing logic, and connect it here instead of a simple EditText
-//TODO: Make manually updating the reference text automatically update the selection within the picker body
+//TODO: Make an EditReference that does the actual input parsing logic, and connect it here instead of a TextView
 public class VersePicker extends LinearLayout implements OnBibleSelectedListener {
 	public static int SELECTION_ONE_VERSE = 0;
 	public static int SELECTION_MANY_VERSES = 1;
@@ -39,6 +41,8 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 //Data Members
 //--------------------------------------------------------------------------------------------------
 	Context context;
+
+	ColorStateList bookTextColor, circleTextColor, circleBackgroundColor;
 
 	Bible bible;
 	String tag;
@@ -89,6 +93,8 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 			a.recycle();
 		}
 
+		loadColors();
+
 		bible = ABT.getInstance(context).getSelectedBible(tag);
 		builder = new Reference.Builder();
 		builder.setFlag(Reference.Builder.PREVENT_AUTO_ADD_VERSES_FLAG);
@@ -116,8 +122,6 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 		verseList.setLayoutManager(new GridLayoutManager(getContext(), 4));
 
 		bookList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.LIST_VERTICAL));
-		chapterList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.GRID_STROKE));
-		verseList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.GRID_STROKE));
 
 		verseSelectionModeButton = (Button) findViewById(R.id.selection_mode_button);
 		verseSelectionModeButton.setOnClickListener(new OnClickListener() {
@@ -161,6 +165,71 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 		if(bible != null) {
 			loadBible();
 		}
+	}
+
+	private void loadColors() {
+		TypedArray a = context.getTheme().obtainStyledAttributes(
+				new int[] {
+						android.R.attr.textColor,
+						R.attr.colorAccent
+				}
+		);
+		int textColor = a.getColor(0, Color.BLACK);
+		int colorAccent = a.getColor(1, Color.LTGRAY);
+		int pressedColor = Color.parseColor("#15000000");
+		a.recycle();
+
+		bookTextColor = new ColorStateList(
+				new int[][]{
+						new int[] { android.R.attr.state_pressed },
+						new int[] { android.R.attr.state_selected },
+						new int[] { }
+				},
+				new int[] {
+						darker(colorAccent, 0.8f),
+						colorAccent,
+						textColor
+				}
+		);
+
+		circleTextColor = new ColorStateList(
+				new int[][]{
+						new int[] { android.R.attr.state_selected },
+						new int[] { }
+				},
+				new int[] {
+						Color.WHITE,
+						textColor,
+				}
+		);
+
+		circleBackgroundColor = new ColorStateList(
+				new int[][]{
+						new int[] { android.R.attr.state_pressed, android.R.attr.state_selected },
+						new int[] { android.R.attr.state_pressed },
+						new int[] { android.R.attr.state_selected },
+						new int[] { }
+				},
+				new int[] {
+						darker(colorAccent, 0.8f),
+						pressedColor,
+						colorAccent,
+						Color.TRANSPARENT
+				}
+		);
+	}
+
+	private static int darker (int color, float factor) {
+		int a = Color.alpha(color);
+		int r = Color.red(color);
+		int g = Color.green(color);
+		int b = Color.blue(color);
+
+		return Color.argb(
+				a,
+				Math.max((int) (r * factor), 0),
+				Math.max((int) (g * factor), 0),
+				Math.max((int) (b * factor), 0));
 	}
 
 	@Override
@@ -300,6 +369,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 
 			root = itemView;
 			tv = (TextView) itemView.findViewById(R.id.book_name);
+			tv.setTextColor(bookTextColor);
 		}
 
 		public void bind(final Book book) {
@@ -359,6 +429,8 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 
 			root = itemView;
 			tv = (TextView) itemView.findViewById(R.id.chapter_name);
+			tv.setTextColor(circleTextColor);
+			ViewCompat.setBackgroundTintList(tv, circleBackgroundColor);
 		}
 
 		public void bind(final int chapter) {
@@ -425,6 +497,8 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 
 			root = itemView;
 			tv = (TextView) itemView.findViewById(R.id.verse_name);
+			tv.setTextColor(circleTextColor);
+			ViewCompat.setBackgroundTintList(tv, circleBackgroundColor);
 		}
 
 		public void bind(final int verse) {

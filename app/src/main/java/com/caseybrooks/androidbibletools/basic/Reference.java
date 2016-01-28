@@ -135,7 +135,6 @@ public final class Reference implements Comparable<Reference> {
 
 		return refString;
 	}
-
 	/**
 	 * Compares two Reference with respect to natural reference order, according to the first
 	 * verse. Defines a natural ordering of verses based on their ordering within the Bible, and

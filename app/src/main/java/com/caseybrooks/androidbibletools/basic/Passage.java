@@ -2,11 +2,9 @@ package com.caseybrooks.androidbibletools.basic;
 
 import android.support.annotation.NonNull;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: fix reflection stuff so that any Passage class can be extended
 //TODO: make verses an unmodifiable list
 
 /**
@@ -34,9 +32,8 @@ public abstract class Passage<T extends Verse> extends AbstractVerse {
 	public Passage(Reference reference) {
 		super(reference);
 
-		Class<? extends Verse> verseClass = getTypeParamemeterClass();
+		Class<? extends Verse> verseClass = getVerseClass();
 
-//		Collections.sort(this.reference.getVerses());
 		this.verses = new ArrayList<>();
 		for(Integer verseNum : this.reference.getVerses()) {
 			try {
@@ -57,17 +54,7 @@ public abstract class Passage<T extends Verse> extends AbstractVerse {
 //		this.verses = Collections.unmodifiableList(this.verses);
 	}
 
-	private Class<? extends Verse> getTypeParamemeterClass() {
-		ParameterizedType genericType = (ParameterizedType) getClass().getGenericSuperclass();
-		Class typeParameter = (Class) genericType.getActualTypeArguments()[0];
-
-		try {
-			return (Class<? extends Verse>) typeParameter;
-		}
-		catch(ClassCastException e) {
-			throw new ClassCastException("Passage generic type parameter class [" + typeParameter.getName() + "] does not extend " + Verse.class.getName());
-		}
-	}
+	public abstract Class<? extends Verse> getVerseClass();
 
 	/**
 	 * Get the list of Verses associated with this Passage

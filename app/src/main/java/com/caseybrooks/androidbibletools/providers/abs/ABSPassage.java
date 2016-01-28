@@ -10,6 +10,7 @@ import com.android.volley.VolleyError;
 import com.caseybrooks.androidbibletools.ABT;
 import com.caseybrooks.androidbibletools.basic.Passage;
 import com.caseybrooks.androidbibletools.basic.Reference;
+import com.caseybrooks.androidbibletools.basic.Verse;
 import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.io.CachingStringRequest;
@@ -36,6 +37,11 @@ public class ABSPassage extends Passage<ABSVerse> implements Downloadable, Respo
 		else {
 			this.id = "Matt.1";
 		}
+	}
+
+	@Override
+	public Class<? extends Verse> getVerseClass() {
+		return ABSVerse.class;
 	}
 
 	@Override

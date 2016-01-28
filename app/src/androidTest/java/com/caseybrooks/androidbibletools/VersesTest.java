@@ -30,6 +30,11 @@ public class VersesTest extends AndroidTestCase {
 		public TestPassage(Reference reference) {
 			super(reference);
 		}
+
+		@Override
+		public Class<? extends Verse> getVerseClass() {
+			return TestVerse.class;
+		}
 	}
 
 //Actual Tests

@@ -8,6 +8,7 @@ import com.android.volley.VolleyError;
 import com.caseybrooks.androidbibletools.ABT;
 import com.caseybrooks.androidbibletools.basic.Passage;
 import com.caseybrooks.androidbibletools.basic.Reference;
+import com.caseybrooks.androidbibletools.basic.Verse;
 import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.io.CachingStringRequest;
@@ -38,6 +39,11 @@ public class CJBPassage extends Passage<CJBVerse> implements Downloadable, Respo
 
 		CachingStringRequest jsonObjReq = new CachingStringRequest(Request.Method.GET, url, this, this);
 		ABT.getInstance().addToRequestQueue(jsonObjReq, tag);
+	}
+
+	@Override
+	public Class<? extends Verse> getVerseClass() {
+		return CJBVerse.class;
 	}
 
 	@Override

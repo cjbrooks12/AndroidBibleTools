@@ -10,12 +10,13 @@ import com.caseybrooks.androidbibletools.ABT;
 import com.caseybrooks.androidbibletools.basic.Passage;
 import com.caseybrooks.androidbibletools.basic.Reference;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
+import com.caseybrooks.androidbibletools.providers.simple.SimplePassage;
 import com.caseybrooks.androidbibletools.providers.simple.SimpleVerse;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class OpenBiblePassage extends Passage<SimpleVerse> implements Response.Listener<String>, Response.ErrorListener {
+public class OpenBiblePassage extends SimplePassage implements Response.Listener<String>, Response.ErrorListener {
 	OnResponseListener listener;
 	String text;
 

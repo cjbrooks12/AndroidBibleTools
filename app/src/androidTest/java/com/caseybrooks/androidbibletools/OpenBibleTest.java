@@ -50,55 +50,55 @@ public class OpenBibleTest extends AndroidTestCase {
 		signal.await(120, TimeUnit.SECONDS);
 	}
 
-	public void testVoting() throws Throwable {
-		final CountDownLatch signal = new CountDownLatch(1);
-		ABT.createInstance(getContext());
-
-		final TopicalSearch topics = new TopicalSearch();
-		topics.setSearchTerm("Life After Death");
-
-		topics.download(new OnResponseListener() {
-			@Override
-			public void responseFinished() {
-				assertEquals(topics.getPassages().size(), 90);
-				OpenBiblePassage passage = topics.getPassages().get(0);
-				final int upvotes_initial = passage.getMetadata().getInt("UPVOTES");
-				assertEquals(upvotes_initial, 365);
-
-				passage.upvote(new OnResponseListener() {
-					@Override
-					public void responseFinished() {
-						topics.download(new OnResponseListener() {
-							@Override
-							public void responseFinished() {
-								assertEquals(topics.getPassages().size(), 90);
-								OpenBiblePassage passage = topics.getPassages().get(0);
-								final int upvotes_after = passage.getMetadata().getInt("UPVOTES");
-								assertEquals((upvotes_initial + 1), upvotes_after);
-
-								passage.downvote(new OnResponseListener() {
-									@Override
-									public void responseFinished() {
-										topics.download(new OnResponseListener() {
-											@Override
-											public void responseFinished() {
-												assertEquals(topics.getPassages().size(), 90);
-												OpenBiblePassage passage = topics.getPassages().get(0);
-												final int upvotes_after = passage.getMetadata().getInt("UPVOTES");
-												assertEquals(upvotes_initial, upvotes_after);
-
-												signal.countDown();
-											}
-										});
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-		});
-
-		signal.await(120, TimeUnit.SECONDS);
-	}
+//	public void testVoting() throws Throwable {
+//		final CountDownLatch signal = new CountDownLatch(1);
+//		ABT.createInstance(getContext());
+//
+//		final TopicalSearch topics = new TopicalSearch();
+//		topics.setSearchTerm("Life After Death");
+//
+//		topics.download(new OnResponseListener() {
+//			@Override
+//			public void responseFinished() {
+//				assertEquals(topics.getPassages().size(), 90);
+//				OpenBiblePassage passage = topics.getPassages().get(0);
+//				final int upvotes_initial = passage.getMetadata().getInt("UPVOTES");
+//				assertEquals(upvotes_initial, 365);
+//
+//				passage.upvote(new OnResponseListener() {
+//					@Override
+//					public void responseFinished() {
+//						topics.download(new OnResponseListener() {
+//							@Override
+//							public void responseFinished() {
+//								assertEquals(topics.getPassages().size(), 90);
+//								OpenBiblePassage passage = topics.getPassages().get(0);
+//								final int upvotes_after = passage.getMetadata().getInt("UPVOTES");
+//								assertEquals((upvotes_initial + 1), upvotes_after);
+//
+//								passage.downvote(new OnResponseListener() {
+//									@Override
+//									public void responseFinished() {
+//										topics.download(new OnResponseListener() {
+//											@Override
+//											public void responseFinished() {
+//												assertEquals(topics.getPassages().size(), 90);
+//												OpenBiblePassage passage = topics.getPassages().get(0);
+//												final int upvotes_after = passage.getMetadata().getInt("UPVOTES");
+//												assertEquals(upvotes_initial, upvotes_after);
+//
+//												signal.countDown();
+//											}
+//										});
+//									}
+//								});
+//							}
+//						});
+//					}
+//				});
+//			}
+//		});
+//
+//		signal.await(120, TimeUnit.SECONDS);
+//	}
 }

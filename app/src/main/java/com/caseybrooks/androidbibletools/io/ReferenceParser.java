@@ -18,7 +18,6 @@ import java.util.ArrayList;
  */
 public class ReferenceParser {
 	Reference.Builder builder;
-	String reference;
 
 	TokenStream ts;
 
@@ -28,7 +27,6 @@ public class ReferenceParser {
 
 	//verse ::= book chapter (punctuation) verse
 	public Reference.Builder getVerseReference(String reference) {
-		this.reference = reference;
 		ts = new TokenStream(reference);
 
 		//Book will throw its own exception if it fails to parse
@@ -43,7 +41,6 @@ public class ReferenceParser {
 
 	//Passage ::= book (punctuation) chapter ((punctuation) verseList)
 	public Reference.Builder getPassageReference(String reference) {
-		this.reference = reference;
 		return getPassageReference(new TokenStream(reference));
 	}
 

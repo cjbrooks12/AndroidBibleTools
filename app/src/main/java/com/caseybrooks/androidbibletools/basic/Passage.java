@@ -69,7 +69,7 @@ public abstract class Passage<T extends Verse> extends AbstractVerse {
 		if(verses.size() > 0) {
 			String text = "";
 
-			text += formatter.onPreFormat(reference);
+			text += formatter.onPreFormat(this);
 
 			for(int i = 0; i < verses.size(); i++) {
 				T verse = verses.get(i);

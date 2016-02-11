@@ -171,25 +171,23 @@ public abstract class Bible<T extends Book> implements Comparable<Bible> {
 			if(bookName.equalsIgnoreCase(book.getName())) {
 				return book;
 			}
-			//equality of the abbreviation last, since it is smallest
+			//check equality of the abbreviation
 			else if(bookName.equalsIgnoreCase(book.getAbbreviation())) {
 				return book;
 			}
 
-			//failing equality, check if the name is close
-			else if(book.getName().contains(bookName)) {
-				return book;
-			}
-			else if(bookName.contains(book.getName())) {
-				return book;
-			}
+			//failing equality, check if we have something close
+			else {
+				int nameSize = Math.min(bookName.length(), book.getName().length());
+				int abbrSize = Math.min(bookName.length(), book.getAbbreviation().length());
 
-			//failing close name, check close to abbreviation
-			else if(book.getAbbreviation().contains(bookName)) {
-				return book;
-			}
-			else if(bookName.contains(book.getAbbreviation())) {
-				return book;
+				if(bookName.substring(0, nameSize).equalsIgnoreCase(book.getName().substring(0, nameSize))) {
+					return book;
+				}
+				//check equality of the abbreviation
+				else if(bookName.substring(0, abbrSize).equalsIgnoreCase(book.getAbbreviation().substring(0, abbrSize))) {
+					return book;
+				}
 			}
 		}
 		return null;

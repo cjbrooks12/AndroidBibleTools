@@ -48,7 +48,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 	String tag;
 	TextView selectedBibleName;
 	TextView editReference;
-	Button verseSelectionModeButton;
+	Button selectionModeChangeButton;
 
 	ViewPager viewPager;
 	TabLayout tabLayout;
@@ -88,6 +88,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 		if(attrs != null) {
 			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.abt_versepicker, 0, 0);
 			attrSelectionMode = a.getInt(R.styleable.abt_versepicker_selectionMode, SELECTION_MANY_VERSES);
+			setAllowSelectionModeChange(a.getBoolean(R.styleable.abt_versepicker_allowSelectionModeChange, false));
 			setSelectedBibleTag(a.getString(R.styleable.abt_versepicker_tag));
 			connectedViewId = a.getResourceId(R.styleable.abt_biblepicker_connectTo, 0);
 			a.recycle();
@@ -123,37 +124,37 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 
 		bookList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.LIST_VERTICAL));
 
-		verseSelectionModeButton = (Button) findViewById(R.id.selection_mode_button);
-		verseSelectionModeButton.setOnClickListener(new OnClickListener() {
+		selectionModeChangeButton = (Button) findViewById(R.id.selection_mode_button);
+		selectionModeChangeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(
 						getContext(),
 						android.R.layout.simple_list_item_single_choice,
 						getResources().getStringArray(R.array.versepicker_selection_titles)) {
-							@Override
-							public View getView(int position, View convertView, ViewGroup parent) {
-								CheckedTextView view = (CheckedTextView) super.getView(position, convertView, parent);
+					@Override
+					public View getView(int position, View convertView, ViewGroup parent) {
+						CheckedTextView view = (CheckedTextView) super.getView(position, convertView, parent);
 
-								if(position == selectionMode)
-									view.setChecked(true);
-								else
-									view.setChecked(false);
+						if(position == selectionMode)
+							view.setChecked(true);
+						else
+							view.setChecked(false);
 
-								return view;
-							}
-						};
+						return view;
+					}
+				};
 
 				new AlertDialog.Builder(getContext())
 						.setTitle("Select...")
 						.setAdapter(itemsAdapter,
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									dialog.dismiss();
-									setSelectionMode(which);
-								}
-							})
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dialog.dismiss();
+										setSelectionMode(which);
+									}
+								})
 						.create()
 						.show();
 
@@ -251,6 +252,15 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 
 	public void setSelectedBibleTag(String tag) {
 		this.tag = tag;
+	}
+
+	public void setAllowSelectionModeChange(boolean allowSelectionModeChange) {
+		if(allowSelectionModeChange) {
+			selectionModeChangeButton.setVisibility(View.VISIBLE);
+		}
+		else {
+			selectionModeChangeButton.setVisibility(View.GONE);
+		}
 	}
 
 	public void setSelectionMode(int selectionMode) {
@@ -382,7 +392,8 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 
 			tv.setText(book.getName());
 
-			root.setOnClickListener(new OnClickListener() {
+			root.setOnClickListener(
+					new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					builder.setBook(book);

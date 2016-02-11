@@ -1,7 +1,6 @@
 package com.caseybrooks.androidbibletools.basic;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.caseybrooks.androidbibletools.io.ReferenceParser;
@@ -98,12 +97,12 @@ public final class Reference implements Comparable<Reference> {
 	public String toString() {
 		String refString = book.getName();
 
-		if(chapter == 0)
-			return refString;
+		if(TextUtils.isEmpty(refString))
+			return "";
 
 		refString += " " + chapter;
 
-		if(verses == null || verses.size() == 0)
+		if(verses.size() == 0)
 			return refString;
 
 		refString += ":";
@@ -281,7 +280,7 @@ public final class Reference implements Comparable<Reference> {
 	 * @return the hashcode
 	 */
 	public int hashCode() {
-		int result = book.hashCode();
+		int result = book.getName().hashCode();
 		result = 31 * result + chapter;
 		result = 31 * result + verses.hashCode();
 		return result;
@@ -305,6 +304,9 @@ public final class Reference implements Comparable<Reference> {
 		public static int DEFAULT_CHAPTER_FLAG = 0x4;
 		public static int DEFAULT_VERSES_FLAG = 0x8;
 		public static int PREVENT_AUTO_ADD_VERSES_FLAG = 0x10;
+		public static int PARSED = 0x20;
+		public static int PARSE_SUCCESS = 0x40;
+		public static int PARSE_FAILURE = 0x80;
 
 		private int flags = 0;
 
@@ -335,19 +337,24 @@ public final class Reference implements Comparable<Reference> {
 			return ((flags & flag) == flag);
 		}
 
-		private Bible bible;
-		private Book book;
+		@NonNull private Bible bible;
+		@NonNull private Book book;
 		private int chapter;
-		private ArrayList<Integer> verses;
+		@NonNull private ArrayList<Integer> verses;
 
 		/**
 		 * Create a new Builder with all properties set to their default values.
 		 */
 		public Builder() {
-			setDefaultBible();
-			setDefaultBook();
-			setDefaultChapter();
-			setDefaultVerses();
+			this.bible = new SimpleBible();
+			this.book = new SimpleBook();
+			chapter = 1;
+			this.verses = new ArrayList<>();
+
+			setFlag(DEFAULT_BIBLE_FLAG);
+			setFlag(DEFAULT_BOOK_FLAG);
+			setFlag(DEFAULT_CHAPTER_FLAG);
+			setFlag(DEFAULT_VERSES_FLAG);
 		}
 
 		/**
@@ -377,12 +384,12 @@ public final class Reference implements Comparable<Reference> {
 		}
 
 		/**
-		 * Set the chapter to its default value, 0.
+		 * Set the chapter to its default value, 1.
 		 *
 		 * @return this Builder, for chaining
 		 */
 		public Builder setDefaultChapter() {
-			this.chapter = 0;
+			this.chapter = 1;
 
 			setFlag(DEFAULT_CHAPTER_FLAG);
 			return this;
@@ -405,7 +412,7 @@ public final class Reference implements Comparable<Reference> {
 		 *
 		 * @return the reference's Bible
 		 */
-		public Bible getBible() {
+		public @NonNull Bible getBible() {
 			return bible;
 		}
 
@@ -414,7 +421,7 @@ public final class Reference implements Comparable<Reference> {
 		 *
 		 * @return the reference's Bible
 		 */
-		public Book getBook() {
+		public @NonNull Book getBook() {
 			return book;
 		}
 
@@ -432,7 +439,7 @@ public final class Reference implements Comparable<Reference> {
 		 *
 		 * @return the reference's Bible
 		 */
-		public List<Integer> getVerses() {
+		public @NonNull List<Integer> getVerses() {
 			return verses;
 		}
 
@@ -449,32 +456,57 @@ public final class Reference implements Comparable<Reference> {
 		 * @see ReferenceParser
 		 */
 		public Builder parseReference(String reference) {
+			//first, set some flags to preserve that will help in determining success of parse
+			boolean defaultBible = checkFlag(DEFAULT_BIBLE_FLAG);
+			boolean autoAddVerses = checkFlag(PREVENT_AUTO_ADD_VERSES_FLAG);
+
+			//clear the builder so no data can accidentally stay from a previous parse
+			//keep the set Bible since that is not able to be parsed from a string (yet)
+			setDefaultBook();
+			setDefaultChapter();
+			setDefaultVerses();
+
+			//unset all flags and but flag this builder as being parsed
+			flags = 0;
+			setFlag(PARSED);
+
 			ReferenceParser parser = new ReferenceParser(this);
 			parser.getPassageReference(reference);
 
-			return this;
-		}
-
-		/**
-		 * Creates a new {@link SimpleBible} for this builder. Useful for handing raw user input.
-		 * If versionAbbr is not given, an abbreviation will be created based on the first letters
-		 * of each word in versionName.
-		 *
-		 * @param versionName  the full name of the Bible
-		 * @param versionAbbr  the abbreviation of Bible.
-		 * @return this Builder, for chaining
-		 *
-		 * @see SimpleBible
-		 */
-		public Builder setBible(String versionName, @Nullable String versionAbbr) {
-			this.bible = new SimpleBible();
-			this.bible.setName(versionName);
-
-			if(!TextUtils.isEmpty(versionAbbr)) {
-				this.bible.setAbbreviation(versionAbbr);
+			//if adding verses is allowed, all we need for a successful parse is a non-default book
+			//and chapter. If adding verses is prevented, we need non-default verses too
+			if(autoAddVerses) {
+				if(!checkFlag(DEFAULT_BOOK_FLAG) && !checkFlag(DEFAULT_CHAPTER_FLAG)) {
+					setFlag(PARSE_SUCCESS);
+					unsetFlag(PARSE_FAILURE);
+				}
+				else {
+					unsetFlag(PARSE_SUCCESS);
+					setFlag(PARSE_FAILURE);
+				}
+			}
+			else {
+				if(!checkFlag(DEFAULT_BOOK_FLAG) && !checkFlag(DEFAULT_CHAPTER_FLAG) && !checkFlag(DEFAULT_VERSES_FLAG)) {
+					setFlag(PARSE_SUCCESS);
+					unsetFlag(PARSE_FAILURE);
+				}
+				else {
+					unsetFlag(PARSE_SUCCESS);
+					setFlag(PARSE_FAILURE);
+				}
 			}
 
-			unsetFlag(DEFAULT_BIBLE_FLAG);
+			//restore the state of flags that couldn't be modified by the parser
+			if(defaultBible)
+				setFlag(DEFAULT_BIBLE_FLAG);
+			else
+				unsetFlag(DEFAULT_BIBLE_FLAG);
+
+			if(autoAddVerses)
+				setFlag(PREVENT_AUTO_ADD_VERSES_FLAG);
+			else
+				unsetFlag(PREVENT_AUTO_ADD_VERSES_FLAG);
+
 			return this;
 		}
 
@@ -490,51 +522,20 @@ public final class Reference implements Comparable<Reference> {
 		 * @see SimpleBible
 		 * @see SimpleBook
 		 */
-		public Builder setBook(String bookName) {
-			if(bible == null)
-				setDefaultBible();
-
-			book = bible.parseBook(bookName);
+		public Builder setBook(@NonNull String bookName) {
+			Book book = bible.parseBook(bookName);
 
 			if(book == null) {
 				book = new SimpleBook();
 				book.setName(bookName);
+				setFlag(DEFAULT_BOOK_FLAG);
+			}
+			else {
+				unsetFlag(DEFAULT_BOOK_FLAG);
 			}
 
-			unsetFlag(DEFAULT_BOOK_FLAG);
-			return this;
-		}
+			this.book = book;
 
-		/**
-		 * Creates a new {@link SimpleBook} with the given information, making no attempt to match
-		 * it against the set Bible. If bookAbbr is not given, an abbreviation will be created
-		 * from the first three characters of the bookName. If location is not given, it will be
-		 * given the largest possible value, to ensure it always gets sorted to the end of a list,
-		 * not interfering with the sorting of Books with a location. If chapters is not given, it
-		 * will be set to an empty list.
-		 *
-		 * @param bookName  the name of the Book
-		 * @param bookAbbr  the abbreviation of the Book
-		 * @param location  the relative position in the Bible where this Book is located
-		 * @param chapters  the list of verse counts for each chapter in this Book
-		 * @return this Builder, for chaining
-		 */
-		public Builder setBook(String bookName, @Nullable String bookAbbr, @Nullable int location, @Nullable int[] chapters) {
-			book = new SimpleBook();
-			book.setName(bookName);
-
-			if(bookAbbr != null)
-				book.setAbbreviation(bookAbbr);
-
-			if(chapters != null)
-				book.setChapters(chapters);
-
-			if(location != 0)
-				book.setLocation(location);
-			else
-				book.setLocation(Integer.MAX_VALUE);
-
-			unsetFlag(DEFAULT_BOOK_FLAG);
 			return this;
 		}
 
@@ -544,7 +545,7 @@ public final class Reference implements Comparable<Reference> {
 		 * @param bible  the Bible to set
 		 * @return this Builder, for chaining
 		 */
-		public Builder setBible(Bible bible) {
+		public Builder setBible(@NonNull Bible bible) {
 			this.bible = bible;
 
 			unsetFlag(DEFAULT_BIBLE_FLAG);
@@ -558,22 +559,41 @@ public final class Reference implements Comparable<Reference> {
 		 * @return this Builder, for chaining
 		 */
 		public Builder setBook(Book book) {
-			this.book = book;
+			if(book != null) {
+				this.book = book;
+				unsetFlag(DEFAULT_BOOK_FLAG);
+			}
+			else {
+				setDefaultBook();
+			}
 
-			unsetFlag(DEFAULT_BOOK_FLAG);
 			return this;
 		}
 
 		/**
-		 * Set the chapter of this builder.
+		 * Set the chapter of this builder, validating its range against the given Bible
 		 *
 		 * @param chapter  the chapter to set
 		 * @return this Builder, for chaining
 		 */
 		public Builder setChapter(int chapter) {
-			this.chapter = chapter;
 
-			unsetFlag(DEFAULT_CHAPTER_FLAG);
+			if(getBook().validateChapter(chapter)) {
+				this.chapter = chapter;
+				unsetFlag(DEFAULT_CHAPTER_FLAG);
+			}
+			else {
+				//if there exists chapters in the selected book and the given chapter is too high,
+				//assume the user wanted the last chapter in the book. Otherwise, default to 1
+				if(getBook().numChapters() >= 1 && chapter > getBook().numChapters()) {
+					this.chapter = getBook().numChapters();
+				}
+				else {
+					this.chapter = 1;
+				}
+				setFlag(DEFAULT_CHAPTER_FLAG);
+			}
+
 			return this;
 		}
 
@@ -584,9 +604,15 @@ public final class Reference implements Comparable<Reference> {
 		 * @return this Builder, for chaining
 		 */
 		public Builder setVerses(int... verses) {
+			//invalid array of verses given, we can do nothing further
+			if(verses == null || verses.length == 0) {
+				setDefaultVerses();
+				return this;
+			}
+
 			this.verses = new ArrayList<>();
 			for(int verse : verses) {
-				this.verses.add(verse);
+				addVerse(verse);
 			}
 
 			unsetFlag(DEFAULT_VERSES_FLAG);
@@ -600,8 +626,16 @@ public final class Reference implements Comparable<Reference> {
 		 * @return this Builder, for chaining
 		 */
 		public Builder setVerses(Collection<Integer> verses) {
+			//invalid collection of verses given, we can do nothing further
+			if(verses == null || verses.size() == 0) {
+				setDefaultVerses();
+				return this;
+			}
+
 			this.verses = new ArrayList<>();
-			this.verses.addAll(verses);
+			for(int verse : verses) {
+				addVerse(verse);
+			}
 
 			unsetFlag(DEFAULT_VERSES_FLAG);
 			return this;
@@ -614,21 +648,38 @@ public final class Reference implements Comparable<Reference> {
 		 * @return this Builder, for chaining
 		 */
 		public Builder addVerse(int verse) {
-			if(!verses.contains(verse)) {
-				this.verses.add(verse);
+			if(getBook().validateVerseInChapter(chapter, verse)) {
+				if(!verses.contains(verse)) {
+					this.verses.add(verse);
+				}
+				unsetFlag(DEFAULT_VERSES_FLAG);
+			}
+			else {
+				//we cannot validate the verse because no book has been created yet or we do not know
+				//the chapter in the book to validate against, so add verse indiscriminately
+
+				if(verse < 1) {
+					verse = 1;
+					setFlag(DEFAULT_VERSES_FLAG);
+				}
+				else {
+					unsetFlag(DEFAULT_VERSES_FLAG);
+				}
+
+				if(!verses.contains(verse)) {
+					this.verses.add(verse);
+				}
 			}
 
-			unsetFlag(DEFAULT_VERSES_FLAG);
 			return this;
 		}
 
 		/**
 		 * Adds all verses in the set chapter from the set Books to this Builder.
-		 * @return
+		 * @return this Builder, for chaining
 		 */
 		public Builder addAllVersesInChapter() {
-			if(book != null
-					&& book.getChapters() != null
+			if(book.getChapters() != null
 					&& book.getChapters().size() > 0
 					&& chapter >= 0
 					&& chapter < book.getChapters().size())
@@ -654,12 +705,9 @@ public final class Reference implements Comparable<Reference> {
 		 * @return a Reference containing the data of this Builder.
 		 */
 		public Reference create() {
-			if(bible == null)
-				setDefaultBible();
-
-			if(verses == null || verses.size() == 0) {
+			if(verses.size() == 0) {
 				if(!checkFlag(PREVENT_AUTO_ADD_VERSES_FLAG)) {
-					if(chapter != 0) {
+					if(chapter > 0) {
 						addAllVersesInChapter();
 					}
 					else {
@@ -672,10 +720,6 @@ public final class Reference implements Comparable<Reference> {
 
 					setFlag(DEFAULT_VERSES_FLAG);
 				}
-			}
-
-			if(book == null) {
-				setDefaultBook();
 			}
 
 			return new Reference(bible, book, chapter, verses);

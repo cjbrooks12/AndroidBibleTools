@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Give me some verse text!"
-            app:verseDisplay="html|formatted"
+            app:verseDisplay="unformatted|html"
             app:verseClass="com.caseybrooks.androidbibletools.providers.abs.ABSPassage"/>
     </ScrollView>
 </RelativeLayout>

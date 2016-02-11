@@ -11,6 +11,7 @@ import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBibleList;
 import com.caseybrooks.androidbibletools.widget.BiblePickerDialog;
 import com.caseybrooks.androidbibletools.widget.OnBibleSelectedListener;
+import com.caseybrooks.androidbibletools.widget.VersePicker;
 import com.caseybrooks.androidbibletools.widget.VersePickerDialog;
 import com.caseybrooks.androidbibletools.widget.VerseView;
 
@@ -45,6 +46,8 @@ public class Fragment3 extends Fragment {
 
 		versePickerDialog = new VersePickerDialog();
 		versePickerDialog.setSelectedBibleTag("frag3");
+		versePickerDialog.setSelectionMode(VersePicker.SELECTION_WHOLE_CHAPTER);
+		versePickerDialog.setAllowSelectionModeChange(false);
 
 		//hit button to show Bible picker
 		biblePickerButton.setOnClickListener(new View.OnClickListener() {

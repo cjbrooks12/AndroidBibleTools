@@ -49,7 +49,7 @@ public abstract class Verse extends AbstractVerse {
 	public String getFormattedText() {
 		String text = "";
 
-		text += formatter.onPreFormat(reference);
+		text += formatter.onPreFormat(this);
 		text += formatter.onFormatVerseStart(reference.getVerses().get(0));
 		text += formatter.onFormatText(text);
 		text += formatter.onPostFormat();

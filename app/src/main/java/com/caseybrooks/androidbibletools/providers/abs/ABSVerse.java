@@ -6,6 +6,7 @@ import com.caseybrooks.androidbibletools.basic.Verse;
 public class ABSVerse extends Verse {
 	public ABSVerse(Reference reference) {
 		super(reference);
+		this.formatter = new ABSFormatter();
 
 		if(reference.getBook() instanceof ABSBook) {
 			ABSBook absBook = (ABSBook) reference.getBook();

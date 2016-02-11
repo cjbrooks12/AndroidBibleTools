@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
+import android.view.ViewGroup;
 
 import com.caseybrooks.androidbibletools.basic.BibleList;
 
@@ -25,11 +26,17 @@ public class BiblePickerDialog extends AppCompatDialogFragment {
 			}
 		});
 
-		picker = new BiblePicker(getActivity());
+		if(picker == null) {
+			picker = new BiblePicker(getActivity());
+			picker.setOnBibleSelectedListener(listener);
+			picker.setBibleListClass(bibleListClass, tag);
+			picker.loadBibleList();
+		}
+		else {
+			((ViewGroup) picker.getParent()).removeView(picker);
+		}
+
 		builder.setView(picker);
-		picker.setOnBibleSelectedListener(listener);
-		picker.setBibleListClass(bibleListClass, tag);
-		picker.loadBibleList();
 
 		return builder.create();
 	}

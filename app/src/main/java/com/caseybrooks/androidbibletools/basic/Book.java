@@ -131,6 +131,14 @@ public abstract class Book {
 		}
 	}
 
+	public boolean validateChapter(int chapter) {
+		return (chapter >= 1) && (chapter <= chapters.size());
+	}
+
+	public boolean validateVerseInChapter(int chapter, int verse) {
+		return (numVersesInChapter(chapter) >= 1) && (verse >= 1) && (verse <= numVersesInChapter(chapter));
+	}
+
 	/**
 	 * Two Books are considered the equal if they represent the same book in the Bible. In other
 	 * words, if they have the same location, then the books will be sorted into the same position,

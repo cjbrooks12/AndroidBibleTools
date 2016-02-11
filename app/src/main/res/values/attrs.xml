@@ -17,13 +17,16 @@
             <enum name="manyverses" value="1"/>
             <enum name="wholechapter" value="2"/>
         </attr>
+        <attr name="allowSelectionModeChange" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="abt_verseview">
         <attr name="verseClass" format="string" />
         <attr name="verseDisplay" >
             <flag name="formatted" value="0x1"/>
-            <flag name="html" value="0x2"/>
+            <flag name="unformatted" value="0x2"/>
+            <flag name="normal" value="0x4"/>
+            <flag name="html" value="0x8"/>
         </attr>
     </declare-styleable>
 </resources>

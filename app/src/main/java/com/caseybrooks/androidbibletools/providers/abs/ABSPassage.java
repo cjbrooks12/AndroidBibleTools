@@ -29,6 +29,7 @@ public class ABSPassage extends Passage<ABSVerse> implements Downloadable, Respo
 
 	public ABSPassage(Reference reference) {
 		super(reference);
+		this.formatter = new ABSFormatter();
 
 		if(reference.getBook() instanceof ABSBook) {
 			ABSBook absBook = (ABSBook) reference.getBook();
@@ -129,5 +130,10 @@ public class ABSPassage extends Passage<ABSVerse> implements Downloadable, Respo
 			e.printStackTrace();
 			onErrorResponse(new VolleyError("Error parsing JSON", e));
 		}
+	}
+
+	@Override
+	public String getText() {
+		return super.getText() + "<br/><i>" + ((ABSBible) reference.getBible()).getCopyright() + "</i>";
 	}
 }

@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.view.ViewGroup;
 
 public class VersePickerDialog extends DialogFragment {
 	VersePicker picker;
 	String tag;
 	OnReferenceCreatedListener listener;
+	boolean allowSelectionModeChange;
+	int selectionMode;
 
 	@Override
 	public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -22,17 +25,29 @@ public class VersePickerDialog extends DialogFragment {
 			}
 		});
 
-		picker = new VersePicker(getActivity());
+		if(picker == null) {
+			picker = new VersePicker(getActivity());
+			picker.setSelectedBibleTag(tag);
+			picker.loadBible();
+			picker.setOnReferenceCreatedListener(listener);
+			picker.setSelectionMode(selectionMode);
+			picker.setAllowSelectionModeChange(allowSelectionModeChange);
+		}
+		else {
+			((ViewGroup) picker.getParent()).removeView(picker);
+		}
+
 		builder.setView(picker);
-		picker.setOnReferenceCreatedListener(listener);
-		picker.setSelectedBibleTag(tag);
-		picker.loadBible();
 
 		return builder.create();
 	}
 
 	public void setSelectedBibleTag(String tag) {
 		this.tag = tag;
+		if(picker != null) {
+			picker.setSelectedBibleTag(tag);
+			picker.loadBible();
+		}
 	}
 
 	public VersePicker getVersePicker() {
@@ -41,5 +56,16 @@ public class VersePickerDialog extends DialogFragment {
 
 	public void setOnReferenceCreatedListener(OnReferenceCreatedListener listener) {
 		this.listener = listener;
+		if(picker != null) {
+			picker.setOnReferenceCreatedListener(listener);
+		}
+	}
+
+	public void setAllowSelectionModeChange(boolean allowSelectionModeChange) {
+		this.allowSelectionModeChange = allowSelectionModeChange;
+	}
+
+	public void setSelectionMode(int selectionMode) {
+		this.selectionMode = selectionMode;
 	}
 }

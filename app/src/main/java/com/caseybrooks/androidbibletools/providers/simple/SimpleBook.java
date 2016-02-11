@@ -12,4 +12,14 @@ public class SimpleBook extends Book {
 		else
 			setAbbreviation(name);
 	}
+
+	@Override
+	public boolean validateChapter(int chapter) {
+		return true;
+	}
+
+	@Override
+	public boolean validateVerseInChapter(int chapter, int verse) {
+		return true;
+	}
 }

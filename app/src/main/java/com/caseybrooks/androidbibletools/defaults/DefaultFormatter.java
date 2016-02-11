@@ -1,6 +1,6 @@
 package com.caseybrooks.androidbibletools.defaults;
 
-import com.caseybrooks.androidbibletools.basic.Reference;
+import com.caseybrooks.androidbibletools.basic.AbstractVerse;
 import com.caseybrooks.androidbibletools.data.Formatter;
 
 import java.util.Random;
@@ -14,13 +14,13 @@ import java.util.Random;
  * replace words with dashes given a threshold between 0 and 1.
  */
 public class DefaultFormatter implements Formatter {
-	Reference reference;
+	protected AbstractVerse verse;
 
 //Set up default interface values
 //--------------------------------------------------------------------------------------------------
 	@Override
-	public String onPreFormat(Reference reference) {
-		this.reference = reference;
+	public String onPreFormat(AbstractVerse verse) {
+		this.verse = verse;
 		return "";
 	}
 
@@ -29,9 +29,6 @@ public class DefaultFormatter implements Formatter {
 
 	@Override
 	public String onFormatText(String verseText) { return verseText; }
-
-	@Override
-	public String onFormatSpecial(String special) { return ""; }
 
 	@Override
 	public String onFormatVerseEnd() { return ""; }
@@ -109,7 +106,7 @@ public class DefaultFormatter implements Formatter {
 
 		@Override
 		public String onFormatText(String verseText) {
-			randomizer = new Random(reference.hashCode() + seedOffset);
+			randomizer = new Random(verse.getReference().hashCode() + seedOffset);
 
 			String text = "";
 			String[] words = verseText.split("\\s");
@@ -117,7 +114,7 @@ public class DefaultFormatter implements Formatter {
 			for(String word : words) {
 				float randomValue = randomizer.nextFloat();
 				if(randomValue > level) {
-					text += onFormatSpecial(word) + " ";
+					text += word.replaceAll("\\w", "_") + " ";
 				}
 				else {
 					text += word + " ";
@@ -125,11 +122,6 @@ public class DefaultFormatter implements Formatter {
 			}
 
 			return text;
-		}
-
-		@Override
-		public String onFormatSpecial(String special) {
-			return special.replaceAll("\\w", "_");
 		}
 	}
 }

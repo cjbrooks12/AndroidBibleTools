@@ -91,7 +91,7 @@ public class BiblePicker extends LinearLayout {
 			a.recycle();
 		}
 
-		selectedBible = ABT.getInstance(context).getSelectedBible(tag);
+		selectedBible = ABT.getInstance(context).getSavedBible(tag);
 
 		TypedArray a = context.getTheme().obtainStyledAttributes(
 				new int[] {
@@ -161,7 +161,7 @@ public class BiblePicker extends LinearLayout {
 //Data retrieval and manipulation
 //--------------------------------------------------------------------------------------------------
 	public void loadBibleList() {
-		selectedBible = ABT.getInstance(context).getSelectedBible(tag);
+		selectedBible = ABT.getInstance(context).getSavedBible(tag);
 
 		progressText.setText("Retrieving Bible list");
 		progressText.setVisibility(View.VISIBLE);
@@ -236,7 +236,7 @@ public class BiblePicker extends LinearLayout {
 			root.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					ABT.getInstance(context).setSelectedBible(bible, tag);
+					ABT.getInstance(context).saveBible(bible, tag);
 					selectedBible = bible;
 					adapter.resort();
 

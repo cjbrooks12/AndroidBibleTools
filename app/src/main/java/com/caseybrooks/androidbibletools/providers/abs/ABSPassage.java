@@ -134,6 +134,33 @@ public class ABSPassage extends Passage<ABSVerse> implements Downloadable, Respo
 
 	@Override
 	public String getText() {
-		return super.getText() + "<br/><i>" + ((ABSBible) reference.getBible()).getCopyright() + "</i>";
+		if(reference.getBible() instanceof ABSBible)
+			return super.getText() + "<br/><i>" + ((ABSBible) reference.getBible()).getCopyright() + "</i>";
+		else
+			return super.getText();
+	}
+
+	@Override
+	public String serialize() {
+		try {
+			JSONObject passageJSON = new JSONObject();
+			passageJSON.put("id", this.id);
+			return passageJSON.toString();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
+
+	@Override
+	public void deserialize(String string) {
+		try {
+			JSONObject passageJSON = new JSONObject(string);
+			this.id = passageJSON.getString("id");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

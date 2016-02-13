@@ -96,7 +96,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 
 		loadColors();
 
-		bible = ABT.getInstance(context).getSelectedBible(tag);
+		bible = ABT.getInstance(context).getSavedBible(tag);
 		builder = new Reference.Builder();
 		builder.setFlag(Reference.Builder.PREVENT_AUTO_ADD_VERSES_FLAG);
 
@@ -278,7 +278,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 	}
 
 	public void loadBible() {
-		bible = ABT.getInstance(context).getSelectedBible(tag);
+		bible = ABT.getInstance(context).getSavedBible(tag);
 
 		if(bible == null)
 			return;

@@ -7,10 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.caseybrooks.androidbibletools.ABT;
 import com.caseybrooks.androidbibletools.basic.Bible;
+import com.caseybrooks.androidbibletools.basic.Reference;
+import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBibleList;
+import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
 import com.caseybrooks.androidbibletools.widget.BiblePickerDialog;
 import com.caseybrooks.androidbibletools.widget.OnBibleSelectedListener;
+import com.caseybrooks.androidbibletools.widget.OnReferenceCreatedListener;
 import com.caseybrooks.androidbibletools.widget.VersePicker;
 import com.caseybrooks.androidbibletools.widget.VersePickerDialog;
 import com.caseybrooks.androidbibletools.widget.VerseView;
@@ -75,9 +80,36 @@ public class Fragment3 extends Fragment {
 		});
 
 		//selecting verses automatically downloads them into the verseview
-		versePickerDialog.setOnReferenceCreatedListener(verseView);
+		versePickerDialog.setOnReferenceCreatedListener(new OnReferenceCreatedListener() {
+			@Override
+			public void onReferenceCreated(Reference.Builder reference) {
+				final ABSPassage passage = new ABSPassage(reference.create());
+				passage.download(new OnResponseListener() {
+					@Override
+					public void responseFinished() {
+						ABT.getInstance(getContext()).saveVerse(passage, "frag3");
+						verseView.setVerse(passage);
+					}
+				});
+			}
+		});
 
 		return view;
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		final ABSPassage passage = (ABSPassage) ABT.getInstance(getContext()).getSavedVerse("frag3");
+
+		if(passage != null) {
+			passage.download(new OnResponseListener() {
+				@Override
+				public void responseFinished() {
+					verseView.setVerse(passage);
+				}
+			});
+		}
+	}
 }

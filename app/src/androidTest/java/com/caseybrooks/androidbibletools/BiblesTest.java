@@ -2,7 +2,6 @@ package com.caseybrooks.androidbibletools;
 
 import android.test.AndroidTestCase;
 
-import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.basic.Book;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.providers.abs.ABSBible;
@@ -146,21 +145,15 @@ public class BiblesTest extends AndroidTestCase {
 		final CJBBible bible1 = new CJBBible();
 		bible1.setService("abs");
 		bible1.setId("eng-NASB");
-		abt.setSelectedBible(bible1, "bible1");
+		abt.saveBible(bible1, "bible1");
 
 		final ABSBible bible2 = new ABSBible();
 		bible2.setId("eng-NASB");
-		abt.setSelectedBible(bible2, "bible2");
-
-		//verify the class that is saved is correct
-		Class<? extends Bible> selectedBibleType1 = abt.getSelectedBibleType("bible1");
-		Class<? extends Bible> selectedBibleType2 = abt.getSelectedBibleType("bible2");
-		assertEquals(selectedBibleType1, CJBBible.class);
-		assertEquals(selectedBibleType2, ABSBible.class);
+		abt.saveBible(bible2, "bible2");
 
 		//verify the Bible that is saved is correct
-		final CJBBible selectedBible1 = (CJBBible) abt.getSelectedBible("bible1");
-		final ABSBible selectedBible2 = (ABSBible) abt.getSelectedBible("bible2");
+		final CJBBible selectedBible1 = (CJBBible) abt.getSavedBible("bible1");
+		final ABSBible selectedBible2 = (ABSBible) abt.getSavedBible("bible2");
 		assertNotNull(bible1);
 		assertNotNull(bible2);
 		assertNotNull(selectedBible1);
@@ -170,7 +163,7 @@ public class BiblesTest extends AndroidTestCase {
 
 		//selectedBible1 type should be CJBBible, so attempting to load it as an ABSBible should fail
 		try {
-			final ABSBible nonSelectedBible = (ABSBible) abt.getSelectedBible("bible1");
+			final ABSBible nonSelectedBible = (ABSBible) abt.getSavedBible("bible1");
 			Assert.fail("Should have thrown ClassCastException");
 		}
 		catch (ClassCastException e) {
@@ -178,7 +171,7 @@ public class BiblesTest extends AndroidTestCase {
 
 		//selectedBible2 type should be ABSBible, so attempting to load it as an CJBBible should fail
 		try {
-			final CJBBible nonSelectedBible = (CJBBible) abt.getSelectedBible("bible2");
+			final CJBBible nonSelectedBible = (CJBBible) abt.getSavedBible("bible2");
 			Assert.fail("Should have thrown ClassCastException");
 		}
 		catch (ClassCastException e) {

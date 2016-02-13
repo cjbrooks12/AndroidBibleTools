@@ -201,6 +201,27 @@ public abstract class AbstractVerse implements Comparable<AbstractVerse> {
 	public abstract String getFormattedText();
 
 	/**
+	 * Serialize this verse into a string that can be used to restore this verse from persistent
+	 * memory. Should serialize only that which is necessary to be able to identify this verse and
+	 * download the rest of the information. This would typically be the fully qualified class name
+	 * of this AbstractVerse, and any IDs/API keys necessary.
+	 *
+	 * @return serialized String representation
+	 */
+	public String serialize() {
+		return "";
+	}
+
+	/**
+	 * deserialize this verse from String.
+	 *
+	 * @see AbstractVerse#serialize()
+	 */
+	public void deserialize(String string) {
+
+	}
+
+	/**
 	 * Compare two AbstractVerses. Each implementation is responsible for deciding whether that
 	 * AbstractVerse implementation can be sorted with any other implementation, and if so, how that
 	 * comparison should work. Refer to the documentation of any implementing classes to see how it

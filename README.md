@@ -1,4 +1,5 @@
 # AndroidBibleTools
+[![](https://jitpack.io/v/cjbrooks12/AndroidBibleTools.svg)](https://jitpack.io/#cjbrooks12/AndroidBibleTools)
 
 ## What is it?
 AndroidBibleTools is a library for Android designed to make sense of verses from the Bible while providing several peripherals and tools to manage and share your verses in a meaningful way. The tools include the following major points:
@@ -36,7 +37,7 @@ repositories {
 Add the following to your module's build.gradle file:
 ```groovy
 dependencies {
-    compile 'com.github.cjbrooks12:AndroidBibleTools:0.2.25@aar'
+    compile 'com.github.cjbrooks12:AndroidBibleTools:0.3.3@aar'
 }
 ```
 

@@ -1,5 +1,7 @@
 # AndroidBibleTools
 [![](https://jitpack.io/v/cjbrooks12/AndroidBibleTools.svg)](https://jitpack.io/#cjbrooks12/AndroidBibleTools)
+[![Build Status](https://travis-ci.org/cjbrooks12/AndroidBibleTools.png)](https://travis-ci.org/cjbrooks12/AndroidBibleTools)
+
 
 ## What is it?
 AndroidBibleTools is a library for Android designed to make sense of verses from the Bible while providing several peripherals and tools to manage and share your verses in a meaningful way. The tools include the following major points:

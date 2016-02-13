@@ -19,6 +19,7 @@ public abstract class Bible<T extends Book> implements Comparable<Bible> {
 	protected ArrayList<T> books;
 
 	public Bible() {
+		this.books = new ArrayList<>();
 	}
 
 

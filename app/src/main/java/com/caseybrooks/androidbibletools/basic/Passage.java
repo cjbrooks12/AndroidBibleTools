@@ -97,7 +97,8 @@ public abstract class Passage<T extends Verse> extends AbstractVerse {
 			String text = "";
 
 			for(int i = 0; i < verses.size(); i++) {
-				text += verses.get(i).getText();
+				if(verses.get(i) != null)
+					text += verses.get(i).getText();
 			}
 
 			return text;

@@ -42,4 +42,20 @@
             app:verseDisplay="unformatted|html"
             app:verseClass="com.caseybrooks.androidbibletools.providers.abs.ABSPassage"/>
     </ScrollView>
+
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="Next"/>
+
+    <Button
+        android:id="@+id/previousButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="Previous"/>
 </RelativeLayout>

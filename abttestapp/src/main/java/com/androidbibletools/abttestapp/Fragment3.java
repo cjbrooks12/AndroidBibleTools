@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.caseybrooks.androidbibletools.ABT;
 import com.caseybrooks.androidbibletools.basic.Bible;
@@ -27,6 +28,8 @@ public class Fragment3 extends Fragment {
 	BiblePickerDialog biblePickerDialog;
 	VersePickerDialog versePickerDialog;
 
+	Button next, previous;
+
 	public static Fragment newInstance() {
 		Fragment fragment = new Fragment3();
 		Bundle extras = new Bundle();
@@ -45,6 +48,9 @@ public class Fragment3 extends Fragment {
 		versePickerButton = (Button) view.findViewById(R.id.versePickerButton);
 
 		verseView = (VerseView) view.findViewById(R.id.verseView);
+
+		next = (Button) view.findViewById(R.id.nextButton);
+		previous = (Button) view.findViewById(R.id.previousButton);
 
 		biblePickerDialog = new BiblePickerDialog();
 		biblePickerDialog.setBibleListClass(ABSBibleList.class, "frag3");
@@ -84,6 +90,7 @@ public class Fragment3 extends Fragment {
 			@Override
 			public void onReferenceCreated(Reference.Builder reference) {
 				final ABSPassage passage = new ABSPassage(reference.create());
+				((MainActivity) getActivity()).toolbar.setSubtitle(passage.getReference().toString());
 				passage.download(new OnResponseListener() {
 					@Override
 					public void responseFinished() {
@@ -91,6 +98,32 @@ public class Fragment3 extends Fragment {
 						verseView.setVerse(passage);
 					}
 				});
+			}
+		});
+
+		next.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Reference.Builder nextChapter = verseView.getVerse().getReference().next(Reference.TYPE_CHAPTER);
+				nextChapter.addAllVersesInChapter();
+				verseView.setText("");
+
+				final ABSPassage passage = new ABSPassage(nextChapter.create());
+				((MainActivity) getActivity()).toolbar.setSubtitle(passage.getReference().toString());
+				passage.download(new OnResponseListener() {
+					@Override
+					public void responseFinished() {
+						ABT.getInstance(getContext()).saveVerse(passage, "frag3");
+						verseView.setVerse(passage);
+					}
+				});
+			}
+		});
+
+		previous.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Toast.makeText(getContext(), "Not yet implemented", Toast.LENGTH_SHORT).show();
 			}
 		});
 
@@ -102,8 +135,8 @@ public class Fragment3 extends Fragment {
 		super.onResume();
 
 		final ABSPassage passage = (ABSPassage) ABT.getInstance(getContext()).getSavedVerse("frag3");
-
 		if(passage != null) {
+			((MainActivity) getActivity()).toolbar.setSubtitle(passage.getReference().toString());
 			passage.download(new OnResponseListener() {
 				@Override
 				public void responseFinished() {

@@ -26,9 +26,14 @@ import java.util.List;
  * determining the behavior of this comparison.
  */
 public final class Reference implements Comparable<Reference> {
+	public static final int TYPE_VERSE = 1;
+	public static final int TYPE_CHAPTER = 2;
+	public static final int TYPE_BOOK = 3;
+
 	private final Bible bible;
 	private final Book book;
 	private final int chapter;
+
 	private final List<Integer> verses;
 
 	/**
@@ -86,6 +91,12 @@ public final class Reference implements Comparable<Reference> {
 		return verses;
 	}
 
+	public int getFinalVerse() {
+		return (verses.size() > 0)
+				? verses.get(verses.size() - 1)
+				: 1;
+	}
+
 	/**
 	 * Get a well-formatted String representation of this Reference. It contains all information
 	 * except the set Bible, and can be parsed in a Builder to create an equivalent object, assuming
@@ -134,6 +145,96 @@ public final class Reference implements Comparable<Reference> {
 
 		return refString;
 	}
+
+
+	public Reference.Builder next(int type) {
+		Reference.Builder builder = new Reference.Builder();
+		builder.setBible(this.bible);
+
+		if(type == TYPE_VERSE) {
+			int nextVerse = nextVerse();
+
+			if(nextVerse == 1) {
+				builder = next(TYPE_CHAPTER);
+				builder.setVerses(nextVerse);
+			}
+			else {
+				builder.setBook(this.book);
+				builder.setChapter(this.chapter);
+				builder.setVerses(nextVerse);
+			}
+		}
+		else if(type == TYPE_CHAPTER) {
+			int nextChapter = nextChapter();
+
+			if(nextChapter == 1) {
+				builder = next(TYPE_BOOK);
+				builder.setChapter(1);
+				builder.setVerses(this.verses);
+			}
+			else {
+				builder.setBook(this.book);
+				builder.setChapter(nextChapter);
+				builder.setVerses(this.verses);
+			}
+		}
+		else if(type == TYPE_BOOK) {
+			Book nextBook = nextBook();
+			builder.setBook(nextBook);
+			builder.setChapter(this.chapter);
+			builder.setVerses(this.verses);
+		}
+
+		return builder;
+	}
+
+	/**
+	 * Return the next Book after the one in this Reference based on the given Bible. If the current
+	 * books is the last in the Bible, return the first Book in the given Bible. If the given Bible
+	 * does not have a listing of Books, return the current Book.
+
+	 * @return the next Book in the Bible after the one in this Reference
+	 */
+	private Book nextBook() {
+		if(bible.getBooks() != null && bible.getBooks().size() > 0) {
+			for(int i = 0; i < bible.getBooks().size(); i++) {
+				if(bible.getBooks().get(i).equals(this.book)) {
+					return (i < bible.getBooks().size() - 1)
+							? (Book) bible.getBooks().get(i + 1)
+							: (Book) bible.getBooks().get(0);
+				}
+			}
+		}
+
+		return this.book;
+	}
+
+	/**
+	 * Return the next chapter in the current book. If we are currently the last chapter in this
+	 * Book, return 1, since that is the always the first chapter in the next book.
+	 *
+	 * @return the next chapter in the Bible after the one in this Reference
+	 */
+	private int nextChapter() {
+		return (this.chapter < book.numChapters())
+			? this.chapter + 1
+			: 1;
+	}
+
+	/**
+	 * Return the next verse in the current chapter. This verse is chosen as the next verse after the
+	 * very last verse in this Reference. If we are currently the last verse in this chapter, return
+	 * 1 sinze tht is always the first verse in the next chapter.
+	 *
+	 * @return the next verse in the Bible after the one in this Reference
+	 */
+	private int nextVerse() {
+		return (getFinalVerse() < book.numVersesInChapter(this.chapter))
+				? getFinalVerse() + 1
+				: 1;
+	}
+
+
 	/**
 	 * Compares two Reference with respect to natural reference order, according to the first
 	 * verse. Defines a natural ordering of verses based on their ordering within the Bible, and

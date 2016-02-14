@@ -29,33 +29,57 @@
             android:text="Verse Picker"/>
     </LinearLayout>
 
-    <ScrollView
-        android:id="@+id/textLayout"
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/buttonsLayout">
-        <com.caseybrooks.androidbibletools.widget.VerseView
-            android:id="@+id/verseView"
+        android:layout_below="@id/buttonsLayout">
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/textLayout"
             android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.caseybrooks.androidbibletools.widget.VerseView
+                android:id="@+id/verseView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Give me some verse text!"
+                android:fontFamily="serif"
+                android:textSize="16sp"
+                android:layout_margin="8dp"
+                app:verseDisplay="unformatted|html"
+                app:verseClass="com.caseybrooks.androidbibletools.providers.abs.ABSPassage"/>
+        </android.support.v4.widget.NestedScrollView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/previousButton"
+            android:src="@drawable/ic_chevron_left"
+            app:fabSize="mini"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Give me some verse text!"
-            app:verseDisplay="unformatted|html"
-            app:verseClass="com.caseybrooks.androidbibletools.providers.abs.ABSPassage"/>
-    </ScrollView>
+            android:enabled="false"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="16dp"
+            app:layout_anchor="@+id/textLayout"
+            app:layout_anchorGravity="bottom|left|end"
+            app:layout_behavior="com.androidbibletools.abttestapp.ScrollAwareFABBehavior"
+            app:backgroundTint="#ffffff"/>
 
-    <Button
-        android:id="@+id/nextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="Next"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/nextButton"
+            android:src="@drawable/ic_chevron_right"
+            app:fabSize="mini"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="16dp"
+            app:layout_anchor="@+id/textLayout"
+            app:layout_anchorGravity="bottom|right|end"
+            app:layout_behavior="com.androidbibletools.abttestapp.ScrollAwareFABBehavior"
+            app:backgroundTint="#ffffff"/>
+    </android.support.design.widget.CoordinatorLayout>
 
-    <Button
-        android:id="@+id/previousButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:text="Previous"/>
 </RelativeLayout>

@@ -235,6 +235,114 @@ public final class Reference implements Comparable<Reference> {
 	}
 
 
+	//TODO: create unit tests for previous verse navigation
+	public Reference.Builder previous(int type) {
+		Reference.Builder builder = new Reference.Builder();
+		builder.setBible(this.bible);
+
+		if(type == TYPE_VERSE) {
+			int previousVerse = previousVerse();
+
+			if(this.verses.get(0) == 1) {
+				builder = previous(TYPE_CHAPTER);
+				builder.setVerses(previousVerse);
+			}
+			else {
+				builder.setBook(this.book);
+				builder.setChapter(this.chapter);
+				builder.setVerses(previousVerse);
+			}
+		}
+		else if(type == TYPE_CHAPTER) {
+			int previousChapter = previousChapter();
+
+			if(this.chapter == 1) {
+				builder = previous(TYPE_BOOK);
+				builder.setChapter(previousChapter);
+				builder.setVerses(this.verses);
+			}
+			else {
+				builder.setBook(this.book);
+				builder.setChapter(previousChapter);
+				builder.setVerses(this.verses);
+			}
+		}
+		else if(type == TYPE_BOOK) {
+			Book previousBook = previousBook();
+			builder.setBook(previousBook);
+			builder.setChapter(this.chapter);
+			builder.setVerses(this.verses);
+		}
+
+		return builder;
+	}
+
+	/**
+	 * Return the Book before the one in this Reference based on the given Bible. If the current
+	 * books is the first in the Bible, return the last Book in the given Bible. If the given Bible
+	 * does not have a listing of Books, return the current Book.
+	 *
+	 * @return the previous Book in the Bible before the one in this Reference
+	 */
+	private Book previousBook() {
+		if(bible.getBooks() != null && bible.getBooks().size() > 0) {
+			for(int i = 0; i < bible.getBooks().size(); i++) {
+				if(bible.getBooks().get(i).equals(this.book)) {
+					return (i > 1)
+							? (Book) bible.getBooks().get(i - 1)
+							: (Book) bible.getBooks().get(bible.getBooks().size() - 1);
+				}
+			}
+		}
+
+		return this.book;
+	}
+
+	/**
+	 * Return the previous chapter in the current book. If we are currently the first chapter in this
+	 * Book, get the previous book and return the last chapter in that book
+	 *
+	 * @return the previous chapter in the Bible before the one in this Reference
+	 */
+	private int previousChapter() {
+		if(this.chapter > 1) {
+			return this.chapter - 1;
+		}
+		else {
+			Book previousBook = previousBook();
+			return previousBook().getChapters().get(previousBook.getChapters().size() - 1);
+		}
+	}
+
+	/**
+	 * Return the previous verse in the current chapter. This verse is chosen as the first verse before the
+	 * very first verse in this Reference. If we are currently the last first in this chapter, we must
+	 * get the previous chapter and find its last verse. If we are the first chapter in the book, we
+	 * must get the previous book and find the last verse in the last chapter of that book.
+	 *
+	 * @return the next verse in the Bible after the one in this Reference
+	 */
+	private int previousVerse() {
+		if(this.verses.get(0) > 1) {
+			return this.verses.get(0) - 1;
+		}
+		else {
+			if(this.chapter > 1) {
+				int previousChapter = previousChapter();
+				return getBook().getChapters().get(previousChapter);
+			}
+			else {
+				Book previousBook = previousBook();
+				return previousBook.getChapters().get(previousBook.getChapters().size() - 1);
+			}
+		}
+	}
+
+
+
+
+
+
 	/**
 	 * Compares two Reference with respect to natural reference order, according to the first
 	 * verse. Defines a natural ordering of verses based on their ordering within the Bible, and

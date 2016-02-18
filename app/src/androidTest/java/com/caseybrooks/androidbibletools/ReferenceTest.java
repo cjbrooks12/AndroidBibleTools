@@ -300,4 +300,73 @@ public class ReferenceTest extends AndroidTestCase {
 
 		signal.await(120, TimeUnit.SECONDS);
 	}
+
+	public void testPreviousVerses() throws Throwable {
+		final CountDownLatch signal = new CountDownLatch(1);
+		ABT.getInstance(getContext())
+				.getMetadata().putString("ABS_ApiKey", "mDaM8REZFo6itplNpcv1ls8J5PkwEz1wbhJ7p9po");
+
+		final ABSBible bible = new ABSBible();
+
+		bible.setId("eng-NASB");
+		bible.download(new OnResponseListener() {
+			@Override
+			public void responseFinished() {
+				Book galatiansBook = bible.parseBook("Galatians");
+				assertNotNull(galatiansBook);
+
+				//test a relatively simple case first, where only the chapter rolls over
+				Reference galatians_3_2 = new Reference.Builder()
+						.setBible(bible)
+						.parseReference("Galatians 3:2")
+						.create();
+				assertEquals(galatians_3_2.getBook(), galatiansBook);
+				assertEquals(galatians_3_2.getChapter(), 3);
+				assertEquals(galatians_3_2.getFinalVerse(), 2);
+
+				Reference galatians_3_1 = galatians_3_2.previous(Reference.TYPE_VERSE).create();
+				assertEquals(galatians_3_1.getBook(), galatiansBook);
+				assertEquals(galatians_3_1.getChapter(), 3);
+				assertEquals(galatians_3_1.getFinalVerse(), 1);
+
+				Reference galatians_2_21 = galatians_3_1.previous(Reference.TYPE_VERSE).create();
+				assertEquals(galatians_2_21.getBook(), galatiansBook);
+				assertEquals(galatians_2_21.getChapter(), 2);
+				assertEquals(galatians_2_21.getFinalVerse(), 21);
+
+				//next, test a more complex case where the book also rolls over
+				Book matthewBook = bible.parseBook("Matthew");
+				assertNotNull(matthewBook);
+
+				Reference mark_1_1 = new Reference.Builder()
+						.setBible(bible)
+						.parseReference("Mark 1:1")
+						.create();
+
+				Reference matthew_28_20 = mark_1_1.previous(Reference.TYPE_VERSE).create();
+
+				assertEquals(matthew_28_20.getBook(), matthewBook);
+				assertEquals(matthew_28_20.getChapter(), 28);
+				assertEquals(matthew_28_20.getFinalVerse(), 20);
+
+				//finally, test most complex case where the book also rolls over to end of Bible
+				Book revelationBook = bible.parseBook("Revelation");
+				assertNotNull(revelationBook);
+
+				Reference genesis_1_1 = new Reference.Builder()
+						.setBible(bible)
+						.parseReference("Genesis 1:1")
+						.create();
+
+				Reference revelation_22_21 = genesis_1_1.previous(Reference.TYPE_VERSE).create();
+				assertEquals(revelation_22_21.getBook(), revelationBook);
+				assertEquals(revelation_22_21.getChapter(), 22);
+				assertEquals(revelation_22_21.getFinalVerse(), 21);
+
+				signal.countDown();
+			}
+		});
+
+		signal.await(120, TimeUnit.SECONDS);
+	}
 }

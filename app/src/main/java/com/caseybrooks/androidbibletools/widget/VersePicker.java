@@ -448,7 +448,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 			this.chapter = chapter;
 			tv.setText(Integer.toString(chapter));
 
-			if(chapter == builder.getChapter())
+			if(chapter == builder.getChapter() && !builder.checkFlag(Reference.Builder.DEFAULT_CHAPTER_FLAG))
 				root.setSelected(true);
 			else
 				root.setSelected(false);
@@ -516,7 +516,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 			this.verse = verse;
 			tv.setText(Integer.toString(verse));
 
-			if(builder.getVerses().contains(Integer.valueOf(verse)))
+			if(builder.getVerses().contains(Integer.valueOf(verse)) && !builder.checkFlag(Reference.Builder.DEFAULT_VERSES_FLAG))
 				root.setSelected(true);
 			else
 				root.setSelected(false);
@@ -527,13 +527,13 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 					public void onClick(View v) {
 						if(selectionMode == SELECTION_ONE_VERSE) {
 							builder.getVerses().clear();
-							builder.getVerses().add(Integer.valueOf(verse));
+							builder.addVerse(Integer.valueOf(verse));
 							if(listener != null)
 								listener.onReferenceCreated(builder);
 						}
 						if(selectionMode == SELECTION_MANY_VERSES) {
 							if(!builder.getVerses().contains(Integer.valueOf(verse)))
-								builder.getVerses().add(Integer.valueOf(verse));
+								builder.addVerse(Integer.valueOf(verse));
 							else
 								builder.getVerses().remove(Integer.valueOf(verse));
 

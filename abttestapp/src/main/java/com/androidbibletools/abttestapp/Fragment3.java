@@ -146,25 +146,19 @@ public class Fragment3 extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
+		final ABSPassage savedPassage = (ABSPassage) ABT.getInstance(getContext()).getSavedVerse("frag3");
 
-		final ABSBible bible = (ABSBible) ABT.getInstance(getContext()).getSavedBible("frag3");
-		if(bible != null) {
-			bible.download(new OnResponseListener() {
+		if(savedPassage != null) {
+			String subtitle = savedPassage.getReference().toString();
+			((MainActivity) getActivity()).toolbar.setSubtitle(subtitle);
+
+			((ABSBible) savedPassage.getReference().getBible()).download(new OnResponseListener() {
 				@Override
 				public void responseFinished() {
-					String reference = ABT.getInstance(getContext()).getSavedVerse("frag3").getReference().toString();
-
-					Reference.Builder builder = new Reference.Builder();
-					builder.setBible(bible);
-					builder.parseReference(reference);
-
-					final ABSPassage passage = new ABSPassage(builder.create());
-
-					((MainActivity) getActivity()).toolbar.setSubtitle(passage.getReference().toString());
-					passage.download(new OnResponseListener() {
+					savedPassage.download(new OnResponseListener() {
 						@Override
 						public void responseFinished() {
-							verseView.setVerse(passage);
+							verseView.setVerse(savedPassage);
 							next.setEnabled(true);
 							previous.setEnabled(true);
 						}

@@ -1,15 +1,22 @@
 package com.caseybrooks.androidbibletools.basic;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 /**
  * A base class for a single book in the Bible.
  */
 public abstract class Book {
-	private String name;
-	private String abbreviation;
-	private int location;
-	private ArrayList<Integer> chapters;
+	protected String name;
+	protected String abbreviation;
+	protected int location;
+	protected ArrayList<Integer> chapters;
+
+	public Book() {
+		chapters = new ArrayList<>();
+	}
 
 	/**
 	 * Set the name of this Book (i.e. Genesis)
@@ -132,11 +139,64 @@ public abstract class Book {
 	}
 
 	public boolean validateChapter(int chapter) {
-		return (chapter >= 1) && (chapter <= chapters.size());
+		return (chapter >= 1) && (chapter <= numChapters());
 	}
 
 	public boolean validateVerseInChapter(int chapter, int verse) {
 		return (numVersesInChapter(chapter) >= 1) && (verse >= 1) && (verse <= numVersesInChapter(chapter));
+	}
+
+	/**
+	 * Serialize this Book into a string that can be used to restore this Book from persistent
+	 * memory. Should serialize only that which is necessary to be able to identify this Book and
+	 * download the rest of the information. This would typically be the fully qualified class name
+	 * of this Book, and any IDs/API keys necessary.
+	 *
+	 * @return serialized String representation
+	 */
+	public String serialize() {
+		try {
+			JSONObject bookJSON = new JSONObject();
+			bookJSON.put("name", this.name);
+			bookJSON.put("abbreviation", this.abbreviation);
+			bookJSON.put("location", this.location);
+
+			JSONArray chapters = new JSONArray();
+			for(int chapter : getChapters()) {
+				chapters.put(chapter);
+			}
+			bookJSON.put("chapters", chapters);
+
+
+			return bookJSON.toString();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
+
+	/**
+	 * deserialize this Book from String.
+	 *
+	 * @see Book#serialize()
+	 */
+	public void deserialize(String string) {
+		try {
+			JSONObject bookJSON = new JSONObject(string);
+			this.name = bookJSON.getString("name");
+			this.abbreviation = bookJSON.getString("abbreviation");
+			this.location = bookJSON.getInt("location");
+
+			JSONArray jsonChapters = bookJSON.getJSONArray("chapters");
+			this.chapters = new ArrayList<>();
+			for(int i = 0; i < jsonChapters.length(); i++) {
+				this.chapters.add(jsonChapters.getInt(i));
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

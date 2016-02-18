@@ -46,7 +46,7 @@
                 android:text="Give me some verse text!"
                 android:fontFamily="serif"
                 android:textSize="16sp"
-                android:layout_margin="8dp"
+                android:padding="8dp"
                 app:verseDisplay="unformatted|html"
                 app:verseClass="com.caseybrooks.androidbibletools.providers.abs.ABSPassage"/>
         </android.support.v4.widget.NestedScrollView>
@@ -58,8 +58,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:enabled="false"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
             android:layout_margin="16dp"
             app:layout_anchor="@+id/textLayout"
             app:layout_anchorGravity="bottom|left|end"
@@ -73,8 +71,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:enabled="false"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_margin="16dp"
             app:layout_anchor="@+id/textLayout"
             app:layout_anchorGravity="bottom|right|end"

@@ -97,6 +97,12 @@ public final class Reference implements Comparable<Reference> {
 				: 1;
 	}
 
+	public int getFirstVerse() {
+		return (verses.size() > 0)
+				? verses.get(0)
+				: 1;
+	}
+
 	/**
 	 * Get a well-formatted String representation of this Reference. It contains all information
 	 * except the set Bible, and can be parsed in a Builder to create an equivalent object, assuming
@@ -145,7 +151,6 @@ public final class Reference implements Comparable<Reference> {
 
 		return refString;
 	}
-
 
 	public Reference.Builder next(int type) {
 		Reference.Builder builder = new Reference.Builder();
@@ -234,8 +239,6 @@ public final class Reference implements Comparable<Reference> {
 				: 1;
 	}
 
-
-	//TODO: create unit tests for previous verse navigation
 	public Reference.Builder previous(int type) {
 		Reference.Builder builder = new Reference.Builder();
 		builder.setBible(this.bible);
@@ -243,9 +246,8 @@ public final class Reference implements Comparable<Reference> {
 		if(type == TYPE_VERSE) {
 			int previousVerse = previousVerse();
 
-			if(this.verses.get(0) == 1) {
+			if(getFirstVerse() == 1) {
 				builder = previous(TYPE_CHAPTER);
-				builder.setVerses(previousVerse);
 			}
 			else {
 				builder.setBook(this.book);
@@ -254,24 +256,26 @@ public final class Reference implements Comparable<Reference> {
 			}
 		}
 		else if(type == TYPE_CHAPTER) {
-			int previousChapter = previousChapter();
-
 			if(this.chapter == 1) {
 				builder = previous(TYPE_BOOK);
-				builder.setChapter(previousChapter);
-				builder.setVerses(this.verses);
 			}
 			else {
+				int previousChapter = previousChapter();
+				int lastVerseInPreviousChapter = this.book.numVersesInChapter(previousChapter);
+
 				builder.setBook(this.book);
 				builder.setChapter(previousChapter);
-				builder.setVerses(this.verses);
+				builder.setVerses(lastVerseInPreviousChapter);
 			}
 		}
 		else if(type == TYPE_BOOK) {
 			Book previousBook = previousBook();
+			int lastChapterInPreviousBook = previousBook.numChapters();
+			int lastVerseInPreviousBook = previousBook.numVersesInChapter(previousBook.numChapters());
+
 			builder.setBook(previousBook);
-			builder.setChapter(this.chapter);
-			builder.setVerses(this.verses);
+			builder.setChapter(lastChapterInPreviousBook);
+			builder.setVerses(lastVerseInPreviousBook);
 		}
 
 		return builder;
@@ -310,7 +314,7 @@ public final class Reference implements Comparable<Reference> {
 		}
 		else {
 			Book previousBook = previousBook();
-			return previousBook().getChapters().get(previousBook.getChapters().size() - 1);
+			return previousBook().numVersesInChapter(previousBook.numChapters());
 		}
 	}
 
@@ -329,19 +333,14 @@ public final class Reference implements Comparable<Reference> {
 		else {
 			if(this.chapter > 1) {
 				int previousChapter = previousChapter();
-				return getBook().getChapters().get(previousChapter);
+				return getBook().numVersesInChapter(previousChapter);
 			}
 			else {
 				Book previousBook = previousBook();
-				return previousBook.getChapters().get(previousBook.getChapters().size() - 1);
+				return previousBook.numVersesInChapter(previousBook.numChapters());
 			}
 		}
 	}
-
-
-
-
-
 
 	/**
 	 * Compares two Reference with respect to natural reference order, according to the first
@@ -786,7 +785,6 @@ public final class Reference implements Comparable<Reference> {
 		 * @return this Builder, for chaining
 		 */
 		public Builder setChapter(int chapter) {
-
 			if(getBook().validateChapter(chapter)) {
 				this.chapter = chapter;
 				unsetFlag(DEFAULT_CHAPTER_FLAG);
@@ -889,11 +887,12 @@ public final class Reference implements Comparable<Reference> {
 		 */
 		public Builder addAllVersesInChapter() {
 			if(book.getChapters() != null
-					&& book.getChapters().size() > 0
+					&& book.numChapters() > 0
 					&& chapter >= 0
-					&& chapter < book.getChapters().size())
+					&& chapter <= book.numChapters())
 			{
 				this.verses = new ArrayList<>();
+
 				for(int i = 1; i <= book.numVersesInChapter(chapter); i++) {
 					this.verses.add(i);
 				}

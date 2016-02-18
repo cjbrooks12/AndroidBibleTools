@@ -5,11 +5,11 @@ import android.text.TextUtils;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.caseybrooks.androidbibletools.ABT;
 import com.caseybrooks.androidbibletools.basic.Reference;
 import com.caseybrooks.androidbibletools.data.Downloadable;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
-import com.caseybrooks.androidbibletools.io.CachingStringRequest;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -54,7 +54,7 @@ public class TopicalSearch implements Downloadable, Response.Listener<String>, R
 		String tag = "TopicalSearch";
 		String url = "http://www.openbible.info/topics/" + searchTerm.trim().replaceAll("\\s+", "_");
 
-		CachingStringRequest htmlObjReq = new CachingStringRequest(Request.Method.GET, url, this, this);
+		StringRequest htmlObjReq = new StringRequest(Request.Method.GET, url, this, this);
 		htmlObjReq.setShouldCache(false);
 
 		ABT.getInstance().addToRequestQueue(htmlObjReq, tag);

@@ -12,6 +12,8 @@ android:
     - android-23
 
     # Additional components
+    - sys-img-armeabi-v7a-android-21
+    - sys-img-x86-android-21
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository

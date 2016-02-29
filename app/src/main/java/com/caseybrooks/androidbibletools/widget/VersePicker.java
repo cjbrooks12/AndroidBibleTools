@@ -288,16 +288,21 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 		if(bible instanceof Downloadable) {
 			((Downloadable) bible).download(new OnResponseListener() {
 				@Override
-				public void responseFinished() {
-					selectedBibleName.setText("From " + bible.getName());
+				public void responseFinished(boolean success) {
+					if(success) {
+						selectedBibleName.setText("From " + bible.getName());
 
-					adapter = new VersePickerPagerAdapter();
-					viewPager.setAdapter(adapter);
-					tabLayout.setupWithViewPager(viewPager);
+						adapter = new VersePickerPagerAdapter();
+						viewPager.setAdapter(adapter);
+						tabLayout.setupWithViewPager(viewPager);
 
-					bookList.getAdapter().notifyDataSetChanged();
-					chapterList.getAdapter().notifyDataSetChanged();
-					verseList.getAdapter().notifyDataSetChanged();
+						bookList.getAdapter().notifyDataSetChanged();
+						chapterList.getAdapter().notifyDataSetChanged();
+						verseList.getAdapter().notifyDataSetChanged();
+					}
+					else {
+						//TODO: set up this
+					}
 				}
 			});
 		}

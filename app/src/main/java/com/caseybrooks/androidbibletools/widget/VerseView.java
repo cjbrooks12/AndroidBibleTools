@@ -80,8 +80,13 @@ public class VerseView extends TextView implements OnReferenceCreatedListener {
 		if(verse instanceof Downloadable) {
 			((Downloadable) verse).download(new OnResponseListener() {
 				@Override
-				public void responseFinished() {
-					displayText();
+				public void responseFinished(boolean success) {
+					if(success) {
+						displayText();
+					}
+					else {
+						//TODO: implement this
+					}
 				}
 			});
 		}

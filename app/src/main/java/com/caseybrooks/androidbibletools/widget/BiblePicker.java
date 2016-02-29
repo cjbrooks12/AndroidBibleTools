@@ -174,14 +174,19 @@ public class BiblePicker extends LinearLayout {
 			if(bibleList instanceof Downloadable) {
 				((Downloadable) bibleList).download(new OnResponseListener() {
 					@Override
-					public void responseFinished() {
-						adapter = new BibleListAdapter(context, bibleList.getBibles().values());
+					public void responseFinished(boolean success) {
+						if(success) {
+							adapter = new BibleListAdapter(context, bibleList.getBibles().values());
 
-						adapter.filterBy(filter.getText().toString());
-						bibleListView.setAdapter(adapter);
-						bibleListView.setVisibility(View.VISIBLE);
-						progressBar.setVisibility(View.GONE);
-						progressText.setVisibility(View.GONE);
+							adapter.filterBy(filter.getText().toString());
+							bibleListView.setAdapter(adapter);
+							bibleListView.setVisibility(View.VISIBLE);
+							progressBar.setVisibility(View.GONE);
+							progressText.setVisibility(View.GONE);
+						}
+						else {
+							//TODO: implement retry
+						}
 					}
 				});
 			}

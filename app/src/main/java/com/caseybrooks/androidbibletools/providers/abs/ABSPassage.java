@@ -84,7 +84,7 @@ public class ABSPassage extends Passage<ABSVerse> implements Downloadable, Respo
 	public void onErrorResponse(VolleyError error) {
 		error.printStackTrace();
 		if(listener != null) {
-			listener.responseFinished();
+			listener.responseFinished(false);
 		}
 	}
 
@@ -123,7 +123,7 @@ public class ABSPassage extends Passage<ABSVerse> implements Downloadable, Respo
 			}
 
 			if(listener != null) {
-				listener.responseFinished();
+				listener.responseFinished(true);
 			}
 		}
 		catch(JSONException e) {

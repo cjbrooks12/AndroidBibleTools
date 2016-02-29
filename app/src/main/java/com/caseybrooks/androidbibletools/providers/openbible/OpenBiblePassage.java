@@ -7,11 +7,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.caseybrooks.androidbibletools.ABT;
-import com.caseybrooks.androidbibletools.basic.Passage;
 import com.caseybrooks.androidbibletools.basic.Reference;
 import com.caseybrooks.androidbibletools.data.OnResponseListener;
 import com.caseybrooks.androidbibletools.providers.simple.SimplePassage;
-import com.caseybrooks.androidbibletools.providers.simple.SimpleVerse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,14 +79,14 @@ public class OpenBiblePassage extends SimplePassage implements Response.Listener
 	@Override
 	public void onErrorResponse(VolleyError error) {
 		if(listener != null) {
-			listener.responseFinished();
+			listener.responseFinished(false);
 		}
 	}
 
 	@Override
 	public void onResponse(String response) {
 		if(listener != null) {
-			listener.responseFinished();
+			listener.responseFinished(true);
 		}
 	}
 

@@ -202,7 +202,7 @@ public class CJBBible extends Bible<CJBBook> implements Downloadable, Response.L
 			}
 
 			if(listener != null) {
-				listener.responseFinished();
+				listener.responseFinished(true);
 			}
 		}
 		catch(JSONException e) {
@@ -215,7 +215,7 @@ public class CJBBible extends Bible<CJBBook> implements Downloadable, Response.L
 	public void onErrorResponse(VolleyError error) {
 		error.printStackTrace();
 		if(listener != null) {
-			listener.responseFinished();
+			listener.responseFinished(false);
 		}
 	}
 }

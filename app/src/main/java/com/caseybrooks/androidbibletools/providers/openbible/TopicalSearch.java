@@ -105,7 +105,7 @@ public class TopicalSearch implements Downloadable, Response.Listener<String>, R
 		}
 
 		if(listener != null) {
-			listener.responseFinished();
+			listener.responseFinished(true);
 		}
 	}
 
@@ -113,7 +113,7 @@ public class TopicalSearch implements Downloadable, Response.Listener<String>, R
 	public void onErrorResponse(VolleyError error) {
 		error.printStackTrace();
 		if(listener != null) {
-			listener.responseFinished();
+			listener.responseFinished(false);
 		}
 	}
 }

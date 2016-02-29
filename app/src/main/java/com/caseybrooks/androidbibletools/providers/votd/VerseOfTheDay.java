@@ -74,7 +74,7 @@ public class VerseOfTheDay implements Downloadable, Response.Listener<String>, R
 		passage.setTags(new Tag("VOTD"));
 
 		if(listener != null) {
-			listener.responseFinished();
+			listener.responseFinished(true);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class VerseOfTheDay implements Downloadable, Response.Listener<String>, R
 	public void onErrorResponse(VolleyError error) {
 		error.printStackTrace();
 		if(listener != null) {
-			listener.responseFinished();
+			listener.responseFinished(false);
 		}
 	}
 }

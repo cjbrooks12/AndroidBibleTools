@@ -24,4 +24,16 @@ public class SimplePassage extends Passage<SimpleVerse> {
 	public String getText() {
 		return text;
 	}
+
+	@Override
+	public String getFormattedText() {
+		String text = "";
+
+		text += formatter.onPreFormat(this);
+		text += formatter.onFormatVerseStart(reference.getVerses().get(0));
+		text += formatter.onFormatText(this.text);
+		text += formatter.onPostFormat();
+
+		return text.trim();
+	}
 }

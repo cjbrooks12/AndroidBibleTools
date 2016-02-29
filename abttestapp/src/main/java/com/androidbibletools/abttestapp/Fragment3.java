@@ -94,7 +94,7 @@ public class Fragment3 extends Fragment {
 				((MainActivity) getActivity()).toolbar.setSubtitle(passage.getReference().toString());
 				passage.download(new OnResponseListener() {
 					@Override
-					public void responseFinished() {
+					public void responseFinished(boolean success) {
 						ABT.getInstance(getContext()).saveVerse(passage, "frag3");
 						verseView.setVerse(passage);
 					}
@@ -113,7 +113,7 @@ public class Fragment3 extends Fragment {
 				((MainActivity) getActivity()).toolbar.setSubtitle(passage.getReference().toString());
 				passage.download(new OnResponseListener() {
 					@Override
-					public void responseFinished() {
+					public void responseFinished(boolean success) {
 						ABT.getInstance(getContext()).saveVerse(passage, "frag3");
 						verseView.setVerse(passage);
 					}
@@ -132,7 +132,7 @@ public class Fragment3 extends Fragment {
 				((MainActivity) getActivity()).toolbar.setSubtitle(passage.getReference().toString());
 				passage.download(new OnResponseListener() {
 					@Override
-					public void responseFinished() {
+					public void responseFinished(boolean success) {
 						ABT.getInstance(getContext()).saveVerse(passage, "frag3");
 						verseView.setVerse(passage);
 					}
@@ -154,10 +154,10 @@ public class Fragment3 extends Fragment {
 
 			((ABSBible) savedPassage.getReference().getBible()).download(new OnResponseListener() {
 				@Override
-				public void responseFinished() {
+				public void responseFinished(boolean success) {
 					savedPassage.download(new OnResponseListener() {
 						@Override
-						public void responseFinished() {
+						public void responseFinished(boolean success) {
 							verseView.setVerse(savedPassage);
 							next.setEnabled(true);
 							previous.setEnabled(true);

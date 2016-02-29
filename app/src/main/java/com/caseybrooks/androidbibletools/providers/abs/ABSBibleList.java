@@ -91,7 +91,7 @@ public class ABSBibleList extends BibleList<ABSBible> implements Response.Listen
 			}
 
 			if(listener != null) {
-				listener.responseFinished();
+				listener.responseFinished(true);
 			}
 		}
 		catch(JSONException e) {
@@ -104,7 +104,7 @@ public class ABSBibleList extends BibleList<ABSBible> implements Response.Listen
 	public void onErrorResponse(VolleyError error) {
 		error.printStackTrace();
 		if(listener != null) {
-			listener.responseFinished();
+			listener.responseFinished(false);
 		}
 	}
 }

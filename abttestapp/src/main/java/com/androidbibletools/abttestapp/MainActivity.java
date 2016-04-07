@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		ABT.getInstance(this)
 			.getMetadata().putString("ABS_ApiKey", "mDaM8REZFo6itplNpcv1ls8J5PkwEz1wbhJ7p9po");
 
+		ABT.getInstance(this)
+				.getMetadata().putString("JoshuaProject_ApiKey", "0aa708d44a81");
+
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
 

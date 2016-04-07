@@ -1,11 +1,14 @@
 package com.caseybrooks.androidbibletools;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.caseybrooks.androidbibletools.basic.AbstractVerse;
 import com.caseybrooks.androidbibletools.basic.Bible;
@@ -33,6 +36,7 @@ public class ABT {
 	private DatastoreHelper mDatastore;
 
 	private RequestQueue mRequestQueue;
+	private ImageLoader mImageLoader;
 
 	/**
 	 * DO NOT USE THIS METHOD! ABT requires an application Context to do any kind of data
@@ -111,6 +115,26 @@ public class ABT {
 		}
 
 		return mRequestQueue;
+	}
+
+	public ImageLoader getImageLoader() {
+		if(mImageLoader == null) {
+			mImageLoader = new ImageLoader(getRequestQueue(), new ImageLoader.ImageCache() {
+				private final LruCache<String, Bitmap> cache = new LruCache<String, Bitmap>(20);
+
+				@Override
+				public Bitmap getBitmap(String url) {
+					return cache.get(url);
+				}
+
+				@Override
+				public void putBitmap(String url, Bitmap bitmap) {
+					cache.put(url, bitmap);
+				}
+			});
+		}
+
+		return mImageLoader;
 	}
 
 	/**

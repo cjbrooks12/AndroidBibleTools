@@ -85,6 +85,7 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 
 		int attrSelectionMode = SELECTION_MANY_VERSES;
 
+		selectionModeChangeButton = (Button) findViewById(R.id.selection_mode_button);
 		if(attrs != null) {
 			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.abt_versepicker, 0, 0);
 			attrSelectionMode = a.getInt(R.styleable.abt_versepicker_selectionMode, SELECTION_MANY_VERSES);
@@ -124,7 +125,6 @@ public class VersePicker extends LinearLayout implements OnBibleSelectedListener
 
 		bookList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.LIST_VERTICAL));
 
-		selectionModeChangeButton = (Button) findViewById(R.id.selection_mode_button);
 		selectionModeChangeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

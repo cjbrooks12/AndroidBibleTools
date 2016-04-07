@@ -6,30 +6,14 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
-        <com.caseybrooks.androidbibletools.widget.BiblePicker
-            android:id="@+id/biblepicker"
-            android:layout_width="360dp"
-            android:layout_height="match_parent"
-            app:bibleListClass="com.caseybrooks.androidbibletools.providers.abs.ABSBibleList"
-            app:tag="Fragment4"
-            app:connectTo="@+id/versepicker"/>
-        <com.caseybrooks.androidbibletools.widget.VersePicker
-            android:id="@+id/versepicker"
-            android:layout_width="360dp"
-            android:layout_height="match_parent"
-            app:tag="Fragment4"
-            app:connectTo="@+id/verseview"
-            app:selectionMode="oneverse"/>
-        <ScrollView
-            android:layout_width="360dp"
-            android:layout_height="match_parent">
-            <com.caseybrooks.androidbibletools.widget.VerseView
-                android:id="@+id/verseview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:verseDisplay="html|formatted"
-                app:verseClass="com.caseybrooks.androidbibletools.providers.abs.ABSPassage"/>
-        </ScrollView>
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/joshuaProjectImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/joshuaProjectPGName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 </HorizontalScrollView>

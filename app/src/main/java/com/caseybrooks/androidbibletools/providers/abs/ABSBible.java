@@ -95,7 +95,7 @@ public class ABSBible extends Bible<ABSBook> implements Downloadable, Response.L
 		this.listener = listener;
 
 		String tag = "ABSBible";
-		String url = "http://" + APIKey + ":x@bibles.org/v2/versions/" + id + "/books.js?include_chapters=true";
+		String url = "https://" + APIKey + ":x@bibles.org/v2/versions/" + id + "/books.js?include_chapters=true";
 
 		CachingStringRequest jsonObjReq = new CachingStringRequest(
 				Request.Method.GET,

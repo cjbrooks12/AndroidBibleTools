@@ -56,7 +56,7 @@ public class ABSPassage extends Passage<ABSVerse> implements Downloadable, Respo
 		this.listener = listener;
 
 		String tag = "ABSBible";
-		String url = "http://" + APIKey + ":x@bibles.org/v2/chapters/" + id + "/verses.js?include_marginalia=false";
+		String url = "https://" + APIKey + ":x@bibles.org/v2/chapters/" + id + "/verses.js?include_marginalia=false";
 
 		CachingStringRequest jsonObjReq = new CachingStringRequest(Request.Method.GET, url, this, this) {
 			@Override

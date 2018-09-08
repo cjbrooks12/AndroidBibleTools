@@ -41,7 +41,7 @@ public class ABSBibleList extends BibleList<ABSBible> implements Response.Listen
 		this.listener = listener;
 
 		String tag = "ABSBibleList";
-		String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/versions.js";
+		String url = "https://" + APIKey + ":x@bibles.org/v2/versions.js";
 
 		CachingStringRequest jsonObjReq = new CachingStringRequest(Request.Method.GET, url, this, this) {
 			@Override

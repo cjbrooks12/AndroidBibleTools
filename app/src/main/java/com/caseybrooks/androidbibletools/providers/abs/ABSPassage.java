@@ -45,7 +45,7 @@ public class ABSPassage extends Passage implements Downloadable {
 	@Override
 	public Document getDocument() throws IOException {
 		if(reference != null) {
-			String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/chapters/" +
+			String url = "https://" + APIKey + ":x@bibles.org/v2/chapters/" +
 					id + "/verses.xml?include_marginalia=false";
 
 			String header = APIKey + ":x";

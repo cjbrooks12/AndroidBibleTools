@@ -129,7 +129,7 @@ public class ABSBible extends Bible implements Downloadable {
 
 	@Override
 	public Document getDocument() throws IOException {
-		String url = "http://" + APIKey + ":x@bibles.org/v2/versions/" +
+		String url = "https://" + APIKey + ":x@bibles.org/v2/versions/" +
 				id + "/books.xml?include_chapters=true";
 
 		String header = APIKey + ":x";
@@ -212,7 +212,7 @@ public class ABSBible extends Bible implements Downloadable {
 	 * @see com.caseybrooks.androidbibletools.providers.abs.ABSBible#parseAvailableVersions(org.jsoup.nodes.Document)
 	 */
 	public static Document availableVersionsDoc(String APIKey, @Optional String languageAbbr) throws IOException {
-		String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/versions.xml";
+		String url = "https://" + APIKey + ":x@bibles.org/v2/versions.xml";
 		if(languageAbbr != null) { url += "?language=" + languageAbbr; }
 
 		String header = APIKey + ":x";

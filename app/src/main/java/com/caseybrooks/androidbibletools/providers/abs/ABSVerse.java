@@ -44,7 +44,7 @@ public class ABSVerse extends Verse implements Downloadable {
 
 	@Override
 	public Document getDocument() throws IOException {
-		String url = "http://" + APIKey + ":x@api-v2.bibles.org/v2/chapters/" +
+		String url = "https://" + APIKey + ":x@bibles.org/v2/chapters/" +
 				id + "/verses.xml?include_marginalia=false";
 
 		String header = APIKey + ":x";

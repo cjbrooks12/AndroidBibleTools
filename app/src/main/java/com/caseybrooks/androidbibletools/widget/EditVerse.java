@@ -1,9 +1,9 @@
 package com.caseybrooks.androidbibletools.widget;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.Html;
 import android.util.AttributeSet;
-import android.widget.EditText;
 
 import com.caseybrooks.androidbibletools.basic.AbstractVerse;
 import com.caseybrooks.androidbibletools.basic.Bible;
@@ -17,7 +17,7 @@ import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
  * include formatting tags as they will be considered part of the verse's text),
  * but does support the same kind of automatic downloading and caching.
  */
-public class EditVerse extends EditText implements IVerseView, IVerseViewListener {
+public class EditVerse extends AppCompatEditText implements IVerseView, IVerseViewListener {
 //Data Members
 //------------------------------------------------------------------------------
 	Context context;

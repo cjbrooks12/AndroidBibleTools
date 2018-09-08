@@ -14,6 +14,12 @@ public class BiblePickerDialog extends AlertDialog {
         return dialog;
 	}
 
+    public static BiblePickerDialog create(Context context) {
+        BiblePickerDialog dialog = new BiblePickerDialog(context);
+        dialog.loadBibleList();
+        return dialog;
+    }
+
 	protected BiblePickerDialog(Context context) {
 		super(context);
 

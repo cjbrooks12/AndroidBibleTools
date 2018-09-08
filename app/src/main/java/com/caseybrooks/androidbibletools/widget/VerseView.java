@@ -1,6 +1,7 @@
 package com.caseybrooks.androidbibletools.widget;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.widget.TextView;
@@ -20,7 +21,7 @@ import com.caseybrooks.androidbibletools.providers.abs.ABSPassage;
  * the user's preferred Bible, and pulls the Bible to download from those classes,
  * which is persisted automatically into SharedPreferences.
  */
-public class VerseView extends TextView implements IVerseView, IVerseViewListener {
+public class VerseView extends AppCompatTextView implements IVerseView, IVerseViewListener {
 //Data Members
 //------------------------------------------------------------------------------
 	Context context;

@@ -1,11 +1,11 @@
 package com.caseybrooks.androidbibletools.widget;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 
 import com.caseybrooks.androidbibletools.basic.Bible;
 import com.caseybrooks.androidbibletools.basic.Book;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
  * chapter of the Bible, so that the entire chapter could be displayed, for example
  * as part of a Bible reader app.
  */
-public class ReferencePicker extends AutoCompleteTextView implements IReferencePicker, IReferencePickerListener {
+public class ReferencePicker extends AppCompatAutoCompleteTextView implements IReferencePicker, IReferencePickerListener {
 //Data Members
 //------------------------------------------------------------------------------
 	Context context;
